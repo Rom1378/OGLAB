@@ -18,6 +18,8 @@ using namespace std::chrono;
 #include "../CORE/SphereRenderer.hpp"
 #include "../CORE/SpherePhysics.hpp"
 
+#include "../CORE/Prefabs/PrefabManager.hpp"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -88,8 +90,46 @@ public:
     }
 };
 
+void registerPrefabs() {
+    // Register a Cube prefab
+    PrefabManager::registerPrefab(
+        PrefabDefinition("CubePrefab", [](std::shared_ptr<GameObject> obj) {
+            // Add required components
+            auto cubeRenderer = obj->addComponent<CubeRenderer>();
+            auto cubePhysics = obj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
+            cubePhysics->setMass(10);
+            })
+        .setDefaultPosition(glm::vec3(0.0f, 20.0f, 0.0f))
+                );
+
+    // Register a Sphere prefab
+    PrefabManager::registerPrefab(
+        PrefabDefinition("SpherePrefab", [](std::shared_ptr<GameObject> obj) {
+            auto sphereRenderer = obj->addComponent<SphereRenderer>();
+            auto spherePhysics = obj->addComponent<SpherePhysics>(PhysicsComponent::Type::DYNAMIC);
+            spherePhysics->setMass(10);
+            })
+        .setDefaultPosition(glm::vec3(0.0f, 10.0f, 0.0f))
+
+
+                );
+
+    // Register a Ground/World prefab
+    PrefabManager::registerPrefab(
+        PrefabDefinition("WorldPrefab", [](std::shared_ptr<GameObject> obj) {
+            obj->setScale(glm::vec3(100.0f, 1.0f, 100.0f));
+            obj->addComponent<CubeRenderer>();
+            obj->addComponent<CubePhysics>();
+            })
+        .setDefaultPosition(glm::vec3(0.0f, -10.0f, 0.0f))
+                );
+}
+
 
 int main() {
+	// register prefabs
+	registerPrefabs();
+
     // Initialize window
     Window::WindowProps props;
     props.title = "CLC";
@@ -97,6 +137,7 @@ int main() {
     props.height = 720;
     Window::init(props);
     std::cout << Window::isVSync() << std::endl;
+
 
     // Initialize input
     Input::init();
@@ -118,9 +159,11 @@ int main() {
         cubeObj->setPosition(glm::vec3(0.0f, 10.0f, -30.0f)); // Positionner le cube au centre
         auto cubeRenderer = cubeObj->addComponent<CubeRenderer>();
         auto cubePhysics = cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
-
         cubePhysics->setMass(10);
         scene.addGameObject(cubeObj);
+
+        //add cube prefab
+		auto prefCube = PrefabManager::instantiate("CubePrefab", scene);
 
         //sphere
         auto sphereObj = std::make_shared<GameObject>("Sphere");
@@ -134,7 +177,7 @@ int main() {
         spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
         auto world = std::make_shared<GameObject>("World");
         world->setScale(glm::vec3(100.0f, 1.0f, 100.0f));
-        world->setPosition(glm::vec3(0.0f, -10.0f, 0.0f));
+        world->setPosition(glm::vec3(0.0f, -50.0f, 0.0f));
         world->addComponent<CubeRenderer>();
         world->addComponent<CubePhysics>();
         scene.addGameObject(world);
@@ -171,6 +214,26 @@ int main() {
         scene.update(deltaTime);
         scene.render();
 
+
+        ///////
+
+        {
+            //instanciate a cube every seconds at 0 40 0
+			static float timer = 0.0f;
+			timer += deltaTime;
+			if (timer > 1.0f)
+			{
+				timer = 0.0f;
+				PrefabManager::instantiate("CubePrefab", scene, glm::vec3(0.0f, 40.0f, 0.0f));
+
+            }
+
+
+        }
+
+
+        ///////
+
         Window::drawImGuiInterface();
 
         //draw data of the object touching the ray
@@ -181,6 +244,12 @@ int main() {
 		//raycast(pxscene*, origin, direction, maxDistance, hitInfo, filterData, queryFlags, maxHits, hitCall, hitBlock)
 		if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, cameraDir, 1000.0f, hitInfo)) {
 			ImGui::Text("Hit object at: %f, %f, %f", hitInfo.position.x, hitInfo.position.y, hitInfo.position.z);
+
+            //if click p, create one cube at this position
+			if (Input::isKeyJustPressed(GLFW_KEY_P))
+            {
+				PrefabManager::instantiate("CubePrefab", scene, glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+			}
 
 			//check if user data is not null and if not null detect wich class it is from
 			GameObject* obj = static_cast<GameObject*>(hitInfo.actor->userData);

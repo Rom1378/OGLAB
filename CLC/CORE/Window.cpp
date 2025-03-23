@@ -18,7 +18,7 @@ namespace Window
 		float frameBufferWidth;
 		float frameBufferHeight;
 
-		const uint32_t sizeArrayFps = 400;
+		const uint32_t sizeArrayFps = 20;
 		float lastFPS[sizeArrayFps];
 		uint32_t indexFPS = 0;
 		float lastTime = 0.0f;

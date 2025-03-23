@@ -14,14 +14,7 @@ public:
 
 
 	void init() override {
-		// Cube vertices with positions and normals (no duplicates)
-		
-		//print vertices
-		for (int i = 0; i < vertices.size(); i++)
-		{
-			std::cout << vertices[i] << std::endl;
-		}
-
+	
 		// Generate and bind VAO, VBO, and EBO
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);

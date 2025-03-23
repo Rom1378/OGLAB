@@ -150,9 +150,6 @@
     <None Include="CORE\shaders\standard.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="CORE\Component.cpp" />
     <ClCompile Include="CORE\Engine.cpp" />
     <ClCompile Include="CORE\GameObject.cpp" />
@@ -160,6 +157,7 @@
     <ClCompile Include="CORE\Input.cpp" />
     <ClCompile Include="CORE\Physics.cpp" />
     <ClCompile Include="CORE\PhysicsComponent.cpp" />
+    <ClCompile Include="CORE\Prefabs\PrefabManager.cpp" />
     <ClCompile Include="CORE\RenderComponent.cpp" />
     <ClCompile Include="CORE\Scene.cpp" />
     <ClCompile Include="CORE\Shader.cpp" />
@@ -184,6 +182,9 @@
     <ClInclude Include="CORE\Physics.hpp" />
     <ClInclude Include="CORE\PhysicsComponent.hpp" />
     <ClInclude Include="CORE\PhysicsScene.hpp" />
+    <ClInclude Include="CORE\Prefabs\Prefab.hpp" />
+    <ClInclude Include="CORE\Prefabs\PrefabDefinition.hpp" />
+    <ClInclude Include="CORE\Prefabs\PrefabManager.hpp" />
     <ClInclude Include="CORE\RenderComponent.hpp" />
     <ClInclude Include="CORE\Scene.hpp" />
     <ClInclude Include="CORE\Shader.hpp" />
