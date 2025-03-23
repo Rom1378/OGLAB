@@ -162,6 +162,12 @@ int main() {
         cubePhysics->setMass(10);
         scene.addGameObject(cubeObj);
 
+		// Load texture
+		auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
+		cubeRenderer->addTexture(txtr);
+
+
+
         //add cube prefab
 		auto prefCube = PrefabManager::instantiate("CubePrefab", scene);
 
@@ -181,6 +187,9 @@ int main() {
         world->addComponent<CubeRenderer>();
         world->addComponent<CubePhysics>();
         scene.addGameObject(world);
+
+        auto doogtxtr = TextureManager::loadTexture("res/textures/doog.PNG", "doog.PNG");
+		world->getComponent<RenderComponent>()->addTexture(doogtxtr);
 
         auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
         camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
@@ -225,10 +234,7 @@ int main() {
 			{
 				timer = 0.0f;
 				PrefabManager::instantiate("CubePrefab", scene, glm::vec3(0.0f, 40.0f, 0.0f));
-
             }
-
-
         }
 
 

@@ -45,10 +45,8 @@ public:
 		setShader("standard");
 		m_shader->use();
 
-		// Load texture
-		auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
-		addTexture(txtr);
-		m_shader->setInt("texture1", 0);
+		this->m_color = glm::vec3(111.0f, 221.0f, 0.2f);
+
 	}
 
 	void draw(const glm::mat4& view, const glm::mat4& projection) override {
@@ -56,9 +54,12 @@ public:
 
 		m_shader->use();
 
-		// Set uniforms
+		// Set uniforms for textures
 
-		bindTextures();
+		m_shader->setBool("useTexture", !m_textures.empty());
+		if (!m_textures.empty())
+			bindTextures();
+
 
 		m_shader->setMat4("model", glm::value_ptr(this->getGameObject()->getModelMatrix()));
 		m_shader->setMat4("view", glm::value_ptr(view));
@@ -69,10 +70,14 @@ public:
 		m_shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 		m_shader->setVec3("objectColor", 1.0f, 1.0f, 0.2f);
 
+
 		// Draw cube using indices
 		glBindVertexArray(VAO);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+
+		if (!m_textures.empty())
+			unBindTextures();
 	}
 
 	~CubeRenderer() {

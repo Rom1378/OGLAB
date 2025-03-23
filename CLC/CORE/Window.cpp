@@ -320,6 +320,7 @@ namespace Window
 		ImVec2 pos = ImGui::GetCursorScreenPos();
 		ImVec2 avail = ImGui::GetContentRegionAvail();
 
+
         //update viewport
 		glViewport((int)pos.x, (int)pos.y, (int)avail.x, (int)avail.y);
 

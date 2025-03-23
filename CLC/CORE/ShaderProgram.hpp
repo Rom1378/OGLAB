@@ -30,6 +30,7 @@ public:
     void setMat4(const std::string& name, const float* value);
     //textures
 	void setTexture(const std::string& name, int texture, int slot);
+	void setBool(const std::string& name, bool value);
 
 private:
     GLuint m_program;

@@ -160,3 +160,8 @@ void ShaderProgram::setTexture(const std::string& name, int texture, int slot)
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(glGetUniformLocation(m_program, name.c_str()), slot);
 }
+
+void ShaderProgram::setBool(const std::string& name, bool value)
+{
+	glUniform1i(glGetUniformLocation(m_program, name.c_str()), value);
+}

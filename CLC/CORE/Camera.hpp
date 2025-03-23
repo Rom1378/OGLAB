@@ -54,6 +54,13 @@ public:
 	const glm::vec3& getRight() const { return m_right; }
 	const glm::vec3& getUp() const { return m_up; }
 
+	void setAspectRatio(float ratio) {
+		if (aspectRatio != ratio) {
+			aspectRatio = ratio;
+			updateProjection();
+		}
+	}
+
 
 	void updateView() {
 			// Calculate the camera's orientation vectors based on its rotation

@@ -19,6 +19,13 @@ namespace TextureManager
 
 	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name)
 	{
+		//first check if the texture hasnt already been loaded :
+		auto it = Internal::textures.find(name);
+		if (it != Internal::textures.end())
+		{
+			return it->second;
+		}
+
 		auto texture = std::make_shared<Texture>();
 		texture->id = 0;
 		texture->width = 0;

@@ -12,25 +12,25 @@ uniform vec3 lightColor;  // Light color
 uniform vec3 objectColor; // Object color
 
 uniform sampler2D texture1;
+uniform bool useTexture; // New uniform
 
 void main() {
-    // Ambient lighting
+    // Lighting
     float ambientStrength = 0.1;
     vec3 ambient = ambientStrength * lightColor;
-
-    // Diffuse lighting
-    vec3 norm = normalize(Normal);  // Normalize the normal
-    vec3 lightDir = normalize(lightPos - FragPos);  // Light direction
-    float diff = max(dot(norm, lightDir), 0.0);  // Diffuse intensity
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
+    float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
-
-    // Combine ambient and diffuse lighting
-    vec3 result = (ambient + diffuse) * objectColor;
     
-    //apply texture
-    vec4 texColor = texture(texture1, TexCoords);
-    result *= texColor.rgb;
+    // Base color
+    vec3 result = (ambient + diffuse) * objectColor;
+
+    // Apply texture if enabled
+    if (useTexture) {
+        vec4 texColor = texture(texture1, TexCoords);
+        result *= texColor.rgb;
+    }
 
     FragColor = vec4(result, 1.0);
-
 }

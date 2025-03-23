@@ -8,6 +8,7 @@
 #include "InterfaceRenderer.hpp"
 #include "Shader.hpp"
 #include "TextureManager.hpp"
+#include <iostream>
 
 
 class RenderComponent : public Component
@@ -44,7 +45,13 @@ public:
 
 	void addTexture(const std::string& textureName)
 	{
-		m_textures.push_back(TextureManager::getTexture(textureName));
+		auto texture = TextureManager::getTexture(textureName);
+		if (texture) {
+			m_textures.push_back(texture);
+		}
+		else {
+			std::cerr << "Failed to load texture: " << textureName << std::endl;
+		}
 	}
 
 	void addTexture(std::shared_ptr<Texture> texture)
@@ -58,6 +65,16 @@ public:
 		{
 			glActiveTexture(GL_TEXTURE0 + i);
 			glBindTexture(GL_TEXTURE_2D, m_textures[i]->id);
+			std::string uniformName = "texture" + std::to_string(i + 1);
+			m_shader->setInt(uniformName, i);
+		}
+	}
+
+	void unBindTextures() {
+		for (unsigned int i = 0; i < m_textures.size(); i++)
+		{
+			glActiveTexture(GL_TEXTURE0 + i);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
 
