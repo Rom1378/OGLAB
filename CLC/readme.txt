@@ -1,1 +1,0 @@
-vcpkg install glm glfw3 assimp glad imgui imgui[glfw-binding] imgui[opengl3-binding] physx imgui[docking-experimental]
