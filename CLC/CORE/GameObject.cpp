@@ -25,3 +25,15 @@ void GameObject::setPosition(const glm::vec3& position) {
 		physicsComponent->setPosition(position);
 	}
 }
+
+// Set rotation and update physics component if exists
+void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
+
+	Transform::setRotation(rotation);
+
+	if (update_physx) {
+		if (auto physicsComponent = getComponent<PhysicsComponent>())
+			physicsComponent->setRotation(rotation);
+	}
+}
+

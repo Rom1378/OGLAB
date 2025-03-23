@@ -44,7 +44,7 @@ public:
 	// Set the position and rotation of the physics body from the GameObject
 	void setRotation(const glm::vec3& rotation) {
 		if (body) {
-			PxQuat quat = PxQuat(glm::radians(rotation.x), PxVec3(1, 0, 0)) *
+			PxQuat quat = PxQuat(glm::radians(rotation.x), PxVec3(-1, 0, 0)) *
 				PxQuat(glm::radians(rotation.y), PxVec3(0, 1, 0)) *
 				PxQuat(glm::radians(rotation.z), PxVec3(0, 0, 1));
 			body->setGlobalPose(PxTransform(body->getGlobalPose().p, quat));

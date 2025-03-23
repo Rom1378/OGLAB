@@ -3,7 +3,7 @@
 
 PhysicsComponent::PhysicsComponent(Type t) {
 	// Here you can initialize material or perform other initialization
-	material = Physics::getPhysics()->createMaterial(0.5f, 0.5f, 0.6f); // Friction & restitution
+	material = Physics::getPhysics()->createMaterial(0.5f, 0.5f, 0.2f); // Friction & restitution
 
 	if (body)
 		body->release();
@@ -63,15 +63,17 @@ void PhysicsComponent::setLinearVelocity(const glm::vec3& velocity) {
 void PhysicsComponent::updateTransform() {
 	if (body) {
 		PxTransform transform = body->getGlobalPose();
+
 		getGameObject()->setPosition(glm::vec3(transform.p.x, transform.p.y, transform.p.z));
 
-		// Correctly convert PxQuat to Euler angles (in radians)
-		glm::vec3 eulerAngles = glm::eulerAngles(glm::quat(transform.q.x, -transform.q.y, transform.q.z, transform.q.w));
-		getGameObject()->setRotation(glm::degrees(eulerAngles));  // Convert to degrees
+		// Convertir correctement PxQuat en angles d'Euler (en radians)
+		glm::quat rotationQuat(transform.q.w, -transform.q.x, transform.q.y, transform.q.z);
+		glm::vec3 eulerAngles = glm::eulerAngles(rotationQuat);
+
+		// Ne mettez à jour la rotation que si elle n'a pas été modifiée par l'utilisateur
+			getGameObject()->setRotation(glm::degrees(eulerAngles), false);  // Convertir en degrés
 	}
-
-
-}
+	}
 
 
 void CubePhysics::init() {

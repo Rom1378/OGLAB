@@ -32,6 +32,13 @@ public:
 		return model;
 	}
 
+
+	bool isRotationUpdated() const { return rotationUpdated; }
+	void resetRotationUpdated() { rotationUpdated = false; }
+
+
+	bool rotationUpdated = false;
+
 protected:
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;

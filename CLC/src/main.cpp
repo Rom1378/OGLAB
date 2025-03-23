@@ -207,7 +207,7 @@ int main() {
                     glm::vec3 pos = seletctedGM->getPosition();
                     glm::vec3 rot = seletctedGM->getRotation();
                     ImGui::SliderFloat3("Position", glm::value_ptr(pos), -100.0f, 100.0f);
-                    ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -180.0f, 180.0f);
+                    ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -1.0f, 1.0f);
                     seletctedGM->setPosition(pos);
                     seletctedGM->setRotation(rot);
 

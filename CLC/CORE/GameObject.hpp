@@ -66,6 +66,9 @@ public:
 	// Set position and update physics component if exists
 	void setPosition(const glm::vec3& position);
 
+	//set rotation and update physics component if exists
+	void setRotation(const glm::vec3& rotation, bool update_physx = true);
+
 	const char* getName() const { return m_name.c_str(); }
 	
 private:
