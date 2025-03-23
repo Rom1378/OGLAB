@@ -1,0 +1,20 @@
+{
+  "standard": {
+    "vertex": "res\\shaders\\standard.vert",
+    "fragment": "res\\shaders\\standard.frag",
+    "defines": {
+      "MAX_LIGHTS": "4"
+    }
+  },
+  "sphere": {
+    "vertex": "res\\shaders\\sphere.vert",
+    "fragment": "res\\shaders\\sphere.frag",
+    "defines": {
+      "MAX_LIGHTS": "4"
+    }
+  },
+  "cursor": {
+    "vertex": "res\\shaders\\cursor.vert",
+    "fragment": "res\\shaders\\cursor.frag"
+  }
+}

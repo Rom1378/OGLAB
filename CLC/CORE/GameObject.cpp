@@ -1,0 +1,27 @@
+#include "GameObject.hpp"
+#include "PhysicsComponent.hpp"
+
+
+// Update all components
+void GameObject::update(float dt) {
+	for (auto& component : m_components) {
+		component->update(dt);
+	}
+}
+
+// Render if has RenderComponent
+void GameObject::render(const glm::mat4& view, const glm::mat4& projection) {
+	if (auto renderComponent = getComponent<RenderComponent>()) {
+		renderComponent->draw(view, projection);
+	}
+}
+
+// Set position and update physics component if exists
+void GameObject::setPosition(const glm::vec3& position) {
+
+	Transform::setPosition(position);
+
+	if (auto physicsComponent = getComponent<PhysicsComponent>()) {
+		physicsComponent->setPosition(position);
+	}
+}
