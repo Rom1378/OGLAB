@@ -45,7 +45,6 @@ public:
 		setShader("standard");
 		m_shader->use();
 
-		this->m_color = glm::vec3(111.0f, 221.0f, 0.2f);
 
 	}
 
@@ -68,7 +67,7 @@ public:
 		// Set lighting uniforms
 		m_shader->setVec3("lightPos", 3.2f, 1.0f, 2.0f);
 		m_shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		m_shader->setVec3("objectColor", 1.0f, 1.0f, 0.2f);
+		m_shader->setVec4("objectColor", m_color.x, m_color.y, m_color.z, m_color.w);
 
 
 		// Draw cube using indices

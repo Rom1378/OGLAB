@@ -16,6 +16,7 @@ class RenderComponent : public Component
 
 
 public:
+	RenderComponent() : Component(), m_color(glm::vec4(255 / 255.0f,100 / 255.0f,200 / 255.0f,100/255.0f)), m_renderer(nullptr), m_shader(nullptr) {}
 	virtual void draw(const glm::mat4& view, const glm::mat4& projection) = 0;
 	virtual void draw()  {};
 
@@ -36,9 +37,13 @@ public:
 
 	void setColor(const glm::vec3& color)
 	{
+		m_color = glm::vec4(color, 1.0f);;
+	}
+
+	void setColor(const glm::vec4& color) {
 		m_color = color;
 	}
-	glm::vec3 getColor() const
+	glm::vec4 getColor() const
 	{
 		return m_color;
 	}
@@ -84,7 +89,7 @@ protected:
 	std::shared_ptr<InterfaceRenderer> m_renderer;
 	std::shared_ptr<ShaderProgram> m_shader;
 	//color
-	glm::vec3 m_color;
+	glm::vec4 m_color;
 
 	unsigned int VAO, VBO, EBO;
 
