@@ -16,7 +16,7 @@ class RenderComponent : public Component
 
 
 public:
-	RenderComponent() : Component(), m_color(glm::vec4(255 / 255.0f,100 / 255.0f,200 / 255.0f,100/255.0f)), m_renderer(nullptr), m_shader(nullptr) {}
+	RenderComponent() : Component(), m_color(glm::vec4(1,1,1,1)), m_renderer(nullptr), m_shader(nullptr), VAO(0), VBO(0), EBO(0) { }
 	virtual void draw(const glm::mat4& view, const glm::mat4& projection) = 0;
 	virtual void draw()  {};
 

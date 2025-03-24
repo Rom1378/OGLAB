@@ -61,6 +61,42 @@ public:
 		}
 	}
 
+	float getAspectRatio() const {
+		return aspectRatio;
+	}
+
+	void setFOV(float f) {
+		if (fov != f) {
+			fov = f;
+			updateProjection();
+		}
+	}
+
+	float getFOV() const {
+		return fov;
+	}
+
+	void setNearPlane(float near) {
+		if (nearPlane != near) {
+			nearPlane = near;
+			updateProjection();
+		}
+	}
+	void setFarPlane(float far) {
+		if (farPlane != far) {
+			farPlane = far;
+			updateProjection();
+		}
+	}
+
+	float getNearPlane() const {
+		return nearPlane;
+	}
+
+	float getFarPlane() const {
+		return farPlane;
+	}
+
 
 	void updateView() {
 			// Calculate the camera's orientation vectors based on its rotation

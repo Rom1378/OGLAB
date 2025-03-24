@@ -13,7 +13,6 @@ namespace Window
         inline GLFWwindow* m_window = nullptr;
         inline WindowProps m_props;
         GLuint fbo, texture, rbo;
-        void framebuffer_size_callback(GLFWwindow* window, int width, int height);
         //opengl scene size 
 		float frameBufferWidth;
 		float frameBufferHeight;
@@ -65,7 +64,6 @@ namespace Window
         }
 
         glfwMakeContextCurrent(Internal::m_window);
-        glfwSetFramebufferSizeCallback(Internal::m_window, Internal::framebuffer_size_callback);
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
         {
@@ -136,8 +134,8 @@ namespace Window
     void clear()
     {
         glBindFramebuffer(GL_FRAMEBUFFER, Window::Internal::fbo);
-        glViewport(0, 0, Window::getWidth(), Window::getHeight());
-
+        //glViewport(0, 0, Window::getWidth(), Window::getHeight());
+		glViewport(0, 0, Window::getFrameBufferWidth(), Window::getFrameBufferHeight());
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
@@ -186,18 +184,6 @@ namespace Window
     {
         Internal::m_props.vsync = enabled;
         glfwSwapInterval(enabled ? 1 : 0);
-    }
-
-    namespace Internal
-    {
-        void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-        {
-			std::cout << "Framebuffer resized to " << width << "x" << height << std::endl;
-            m_props.width = width;
-            m_props.height = height;
-            glViewport(0, 0, width, height);
-
-        }
     }
 
     void CreateFramebuffer(int width, int height) {
@@ -265,6 +251,11 @@ namespace Window
 
 		Internal::frameBufferWidth = width;
 		Internal::frameBufferHeight = height;
+
+		//should update camera data. (aspect ratio and camera center moved)
+       
+
+
     }
 
     GLuint getFramebufferTexture()
@@ -350,6 +341,14 @@ namespace Window
                 Input::setMouseLocked(false);
             }
         }
+
+		//viewports 
+		ImGui::Begin("Viewport");
+		ImGui::Text("Viewport size: %.0f x %.0f", avail.x, avail.y);
+        //pos
+		ImGui::Text("Viewport position: %.0f x %.0f", pos.x, pos.y);
+		ImGui::End();
+
 
         // Display input state for debugging
         ImGui::Text("Mouse Locked: %s", Input::isMouseLocked() ? "Yes" : "No");
