@@ -3,6 +3,7 @@
 #include "PhysicsComponent.hpp"
 
 void Scene::update(float dt) { 
+
     m_camera->update(dt);
 
     m_physicsScene->update(dt);

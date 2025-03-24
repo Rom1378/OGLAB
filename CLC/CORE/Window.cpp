@@ -23,7 +23,15 @@ namespace Window
 		float lastTime = 0.0f;
 		float avgFPS = 0.0f;
 
+		bool viewport_changed = false;
+
     }
+
+    bool getViewPortChanged()
+    {
+		return Internal::viewport_changed;
+	}
+
 
     //get texture for rendering
     GLuint getTexture() {
@@ -316,13 +324,17 @@ namespace Window
 		glViewport((int)pos.x, (int)pos.y, (int)avail.x, (int)avail.y);
 
 
+		if (Internal::viewport_changed) {
+			Internal::viewport_changed = false;
+		}
         // Update OpenGL viewport to match the ImGui window
         ImVec2 currentSize = ImGui::GetContentRegionAvail();
         static ImVec2 lastSize = ImVec2(0, 0);
+        
         if (currentSize.x != lastSize.x || currentSize.y != lastSize.y) {
 			rescale_framebuffer(currentSize.x, currentSize.y);
-            //framebuffer_size_callback(nullptr, (int)currentSize.x, (int)currentSize.y);
             lastSize = currentSize;
+            Internal::viewport_changed = true;
         }
 
         // Check if window is hovered and focused

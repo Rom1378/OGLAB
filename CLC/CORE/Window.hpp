@@ -36,6 +36,7 @@ namespace Window
 	WindowProps const* getWindowProps();
 	float getFrameBufferWidth();
 	float getFrameBufferHeight();
+    bool getViewPortChanged();
     
     void drawImGuiInterface();
 

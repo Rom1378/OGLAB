@@ -122,14 +122,7 @@ namespace Input
             GLFW_CURSOR,
             locked ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 
-        //do it for imgui too
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NoMouse;
-		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
-            
-
-
-
+     
         std::cout << "Mouse lock state changed to: " << (locked ? "Locked" : "Unlocked") << std::endl;
     }
 
@@ -198,13 +191,13 @@ namespace Input
                 // Window lost focus, release the mouse
                 if (mouseLocked) {
                     // Temporarily release the mouse without changing the internal state
-                    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                 }
             }
             else {
                 // Window gained focus, re-lock the mouse if it was locked before
                 if (mouseLocked) {
-                    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                     firstMouse = true; // Reset to avoid jumps
                 }
             }

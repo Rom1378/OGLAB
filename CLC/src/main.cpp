@@ -286,7 +286,10 @@ int main() {
         ///////
 
         Window::drawImGuiInterface();
-
+        if (Window::getViewPortChanged())
+		{
+            scene.getCamera()->setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
+		}
 		UICameraController(scene.getCamera());
 
         //draw data of the object touching the ray
