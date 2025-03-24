@@ -252,9 +252,10 @@ int main() {
 			ImGui::Text("Hit object at: %f, %f, %f", hitInfo.position.x, hitInfo.position.y, hitInfo.position.z);
 
             //if click p, create one cube at this position
-			if (Input::isKeyJustPressed(GLFW_KEY_P))
+			if (Input::isKeyPressed(GLFW_KEY_P))
             {
 				PrefabManager::instantiate("CubePrefab", scene, glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+				std::cout << "cube created at: " << hitInfo.position.x << ", " << hitInfo.position.y << ", " << hitInfo.position.z << std::endl;
 			}
 
 			//check if user data is not null and if not null detect wich class it is from

@@ -34,7 +34,6 @@ namespace Input
 
     void update() {
 
-        glfwPollEvents();
         // Reset per-frame values
         Internal::scrollDelta = 0.0f;
 
@@ -82,6 +81,8 @@ namespace Input
             // If not locked, delta is calculated in mouse_callback, but reset it here after one frame
             Internal::prevMousePosition = Internal::mousePosition;
         }
+        glfwPollEvents();
+
     }
 
     const glm::vec2& getMousePosition() { return Internal::mousePosition; }
