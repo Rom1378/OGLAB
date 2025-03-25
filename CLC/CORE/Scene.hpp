@@ -3,12 +3,13 @@
 #include <vector>
 #include "GameObject.hpp"
 #include "Camera.hpp"
+#include "CubeMap.hpp"
 #include "PhysicsScene.hpp"
 
 
 class Scene  {
 public:
-    Scene() {
+	Scene() : m_camera(nullptr), m_cubemap(nullptr) {
 		m_physicsScene = std::make_shared<PhysicsScene>();
     }
     virtual ~Scene() = default;
@@ -34,6 +35,15 @@ public:
 		return m_camera;
 	}
 
+    //set get cubemap
+	void setCubemap(std::shared_ptr<CubeMap> cubemap) {
+		m_cubemap = cubemap;
+	}
+
+	std::shared_ptr<CubeMap> getCubemap() {
+		return m_cubemap;
+	}
+
 	std::shared_ptr<PhysicsScene> getPhysicsScene() {
 		return m_physicsScene;
 	}
@@ -41,5 +51,7 @@ public:
 protected:
     std::vector<std::shared_ptr<GameObject>> m_gameObjects;
     std::shared_ptr<Camera> m_camera;
+    std::shared_ptr<CubeMap> m_cubemap;
 	std::shared_ptr<PhysicsScene> m_physicsScene;
+
 };

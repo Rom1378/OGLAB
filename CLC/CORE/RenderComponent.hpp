@@ -10,7 +10,6 @@
 #include "TextureManager.hpp"
 #include <iostream>
 
-
 class RenderComponent : public Component
 {
 
@@ -102,3 +101,4 @@ protected:
 
 
 }; // class RenderComponent
+

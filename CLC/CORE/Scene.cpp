@@ -18,9 +18,14 @@ void Scene::render() {
     glm::mat4 view = m_camera->getViewMatrix();
     glm::mat4 projection = m_camera->getProjectionMatrix();
 
+    //drawcubemap
+    if (m_cubemap)
+        m_cubemap->draw(view,projection);
     for (auto& gameObject : m_gameObjects) {
         gameObject->render(view, projection);
     }
+
+
 }
 
 std::shared_ptr<GameObject> Scene::createGameObject() {

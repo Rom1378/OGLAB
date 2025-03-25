@@ -151,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CORE\Component.cpp" />
+    <ClCompile Include="CORE\CubeMap.cpp" />
     <ClCompile Include="CORE\Engine.cpp" />
     <ClCompile Include="CORE\GameObject.cpp" />
     <ClCompile Include="CORE\HeightMap.cpp" />
@@ -172,12 +173,14 @@
   <ItemGroup>
     <ClInclude Include="CORE\Camera.hpp" />
     <ClInclude Include="CORE\Component.hpp" />
+    <ClInclude Include="CORE\CubeMap.hpp" />
     <ClInclude Include="CORE\CubeRenderer.hpp" />
     <ClInclude Include="CORE\Engine.hpp" />
     <ClInclude Include="CORE\GameObject.hpp" />
     <ClInclude Include="CORE\HeightMap.hpp" />
     <ClInclude Include="CORE\Input.hpp" />
     <ClInclude Include="CORE\InterfaceRenderer.hpp" />
+    <ClInclude Include="CORE\Mesh\CubeMap.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMesh.hpp" />
     <ClInclude Include="CORE\Physics.hpp" />
     <ClInclude Include="CORE\PhysicsComponent.hpp" />
@@ -197,6 +200,12 @@
     <ClInclude Include="CORE\RayCastComponent.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\AppData\Local\Temp\Rar$DRa956.19823.rartemp\skybox\back.jpg" />
+    <Image Include="..\..\..\AppData\Local\Temp\Rar$DRa956.19823.rartemp\skybox\bottom.jpg" />
+    <Image Include="..\..\..\AppData\Local\Temp\Rar$DRa956.19823.rartemp\skybox\front.jpg" />
+    <Image Include="..\..\..\AppData\Local\Temp\Rar$DRa956.19823.rartemp\skybox\left.jpg" />
+    <Image Include="..\..\..\AppData\Local\Temp\Rar$DRa956.19823.rartemp\skybox\right.jpg" />
+    <Image Include="..\..\..\AppData\Local\Temp\Rar$DRa956.19823.rartemp\skybox\top.jpg" />
     <Image Include="C:\Users\romai\OneDrive\Bureau\CAT PP.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

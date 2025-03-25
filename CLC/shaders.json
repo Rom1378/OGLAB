@@ -16,5 +16,13 @@
   "cursor": {
     "vertex": "res\\shaders\\cursor.vert",
     "fragment": "res\\shaders\\cursor.frag"
+  },
+  "cubemap": {
+    "vertex": "res\\shaders\\cubemap.vert",
+    "fragment": "res\\shaders\\cubemap.frag"
+  },
+  "equirectanular2cubemap": {
+    "vertex": "res\\shaders\\equirectangular_to_cubemap.vs",
+    "fragment": "res\\shaders\\equirectangular_to_cubemap.fs"
   }
 }

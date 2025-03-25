@@ -17,7 +17,6 @@ using namespace std::chrono;
 #include "../CORE/CubeRenderer.hpp"
 #include "../CORE/SphereRenderer.hpp"
 #include "../CORE/SpherePhysics.hpp"
-
 #include "../CORE/Prefabs/PrefabManager.hpp"
 
 #include <glm/glm.hpp>
@@ -232,6 +231,20 @@ int main() {
         camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
         camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
         scene.setCamera(camera);
+
+
+        //textures
+		std::vector<std::string> faces = {  "res/textures/CubeMaps/skybox/right.jpg", 
+					                        "res/textures/CubeMaps/skybox/left.jpg", 
+				                            "res/textures/CubeMaps/skybox/top.jpg", 
+						                    "res/textures/CubeMaps/skybox/bottom.jpg", 
+							                "res/textures/CubeMaps/skybox/front.jpg", 
+					                        "res/textures/CubeMaps/skybox/back.jpg" };
+        //cubemap
+        auto cb = std::make_shared<CubeMap>();
+        cb->init();
+        cb->setHDRTexture("res/textures/CubeMaps/golden_gate_hills_16k.hdr");
+		scene.setCubemap(cb);
 
 
 
