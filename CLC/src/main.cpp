@@ -243,7 +243,7 @@ int main() {
         //cubemap
         auto cb = std::make_shared<CubeMap>();
         cb->init();
-        cb->setHDRTexture("res/textures/CubeMaps/golden_gate_hills_16k.hdr");
+        cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
 		scene.setCubemap(cb);
 
 
