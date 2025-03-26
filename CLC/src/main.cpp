@@ -1,8 +1,9 @@
+#include "../CORE/LightManager.hpp"
+
 #include "../CORE/Scene.hpp"
 #include "../CORE/Window.hpp"
 #include "../CORE/Input.hpp"
 #include "../CORE/Shader.hpp"
-#include "../CORE/Camera.hpp"
 #include <iostream>
 #include <PxPhysicsAPI.h>
 #include <chrono>
@@ -12,8 +13,6 @@
 
 using namespace std::chrono;
 
-#include "../CORE/PhysicsComponent.hpp"
-#include "../CORE/RenderComponent.hpp"
 #include "../CORE/CubeRenderer.hpp"
 #include "../CORE/SphereRenderer.hpp"
 #include "../CORE/SpherePhysics.hpp"
@@ -219,8 +218,8 @@ int main() {
         spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
         auto world = std::make_shared<GameObject>("World");
         world->setScale(glm::vec3(100.0f, 1.0f, 100.0f));
-        world->setPosition(glm::vec3(0.0f, -50.0f, 0.0f));
-        world->addComponent<CubeRenderer>();
+        world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
+        auto wren= world->addComponent<CubeRenderer>();
         world->addComponent<CubePhysics>();
         scene.addGameObject(world);
 
@@ -249,6 +248,38 @@ int main() {
 
 
     }
+
+    // Light
+
+//exemple declaration
+//Light light(LightType::POINT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+//Light light2(LightType::DIRECTIONAL, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+//Light light3(LightType::SPOT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+    //Light ptlight(LightType::POINT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+
+    //Light dirlight(LightType::DIRECTIONAL, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+
+    //Light spotlight(LightType::SPOT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+
+    //LightManager::addLight(ptlight);
+
+    //LightManager::addLight(dirlight);
+
+    //LightManager::addLight(spotlight);
+
+    //sun
+    auto sunLight = std::make_shared<Light>(
+        LightType::DIRECTIONAL,  // Light type is DIRECTIONAL for sun
+        glm::vec3(0.0f, 0.0f, 0.0f),  // Position (less relevant for directional lights)
+        glm::vec3(0.0f, -1.0f, 0.0f),  // Direction - pointing downward, simulating sun from above
+        glm::vec3(1.0f, 0.95f, 0.8f),  // Warm sunlight color (slightly warm white)
+        1.0f  // Intensity
+    );
+    LightManager::addLight(sunLight);
+
+
+
+
 
     //gameobject cursor 
 	auto cursor = std::make_shared<GameObject>("Cursor");
@@ -304,6 +335,23 @@ int main() {
             scene.getCamera()->setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
 		}
 		UICameraController(scene.getCamera());
+
+
+
+        //rotate the sun
+        // use sin cos and time to make the sun move
+        //rotation matrix
+        float sunSpeed =1.1f;
+        float sunX = sin(glfwGetTime() * sunSpeed);
+        float sunY = cos(glfwGetTime() * sunSpeed);
+        sunLight->direction.x = sunX;
+        sunLight->direction.y = sunY;
+        sunLight->direction.z = sunX;
+
+
+            
+
+
 
         //draw data of the object touching the ray
         ImGui::Begin("Raycast");

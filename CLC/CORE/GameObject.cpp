@@ -16,6 +16,12 @@ void GameObject::render(const glm::mat4& view, const glm::mat4& projection) {
 	}
 }
 
+void GameObject::render(std::shared_ptr<Camera> cam) {
+	if (auto renderComponent = getComponent<RenderComponent>()) {
+		renderComponent->draw(cam);
+	}
+}
+
 // Set position and update physics component if exists
 void GameObject::setPosition(const glm::vec3& position) {
 

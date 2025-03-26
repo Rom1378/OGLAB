@@ -9,7 +9,6 @@
 
 #include "Shader.hpp"
 #include "Mesh/CubeMap.hpp"
-//glms
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

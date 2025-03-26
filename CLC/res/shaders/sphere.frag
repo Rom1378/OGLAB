@@ -1,26 +1,66 @@
 #version 460 core
 
-in vec3 FragPos;  // Fragment position in world space
-in vec3 Normal;   // Transformed normal
+struct Light {
+    int type;       // 0: Point, 1: Directional, 2: Spot
+    vec3 position;
+    vec3 direction;
+    vec3 color;
+    float intensity;
+};
+
+#define MAX_LIGHTS 128
+#define POINT_LIGHT 0
+#define DIRECTIONAL_LIGHT 1
+#define SPOT_LIGHT 2
+
+in vec3 FragPos;
+in vec3 Normal;
 
 out vec4 FragColor;
 
-uniform vec3 lightPos;    // Light position in world space
-uniform vec3 lightColor;  // Light color
-uniform vec3 objectColor; // Object color
+uniform int numLights;
+uniform bool useLighting;
+uniform Light lights[MAX_LIGHTS];
+uniform vec3 objectColor;
+uniform vec3 viewPos;  // Camera position for specular calculations
 
 void main() {
-    // Ambient lighting
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 resultColor = objectColor * 0.1; // Ambient base light
 
-    // Diffuse lighting
-    vec3 norm = normalize(Normal);  // Normalize the normal
-    vec3 lightDir = normalize(lightPos - FragPos);  // Light direction
-    float diff = max(dot(norm, lightDir), 0.0);  // Diffuse intensity
-    vec3 diffuse = diff * lightColor;
+    if (useLighting) {
+        vec3 norm = normalize(Normal);
+        for (int i = 0; i < numLights; i++) {
+            vec3 lightContribution = vec3(0.0);
+            
+            if (lights[i].type == POINT_LIGHT) {
+                // Point Light Calculation
+                vec3 lightDir = normalize(lights[i].position - FragPos);
+                float diff = max(dot(norm, lightDir), 0.0);
+                lightContribution = diff * lights[i].color * lights[i].intensity;
+            }
+            else if (lights[i].type == DIRECTIONAL_LIGHT) {
+                // Directional Light Calculation
+                vec3 lightDir = normalize(-lights[i].direction);
+                float diff = max(dot(norm, lightDir), 0.0);
+                lightContribution = diff * lights[i].color * lights[i].intensity;
+            }
+            else if (lights[i].type == SPOT_LIGHT) {
+                // Spot Light Calculation (basic implementation)
+                vec3 lightDir = normalize(lights[i].position - FragPos);
+                float diff = max(dot(norm, lightDir), 0.0);
+                
+                // Add spot light cone effect
+                float theta = dot(lightDir, normalize(-lights[i].direction));
+                float epsilon = 0.1; // Inner cutoff
+                float intensity = clamp((theta - (1.0 - epsilon)) / epsilon, 0.0, 1.0);
+                
+                lightContribution = diff * lights[i].color * lights[i].intensity * intensity;
+            }
+            
+            resultColor += lightContribution * objectColor;
+        }
 
-    // Combine ambient and diffuse lighting
-    vec3 result = (ambient + diffuse) * objectColor;
-    FragColor = vec4(result, 1.0);  // Output final color
+    }
+
+    FragColor = vec4(resultColor, 1.0);
 }

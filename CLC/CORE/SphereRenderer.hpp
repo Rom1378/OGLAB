@@ -21,27 +21,7 @@ public:
         setShader("sphere");
     }
 
-    void draw(const glm::mat4& view, const glm::mat4& projection) override {
-        auto shader = ShaderManager::getShader("sphere");
-        if (!shader) return;
-
-        shader->use();
-
-        // Set uniforms
-        shader->setMat4("model", glm::value_ptr(this->getGameObject()->getModelMatrix()));
-        shader->setMat4("view", glm::value_ptr(view));
-        shader->setMat4("projection", glm::value_ptr(projection));
-
-        // Set lighting uniforms
-        shader->setVec3("lightPos", 3.2f, 1.0f, 2.0f);
-        shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
-
-        // Draw sphere using indices
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-    }
+    void draw(const std::shared_ptr<Camera> cam) override;
 
     ~SphereRenderer() {
         glDeleteVertexArrays(1, &VAO);

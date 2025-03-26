@@ -63,6 +63,8 @@ public:
 	// Render if has RenderComponent
 	void render(const glm::mat4& view, const glm::mat4& projection);
 
+	void render(std::shared_ptr<Camera> cam);
+
 	// Set position and update physics component if exists
 	void setPosition(const glm::vec3& position);
 

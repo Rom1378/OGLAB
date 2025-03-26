@@ -152,10 +152,13 @@
   <ItemGroup>
     <ClCompile Include="CORE\Component.cpp" />
     <ClCompile Include="CORE\CubeMap.cpp" />
+    <ClCompile Include="CORE\CubeRenderer.cpp" />
     <ClCompile Include="CORE\Engine.cpp" />
     <ClCompile Include="CORE\GameObject.cpp" />
     <ClCompile Include="CORE\HeightMap.cpp" />
     <ClCompile Include="CORE\Input.cpp" />
+    <ClCompile Include="CORE\LightManager.cpp" />
+    <ClCompile Include="CORE\LightManager.hpp" />
     <ClCompile Include="CORE\Physics.cpp" />
     <ClCompile Include="CORE\PhysicsComponent.cpp" />
     <ClCompile Include="CORE\Prefabs\PrefabManager.cpp" />
@@ -164,6 +167,7 @@
     <ClCompile Include="CORE\Shader.cpp" />
     <ClCompile Include="CORE\ShaderProgram.cpp" />
     <ClCompile Include="CORE\SpherePhysics.cpp" />
+    <ClCompile Include="CORE\SphereRenderer.cpp" />
     <ClCompile Include="CORE\TextureManager.cpp" />
     <ClCompile Include="CORE\UIGameObjectController.cpp" />
     <ClCompile Include="CORE\Window.cpp" />
@@ -180,6 +184,7 @@
     <ClInclude Include="CORE\HeightMap.hpp" />
     <ClInclude Include="CORE\Input.hpp" />
     <ClInclude Include="CORE\InterfaceRenderer.hpp" />
+    <ClInclude Include="CORE\Light.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMap.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMesh.hpp" />
     <ClInclude Include="CORE\Physics.hpp" />

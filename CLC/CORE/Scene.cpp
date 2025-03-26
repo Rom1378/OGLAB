@@ -23,6 +23,7 @@ void Scene::render() {
         m_cubemap->draw(view,projection);
     for (auto& gameObject : m_gameObjects) {
         gameObject->render(view, projection);
+        gameObject->render(m_camera);
     }
 
 

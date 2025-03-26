@@ -9,14 +9,17 @@
 #include "Shader.hpp"
 #include "TextureManager.hpp"
 #include <iostream>
+#include "Camera.hpp"
+
 
 class RenderComponent : public Component
 {
 
 
 public:
-	RenderComponent() : Component(), m_color(glm::vec4(1,1,1,1)), m_renderer(nullptr), m_shader(nullptr), VAO(0), VBO(0), EBO(0) { }
-	virtual void draw(const glm::mat4& view, const glm::mat4& projection) = 0;
+	RenderComponent() : Component(), m_color(glm::vec4(1, 1, 1, 1)), m_renderer(nullptr), m_shader(nullptr), VAO(0), VBO(0), EBO(0) { }
+	virtual void draw(const glm::mat4& view, const glm::mat4& projection) {};
+	virtual void draw(const std::shared_ptr<Camera> cam) {};
 	virtual void draw()  {};
 
 	void setRenderer(std::shared_ptr<InterfaceRenderer> renderer)

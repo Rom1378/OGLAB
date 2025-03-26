@@ -5,12 +5,14 @@
 #include "Component.hpp"
 #include "Input.hpp"
 #include <iostream>
+#include "Transform.hpp"
+
 
 
 class Camera : public Transform, public Component {
 public:
 	Camera(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
-		: fov(fov), aspectRatio(aspectRatio),
+		: fov(fov), aspectRatio(aspectRatio), maxLightDistance(1000000.0f),
 		nearPlane(nearPlane), farPlane(farPlane) {
 		updateProjection();
 	}
@@ -114,6 +116,14 @@ public:
 			view = glm::lookAt(m_position, m_position + m_forward, m_up);
 
 	}
+
+	float getMaxLightDistance() const {
+		return maxLightDistance;
+	}
+
+	void setMaxLightDistance(float distance) {
+		maxLightDistance = distance;
+	}
 protected:
 	glm::vec3 m_forward{ 0.0f, 0.0f, -1.0f }; // Forward direction
 	glm::vec3 m_right{ 1.0f, 0.0f, 0.0f };   // Right direction
@@ -129,6 +139,7 @@ private:
 	float aspectRatio;
 	float nearPlane;
 	float farPlane;
+	float maxLightDistance;
 
 
 
