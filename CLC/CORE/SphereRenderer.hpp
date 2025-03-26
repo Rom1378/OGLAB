@@ -35,7 +35,7 @@ public:
         // Set lighting uniforms
         shader->setVec3("lightPos", 3.2f, 1.0f, 2.0f);
         shader->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        shader->setVec3("objectColor", 0.0f, 1.0f, 0.2f);
+        shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
 
         // Draw sphere using indices
         glBindVertexArray(VAO);
