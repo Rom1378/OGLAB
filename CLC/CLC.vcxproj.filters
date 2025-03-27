@@ -29,9 +29,6 @@
     <ClCompile Include="CORE\Shader.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\HeightMap.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="CORE\Engine.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -112,9 +109,6 @@
     <ClInclude Include="CORE\ShaderProgram.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\HeightMap.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="CORE\Engine.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -155,9 +149,6 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Mesh\CubeMesh.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="CORE\Prefabs\Prefab.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Prefabs\PrefabManager.hpp">

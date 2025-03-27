@@ -43,3 +43,12 @@ void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
 	}
 }
 
+// Set scale and update physics component if exists
+void GameObject::setScale(const glm::vec3& scale) {
+
+	Transform::setScale(scale);
+
+	if (auto physicsComponent = getComponent<PhysicsComponent>()) {
+		physicsComponent->setScale(scale);
+	}
+}

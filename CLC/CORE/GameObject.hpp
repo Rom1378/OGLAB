@@ -71,6 +71,10 @@ public:
 	//set rotation and update physics component if exists
 	void setRotation(const glm::vec3& rotation, bool update_physx = true);
 
+	// Set scale and update physics component if exists
+	void setScale(const glm::vec3& scale);
+
+
 	const char* getName() const { return m_name.c_str(); }
 	
 private:

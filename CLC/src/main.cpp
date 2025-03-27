@@ -128,7 +128,7 @@ public:
 void registerPrefabs() {
     // Register a Cube prefab
     PrefabManager::registerPrefab(
-        PrefabDefinition("CubePrefab", [](std::shared_ptr<GameObject> obj) {
+        PrefabDefinition("DynamicCubePrefab", [](std::shared_ptr<GameObject> obj) {
             // Add required components
             auto cubeRenderer = obj->addComponent<CubeRenderer>();
             auto cubePhysics = obj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
@@ -189,22 +189,27 @@ int main() {
     Scene scene;
     scene.init();
     {
-
+/*
         auto cubeObj = std::make_shared<GameObject>("Cube");
         cubeObj->setPosition(glm::vec3(0.0f, 10.0f, -30.0f)); // Positionner le cube au centre
         auto cubeRenderer = cubeObj->addComponent<CubeRenderer>();
         auto cubePhysics = cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
         cubePhysics->setMass(10);
         scene.addGameObject(cubeObj);
-
+		cubeRenderer->addTexture(txtr);
+*/
 		// Load texture
 		auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
-		cubeRenderer->addTexture(txtr);
+
+        auto cubeObj = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(100.0f, 100.0f, 100.0f));
+        cubeObj->getComponent<RenderComponent>()->addTexture(txtr);
+        cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
+
 
 
 
         //add cube prefab
-		auto prefCube = PrefabManager::instantiate("CubePrefab", scene);
+		auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
 
         //sphere
         auto sphereObj = std::make_shared<GameObject>("Sphere");
@@ -216,8 +221,10 @@ int main() {
         scene.addGameObject(sphereObj);
 
         spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
+
+
         auto world = std::make_shared<GameObject>("World");
-        world->setScale(glm::vec3(100.0f, 1.0f, 100.0f));
+        world->setScale(glm::vec3(1000.0f, 10.0f, 1000.0f));
         world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
         auto wren= world->addComponent<CubeRenderer>();
         world->addComponent<CubePhysics>();
@@ -245,28 +252,6 @@ int main() {
         cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
 		scene.setCubemap(cb);
 
-
-
-    }
-
-    // Light
-
-//exemple declaration
-//Light light(LightType::POINT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
-//Light light2(LightType::DIRECTIONAL, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
-//Light light3(LightType::SPOT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
-    //Light ptlight(LightType::POINT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
-
-    //Light dirlight(LightType::DIRECTIONAL, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
-
-    //Light spotlight(LightType::SPOT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
-
-    //LightManager::addLight(ptlight);
-
-    //LightManager::addLight(dirlight);
-
-    //LightManager::addLight(spotlight);
-
     //sun
     auto sunLight = std::make_shared<Light>(
         LightType::DIRECTIONAL,  // Light type is DIRECTIONAL for sun
@@ -278,6 +263,8 @@ int main() {
     LightManager::addLight(sunLight);
 
 
+
+    }
 
 
 
@@ -337,22 +324,6 @@ int main() {
 		UICameraController(scene.getCamera());
 
 
-
-        //rotate the sun
-        // use sin cos and time to make the sun move
-        //rotation matrix
-        float sunSpeed =1.1f;
-        float sunX = sin(glfwGetTime() * sunSpeed);
-        float sunY = cos(glfwGetTime() * sunSpeed);
-        sunLight->direction.x = sunX;
-        sunLight->direction.y = sunY;
-        sunLight->direction.z = sunX;
-
-
-            
-
-
-
         //draw data of the object touching the ray
         ImGui::Begin("Raycast");
         PxRaycastHit hitInfo;
@@ -393,12 +364,16 @@ int main() {
                 //move and rotate with slider
                     glm::vec3 pos = seletctedGM->getPosition();
                     glm::vec3 rot = seletctedGM->getRotation();
+                    glm::vec3 scale= seletctedGM->getScale();
 					glm::vec3 col = seletctedGM->getComponent<RenderComponent>()->getColor();
+
 					ImGui::ColorEdit3("Color", glm::value_ptr(col));
                     ImGui::SliderFloat3("Position", glm::value_ptr(pos), -100.0f, 100.0f);
                     ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -1.0f, 1.0f);
+                    ImGui::SliderFloat3("Scale", glm::value_ptr(scale), 0.1f, 10.0f);
                     seletctedGM->setPosition(pos);
                     seletctedGM->setRotation(rot);
+                    seletctedGM->setScale(scale);
 					seletctedGM->getComponent<RenderComponent>()->setColor(col);
 
 

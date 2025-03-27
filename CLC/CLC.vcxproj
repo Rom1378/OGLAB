@@ -155,7 +155,6 @@
     <ClCompile Include="CORE\CubeRenderer.cpp" />
     <ClCompile Include="CORE\Engine.cpp" />
     <ClCompile Include="CORE\GameObject.cpp" />
-    <ClCompile Include="CORE\HeightMap.cpp" />
     <ClCompile Include="CORE\Input.cpp" />
     <ClCompile Include="CORE\LightManager.cpp" />
     <ClCompile Include="CORE\LightManager.hpp" />
@@ -181,7 +180,6 @@
     <ClInclude Include="CORE\CubeRenderer.hpp" />
     <ClInclude Include="CORE\Engine.hpp" />
     <ClInclude Include="CORE\GameObject.hpp" />
-    <ClInclude Include="CORE\HeightMap.hpp" />
     <ClInclude Include="CORE\Input.hpp" />
     <ClInclude Include="CORE\InterfaceRenderer.hpp" />
     <ClInclude Include="CORE\Light.hpp" />
@@ -190,7 +188,6 @@
     <ClInclude Include="CORE\Physics.hpp" />
     <ClInclude Include="CORE\PhysicsComponent.hpp" />
     <ClInclude Include="CORE\PhysicsScene.hpp" />
-    <ClInclude Include="CORE\Prefabs\Prefab.hpp" />
     <ClInclude Include="CORE\Prefabs\PrefabDefinition.hpp" />
     <ClInclude Include="CORE\Prefabs\PrefabManager.hpp" />
     <ClInclude Include="CORE\RenderComponent.hpp" />
