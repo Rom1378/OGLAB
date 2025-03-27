@@ -166,7 +166,6 @@ class CubePhysics : public PhysicsComponent {
 public:
 	CubePhysics(Type t = Type::STATIC) : PhysicsComponent(t) {	}
 
-
 	void init();
 };
 
