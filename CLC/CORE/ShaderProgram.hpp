@@ -2,6 +2,8 @@
 #include <string>
 #include <unordered_map>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+
 
 class ShaderProgram
 {
@@ -25,9 +27,12 @@ public:
 
     // Uniform setters
     void setInt(const std::string& name, int value);
+
     void setFloat(const std::string& name, float value);
     void setVec3(const std::string& name, float x, float y, float z);
+    void setVec3(const std::string& name, const glm::vec3& value);
 	void setVec4(const std::string& name, float x, float y, float z, float w);
+    void setMat4(const std::string& name, const glm::mat4& value);
     void setMat4(const std::string& name, const float* value);
     //textures
 	void setTexture(const std::string& name, int texture, int slot);

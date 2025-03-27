@@ -13,7 +13,7 @@ class Camera : public Transform, public Component {
 public:
 	Camera(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
 		: fov(fov), aspectRatio(aspectRatio), maxLightDistance(1000000.0f),
-		nearPlane(nearPlane), farPlane(farPlane) {
+		nearPlane(nearPlane), farPlane(farPlane), Component(), Transform() {
 		updateProjection();
 	}
 

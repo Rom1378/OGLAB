@@ -7,8 +7,7 @@ class Transform
 {
 
 public:
-	Transform() : m_position(0.0f), m_rotation(0.0f), m_scale(1.0f) {}
-	Transform(const glm::vec3& position, const glm::vec3& rotation, const glm::vec3& scale) : m_position(position), m_rotation(rotation), m_scale(scale) {}
+	Transform(const glm::vec3& position = glm::vec3(0.0f, 0.0f, 0.0f), const glm::vec3& rotation = glm::vec3(0.0f, 0.0f, 0.0f), const glm::vec3& scale = glm::vec3(1.0f,1.0f,1.0f)) : m_position(position), m_rotation(rotation), m_scale(scale) {}
 
 	const glm::vec3& getPosition() const { return m_position; }
 	const glm::vec3& getRotation() const { return m_rotation; }

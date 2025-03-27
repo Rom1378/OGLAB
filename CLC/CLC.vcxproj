@@ -156,6 +156,7 @@
     <ClCompile Include="CORE\Engine.cpp" />
     <ClCompile Include="CORE\GameObject.cpp" />
     <ClCompile Include="CORE\Input.cpp" />
+    <ClCompile Include="CORE\Light.cpp" />
     <ClCompile Include="CORE\LightManager.cpp" />
     <ClCompile Include="CORE\LightManager.hpp" />
     <ClCompile Include="CORE\Physics.cpp" />
@@ -183,6 +184,7 @@
     <ClInclude Include="CORE\Input.hpp" />
     <ClInclude Include="CORE\InterfaceRenderer.hpp" />
     <ClInclude Include="CORE\Light.hpp" />
+    <ClInclude Include="CORE\LightComponent.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMap.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMesh.hpp" />
     <ClInclude Include="CORE\Physics.hpp" />

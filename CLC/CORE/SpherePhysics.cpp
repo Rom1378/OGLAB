@@ -17,6 +17,9 @@ void SpherePhysics::init() {
 
 	GameObject* gm = getGameObject();
 
+	glm::vec3 scale = gm->getScale();
+
+
 	// Position and rotation
 	PxVec3 position(gm->getPosition().x, gm->getPosition().y, gm->getPosition().z);
 
@@ -27,8 +30,21 @@ void SpherePhysics::init() {
 
 	PxTransform transform(position, quat);
 
+	float radius = 1.0f * glm::max(glm::max(scale.x, scale.y), scale.z);
+
 	if (body) {
-		body->attachShape(*Physics::getPhysics()->createShape(PxSphereGeometry(1.0f), *material));
+		releaseAllShapes();
+
+		// Create a new shape
+		PxShape* shape = Physics::getPhysics()->createShape(
+			PxSphereGeometry(radius),
+			*material,
+			true // Exclusive - allows modification later
+		);
+
+		body->attachShape(*shape);
+		shapes.push_back(shape); // Track for cleanup
+
 		body->setGlobalPose(transform);
 
 		if (isDynamic) {
@@ -38,5 +54,30 @@ void SpherePhysics::init() {
 	}
 	else {
 		std::cerr << "Failed to create rigid body!" << std::endl;
+	}
+}
+
+void SpherePhysics::applyScale(const glm::vec3& scale) {
+	if (!body || shapes.empty()) return;
+
+	// For sphere, use largest scale component
+	float radius = 1.0f * glm::max(glm::max(scale.x, scale.y), scale.z);
+
+	// Create new shape with updated geometry
+	releaseAllShapes();
+
+	PxShape* shape = Physics::getPhysics()->createShape(
+		PxSphereGeometry(radius),
+		*material,
+		true
+	);
+	body->attachShape(*shape);
+	shapes.push_back(shape);
+
+	// Update mass if dynamic
+	if (isDynamic) {
+		PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
+		PxRigidBodyExt::updateMassAndInertia(*dynamic, mass);
+		dynamic->wakeUp();
 	}
 }

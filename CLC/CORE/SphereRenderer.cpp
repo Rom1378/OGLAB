@@ -24,23 +24,18 @@ void SphereRenderer::draw(const std::shared_ptr<Camera> cam) {
 
         // Set light type
         int lightType = 0; // Default to Point Light
-        switch (relevantLights[i]->type) {
+        switch (relevantLights[i]->getType()) {
         case LightType::POINT: lightType = 0; break;
         case LightType::DIRECTIONAL: lightType = 1; break;
         case LightType::SPOT: lightType = 2; break;
         }
         m_shader->setInt(base + "type", lightType);
 
-        m_shader->setVec3(base + "position", relevantLights[i]->position.x, relevantLights[i]->position.y, relevantLights[i]->position.z);
-        m_shader->setVec3(base + "direction", relevantLights[i]->direction.x, relevantLights[i]->direction.y, relevantLights[i]->direction.z);
-        m_shader->setVec3(base + "color", relevantLights[i]->color.x, relevantLights[i]->color.y, relevantLights[i]->color.z);
-        m_shader->setFloat(base + "intensity", relevantLights[i]->intensity);
-        //print lights data
-        std::cout << "Light " << i << " position: " << relevantLights[i]->position.x << ", " << relevantLights[i]->position.y << ", " << relevantLights[i]->position.z << std::endl;
-        std::cout << "Light " << i << " color: " << relevantLights[i]->color.x << ", " << relevantLights[i]->color.y << ", " << relevantLights[i]->color.z << std::endl;
-        std::cout << "Light " << i << " intensity: " << relevantLights[i]->intensity << std::endl;
-
-    }
+        m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
+        m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
+        m_shader->setVec3(base + "color", relevantLights[i]->getColor());
+        m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
+         }
 
 
     m_shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);

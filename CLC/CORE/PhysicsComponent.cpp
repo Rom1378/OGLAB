@@ -75,6 +75,26 @@ void PhysicsComponent::updateTransform() {
 	}
 	}
 
+void PhysicsComponent::releaseAllShapes() {
+	if (!body) return;
+
+	// Get all shapes attached to the body
+	PxU32 nbShapes = body->getNbShapes();
+	PxShape** shapes = new PxShape * [nbShapes];
+	body->getShapes(shapes, nbShapes);
+
+	// Detach and release each shape
+	for (PxU32 i = 0; i < nbShapes; i++) {
+		body->detachShape(*shapes[i]);
+		shapes[i]->release();
+	}
+
+	delete[] shapes;
+
+	// Clear our tracked shapes
+	this->shapes.clear();
+}
+
 
 void CubePhysics::init() {
 	if (!material) {
@@ -87,6 +107,7 @@ void CubePhysics::init() {
 	gm->getPosition();
 	// Position and rotation
 	PxVec3 position(gm->getPosition().x, gm->getPosition().y, gm->getPosition().z);
+	glm::vec3 scale = gm->getScale();
 
 	// Convert glm::vec3 rotation (Euler angles) to PxQuat
 	PxQuat quat = PxQuat(glm::radians(gm->getRotation().x), PxVec3(1, 0, 0)) *
@@ -98,8 +119,18 @@ void CubePhysics::init() {
 	glm::vec3 scale_factor = gm->getScale();
 
 	if (body) {
-		body->attachShape(*Physics::getPhysics()->createShape(PxBoxGeometry(0.5f * scale_factor.x, 0.5f * scale_factor.y, 0.5f * scale_factor.z), *material));
+		releaseAllShapes();
+
+		PxShape* shape = Physics::getPhysics()->createShape(
+			PxBoxGeometry(0.5f * scale.x, 0.5f * scale.y, 0.5f * scale.z),
+			*material,
+			true
+		);
+		body->attachShape(*shape);
+		shapes.push_back(shape);
+
 		body->setGlobalPose(transform);
+
 
 		if (isDynamic) {
 			PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
@@ -111,4 +142,22 @@ void CubePhysics::init() {
 	}
 }
 
+void CubePhysics::applyScale(const glm::vec3& scale) {
+	if (!body) return;
 
+	releaseAllShapes();
+
+	PxShape* shape = Physics::getPhysics()->createShape(
+		PxBoxGeometry(0.5f * scale.x, 0.5f * scale.y, 0.5f * scale.z),
+		*material,
+		true
+	);
+	body->attachShape(*shape);
+	shapes.push_back(shape);
+
+	if (isDynamic) {
+		PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
+		PxRigidBodyExt::updateMassAndInertia(*dynamic, mass);
+		dynamic->wakeUp();
+	}
+}

@@ -3,6 +3,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
+
 
 ShaderProgram::ShaderProgram() : m_program(0)
 {
@@ -149,9 +151,19 @@ void ShaderProgram::setVec3(const std::string& name, float x, float y, float z)
     glUniform3f(glGetUniformLocation(m_program, name.c_str()), x, y, z);
 }
 
+void ShaderProgram::setVec3(const std::string& name, const glm::vec3& value)
+{
+	glUniform3fv(glGetUniformLocation(m_program, name.c_str()), 1, glm::value_ptr(value));
+}
+
 void ShaderProgram::setVec4(const std::string& name, float x, float y, float z, float w)
 {
 	glUniform4f(glGetUniformLocation(m_program, name.c_str()), x, y, z, w);
+}
+
+void ShaderProgram::setMat4(const std::string& name, const glm::mat4& value)
+{
+	glUniformMatrix4fv(glGetUniformLocation(m_program, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
 }
 
 void ShaderProgram::setMat4(const std::string& name, const float* value)
