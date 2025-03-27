@@ -61,120 +61,85 @@ public:
 		}
 	}
 
-	// scale
-	// Improved PhysicsComponent scaling method
-	void setScale(const glm::vec3& newScale) {
-		if (!body) return;
+    void setScale(const glm::vec3& scale) {
+        if (!body) return;
 
-        // Remove the existing shape
-        PxShape* existingShape;
-        PxU32 shapeCount = body->getNbShapes();
-        if (shapeCount == 0) return;
+        // Get current shape(s)
+        PxU32 nbShapes = body->getNbShapes();
+        PxShape** shapes = new PxShape * [nbShapes];
+        body->getShapes(shapes, nbShapes);
 
-        body->getShapes(&existingShape, 1);
+        // Scale each shape
+        for (PxU32 i = 0; i < nbShapes; i++) {
+            PxShape* shape = shapes[i];
+            PxGeometryHolder geomHolder = shape->getGeometry();
 
-        // Get the existing geometry
-        PxGeometry* existingGeometry = nullptr;
-        PxGeometryType::Enum geometryType = existingShape->getGeometry().getType();
-
-        // Create a new shape based on the geometry type
-        PxShape* newShape = nullptr;
-        switch (geometryType) {
-        case PxGeometryType::eBOX: {
-            PxBoxGeometry boxGeom;
-            existingShape->getGeometry(boxGeom);
-            PxVec3 halfExtents(
-                std::abs(newScale.x) / 2.0f,
-                std::abs(newScale.y) / 2.0f,
-                std::abs(newScale.z) / 2.0f
-            );
-            newShape = PxGetPhysics().createShape(
-                PxBoxGeometry(halfExtents),
-                *material,
-                true
-            );
-            break;
-        }
-        case PxGeometryType::eSPHERE: {
-            PxSphereGeometry sphereGeom;
-            existingShape->getGeometry(sphereGeom);
-            float averageScale = (newScale.x + newScale.y + newScale.z) / 3.0f;
-            newShape = PxGetPhysics().createShape(
-                PxSphereGeometry(sphereGeom.radius * averageScale),
-                *material,
-                true
-            );
-            break;
-        }
-        case PxGeometryType::eCAPSULE: {
-            PxCapsuleGeometry capsuleGeom;
-            auto cg=existingShape->getGeometry();
-            existingShape->getGeometry(capsuleGeom);
-            float averageScale = (newScale.x + newScale.y + newScale.z) / 3.0f;
-            newShape = PxGetPhysics().createShape(
-                PxCapsuleGeometry(
-                    capsuleGeom.radius * averageScale,
-                    capsuleGeom.halfHeight * averageScale
-                ),
-                *material,
-                true
-            );
-            break;
-        }
-        default:
-            // Unsupported geometry type
-            return;
+            // Handle different geometry types
+            switch (geomHolder.getType()) {
+            case PxGeometryType::eBOX: {
+                PxBoxGeometry box = geomHolder.box();
+                box.halfExtents = PxVec3(
+                    box.halfExtents.x * scale.x,
+                    box.halfExtents.y * scale.y,
+                    box.halfExtents.z * scale.z
+                );
+                shape->setGeometry(box);
+                break;
+            }
+            case PxGeometryType::eSPHERE: {
+                PxSphereGeometry sphere = geomHolder.sphere();
+                // For sphere, we'll scale by largest component (uniform scaling)
+                float maxScale = glm::max(glm::max(scale.x, scale.y), scale.z);
+                sphere.radius *= maxScale;
+                shape->setGeometry(sphere);
+                break;
+            }
+            case PxGeometryType::eCAPSULE: {
+                PxCapsuleGeometry capsule = geomHolder.capsule();
+                // For capsule, scale radius by average of x/z, height by y
+                float radiusScale = (scale.x + scale.z) * 0.5f;
+                capsule.radius *= radiusScale;
+                capsule.halfHeight *= scale.y;
+                shape->setGeometry(capsule);
+                break;
+            }
+                                         // Add cases for other geometry types as needed
+            default:
+                std::cerr << "Warning: Unsupported geometry type for scaling" << std::endl;
+                break;
+            }
         }
 
-        // Detach old shape and attach new shape
-        body->detachShape(*existingShape);
-        body->attachShape(*newShape);
+        delete[] shapes;
 
-        // Adjust mass for dynamic bodies
+        // For dynamic bodies, we need to wake them up and update mass/inertia
         if (isDynamic) {
-            float originalMass = mass;
-            float volumeScale = calculateVolumeScale(existingShape, newShape);
-            mass *= volumeScale;
+            PxRigidDynamic* dynamic = static_cast<PxRigidDynamic*>(body);
+            dynamic->wakeUp();
 
+            // Update mass properties if mass was previously set
+            if (mass > 0.0f) {
+                PxRigidBodyExt::updateMassAndInertia(*dynamic, mass);
+            }
         }
-
-        // Clean up
-        existingShape->release();
-        newShape->release();
     }
 
-    // Helper method to calculate volume scale
-    float calculateVolumeScale(PxShape* oldShape, PxShape* newShape) {
-        PxGeometryType::Enum geometryType = oldShape->getGeometry().getType();
+    // Helper method to get the current scale (approximate)
+    glm::vec3 getScale() {
+        if (!body || body->getNbShapes() == 0) return glm::vec3(1.0f);
 
-        switch (geometryType) {
+        PxShape* shape;
+        body->getShapes(&shape, 1);
+        PxGeometryHolder geomHolder = shape->getGeometry();
+
+        switch (geomHolder.getType()) {
         case PxGeometryType::eBOX: {
-            PxBoxGeometry oldBoxGeom, newBoxGeom;
-            oldShape->getGeometry(oldBoxGeom);
-            newShape->getGeometry(newBoxGeom);
-            return (newBoxGeom.halfExtents.x * newBoxGeom.halfExtents.y * newBoxGeom.halfExtents.z) /
-                (oldBoxGeom.halfExtents.x * oldBoxGeom.halfExtents.y * oldBoxGeom.halfExtents.z);
+            PxBoxGeometry box = geomHolder.box();
+            return glm::vec3(box.halfExtents.x, box.halfExtents.y, box.halfExtents.z);
         }
-        case PxGeometryType::eSPHERE: {
-            PxSphereGeometry oldSphereGeom, newSphereGeom;
-            oldShape->getGeometry(oldSphereGeom);
-            newShape->getGeometry(newSphereGeom);
-            float oldVolume = (4.0f / 3.0f) * PxPi * PxPow(oldSphereGeom.radius, 3);
-            float newVolume = (4.0f / 3.0f) * PxPi * PxPow(newSphereGeom.radius, 3);
-            return newVolume / oldVolume;
-        }
-        case PxGeometryType::eCAPSULE: {
-            PxCapsuleGeometry oldCapsuleGeom, newCapsuleGeom;
-            oldShape->getGeometry(oldCapsuleGeom);
-            newShape->getGeometry(newCapsuleGeom);
-            float oldVolume = PxPi * PxPow(oldCapsuleGeom.radius, 2) *
-                (4.0f / 3.0f * oldCapsuleGeom.radius + 2.0f * oldCapsuleGeom.halfHeight);
-            float newVolume = PxPi * PxPow(newCapsuleGeom.radius, 2) *
-                (4.0f / 3.0f * newCapsuleGeom.radius + 2.0f * newCapsuleGeom.halfHeight);
-            return newVolume / oldVolume;
-        }
+                                 // Add cases for other geometry types as needed
         default:
-            return 1.0f;
+            return glm::vec3(1.0f);
         }
     }
 
