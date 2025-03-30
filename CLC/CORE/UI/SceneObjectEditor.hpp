@@ -8,130 +8,123 @@
 
 namespace UI {
 
-	void renderImGuiSceneHierarchy(Scene* scene, GameObject** selectedObject) {
-		if (!scene) return;
+    static GameObject* g_SelectedObject = nullptr;
+    static bool g_SelectedFromHierarchy = false;
+    static bool g_JustSelectedFromHierarchy = false;
 
-		if (ImGui::Begin("Scene Hierarchy")) {
-			// Search filter
-			static char searchFilter[256] = "";
-			ImGui::InputText("Search", searchFilter, IM_ARRAYSIZE(searchFilter));
+    void renderImGuiSceneHierarchy(Scene* scene) {
+        if (!scene) return;
 
-			// List all objects
-			ImGui::BeginChild("Object List", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
+        if (ImGui::Begin("Scene Hierarchy")) {
+            // Search filter
+            static char searchFilter[256] = "";
+            ImGui::InputText("Search", searchFilter, IM_ARRAYSIZE(searchFilter));
 
-			bool anySelected = false;
-			for (auto& obj : scene->getGameObjects()) {
-				if (!obj) continue;
+            // List all objects
+            ImGui::BeginChild("Object List", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
 
-				// Filter by name
-				if (searchFilter[0] != '\0' &&
-					std::string(obj->getName()).find(searchFilter) == std::string::npos) {
-					continue;
-				}
+            for (auto& obj : scene->getGameObjects()) {
+                if (!obj) continue;
 
-				// Display selectable object
-				bool isSelected = (*selectedObject == obj.get());
-				if (ImGui::Selectable(obj->getName(), isSelected)) {
-					*selectedObject = obj.get();
-				}
+                // Filter by name
+                if (searchFilter[0] != '\0' &&
+                    std::string(obj->getName()).find(searchFilter) == std::string::npos) {
+                    continue;
+                }
 
-				if (isSelected) {
-					anySelected = true;
-					// Scroll to show selected item
-					if (ImGui::GetScrollMaxY() > 0) {
-						ImGui::SetScrollHereY(0.5f);
-					}
-				}
-			}
+                // Display selectable object
+                bool isSelected = (g_SelectedObject == obj.get());
+                if (ImGui::Selectable(obj->getName(), isSelected)) {
+                    g_SelectedObject = obj.get();
+                    g_SelectedFromHierarchy = true;
+                    g_JustSelectedFromHierarchy = true;
+                }
 
-			// Clear selection if no object is selected anymore
-			if (!anySelected && *selectedObject) {
-				*selectedObject = nullptr;
-			}
+                if (isSelected && g_SelectedFromHierarchy && ImGui::GetScrollMaxY() > 0) {
+                    ImGui::SetScrollHereY(0.5f);
+                }
+            }
+            ImGui::EndChild();
+        }
+        ImGui::End();
+    }
 
-			ImGui::EndChild();
+    void renderImGuiObjectEditor() {
+        if (!g_SelectedObject) return;
 
-			// Add/Remove buttons
-			if (ImGui::Button("Create Object")) {
-				scene->createGameObject();
-			}
+        if (ImGui::Begin("Object Editor")) {
+            ImGui::Text("Selected: %s", g_SelectedObject->getName());
+            if (!g_SelectedFromHierarchy) {
+                ImGui::SameLine();
+                ImGui::TextColored(ImVec4(1, 1, 0, 1), "(Raycast Selected)");
+            }
+            ImGui::Separator();
+            // Position editor
+            if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
 
-			ImGui::SameLine();
+                glm::vec3 position = g_SelectedObject->getPosition();
+                if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
+                    g_SelectedObject->setPosition(position, true);
+                }
 
-			/*
-			if (ImGui::Button("Delete Selected") && *selectedObject) {
-				scene->destroyGameObject(*selectedObject->shared_from_this());
-				*selectedObject = nullptr;
-			}
-			*/
-		}
-		ImGui::End();
-	}
+                // Rotation editor with tabs for Euler/Quaternion
+                if (ImGui::BeginTabBar("RotationTabs")) {
+                    // Euler angles tab
+                    if (ImGui::BeginTabItem("Euler Angles")) {
+                        glm::vec3 rotation = g_SelectedObject->getRotation();
+                        if (ImGui::DragFloat3("Rotation", glm::value_ptr(rotation), 1.0f)) {
+                            g_SelectedObject->setRotation(rotation, true);
+                        }
+                        ImGui::EndTabItem();
+                    }
 
-	void renderImGuiObjectEditor(GameObject* selectedObject) {
-		if (!selectedObject) return;
+                    // Quaternion tab
+                    if (ImGui::BeginTabItem("Quaternion")) {
+                        glm::quat rotQuat = g_SelectedObject->getRotationQuaternion();
+                        float quatValues[4] = { rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w };
+                        if (ImGui::DragFloat4("Rotation", quatValues, 0.01f)) {
+                            glm::quat newQuat(quatValues[3], quatValues[0], quatValues[1], quatValues[2]);
+                            newQuat = glm::normalize(newQuat);
+                            g_SelectedObject->setRotationQuaternion(newQuat, true);
+                        }
 
-		// Create a window for the object editor
-		if (ImGui::Begin("Object Editor")) {
-			ImGui::Text("Selected: %s", selectedObject->getName());
-			ImGui::Separator();
+                        if (ImGui::Button("Normalize")) {
+                            glm::quat normalized = glm::normalize(g_SelectedObject->getRotationQuaternion());
+                            g_SelectedObject->setRotationQuaternion(normalized, true);
+                        }
+                        ImGui::EndTabItem();
+                    }
+                    ImGui::EndTabBar();
+                }
 
-			// Position editor
-			if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-				glm::vec3 position = selectedObject->getPosition();
-				if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
-					selectedObject->setPosition(position, true);
-				}
+                // Scale editor
+                glm::vec3 scale = g_SelectedObject->getScale();
+                if (ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.1f)) {
+                    g_SelectedObject->setScale(scale);
+                    
+                }
+            }
+        }
+        ImGui::End();
+    }
 
-				// Rotation editor with tabs for Euler/Quaternion
-				if (ImGui::BeginTabBar("RotationTabs")) {
-					// Euler angles tab
-					if (ImGui::BeginTabItem("Euler Angles")) {
-						glm::vec3 rotation = selectedObject->getRotation();
-						if (ImGui::DragFloat3("Rotation", glm::value_ptr(rotation), 1.0f)) {
-							selectedObject->setRotation(rotation, true);
-						}
-						ImGui::EndTabItem();
-					}
+    void setRaycastSelectedObject(GameObject* obj) {
+        g_SelectedFromHierarchy = obj;
+        // Clear hierarchy selection when selecting via raycast
+        if (obj) {
+            g_SelectedFromHierarchy = false;
+        }
+    }
 
-					// Quaternion tab
-					if (ImGui::BeginTabItem("Quaternion")) {
-						glm::quat rotQuat = selectedObject->getRotationQuaternion();
-						float quatValues[4] = { rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w };
-						if (ImGui::DragFloat4("Rotation", quatValues, 0.01f)) {
-							glm::quat newQuat(quatValues[3], quatValues[0], quatValues[1], quatValues[2]);
-							newQuat = glm::normalize(newQuat);
-							selectedObject->setRotationQuaternion(newQuat, true);
-						}
-
-						if (ImGui::Button("Normalize")) {
-							glm::quat normalized = glm::normalize(selectedObject->getRotationQuaternion());
-							selectedObject->setRotationQuaternion(normalized, true);
-						}
-						ImGui::EndTabItem();
-					}
-					ImGui::EndTabBar();
-				}
-
-				// Scale editor
-				glm::vec3 scale = selectedObject->getScale();
-				if (ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.1f)) {
-					selectedObject->setScale(scale);
-				}
-			}
-
-			// Add more editable properties here as needed
-			if (ImGui::CollapsingHeader("Other Properties")) {
-				// Example: Name editing
-				static char nameBuffer[256];
-				strncpy(nameBuffer, selectedObject->getName(), 256);
-				if (ImGui::InputText("Name", nameBuffer, 256)) {
-					selectedObject->setName(nameBuffer);
-				}
-
-				// Add more properties here...
-			}
-		}
-		ImGui::End();
-	}
+    void handleRaycastSelection(GameObject* hitObject) {
+        // Only set from raycast if we didn't just select from hierarchy
+        // and if the mouse isn't over the ImGui window
+        if (!g_JustSelectedFromHierarchy && !ImGui::GetIO().WantCaptureMouse) {
+            if (hitObject && Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+                g_SelectedObject = hitObject;
+                g_SelectedFromHierarchy = false;
+            }
+        }
+        g_JustSelectedFromHierarchy = false;
+    }
 }

@@ -159,7 +159,7 @@ int main() {
 			//instanciate a cube every seconds at 0 40 0
 			static float timer = 0.0f;
 			timer += deltaTime;
-			if (timer > 0.6f)
+			if (timer > 0.01f)
 			{
 				timer = 0.0f;
 				PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 40.0f, 0.0f));
@@ -175,43 +175,24 @@ int main() {
 
 		UI::UICameraController(scene.getCamera());
 
-		//draw data of the object touching the ray
-		PxRaycastHit hitInfo;
+		// In your raycast detection code:
+		// In your raycast code:
 		auto cameraPos = scene.getCamera()->getPosition();
-		auto cameraDir = scene.getCamera()->getForward();
-		//raycast(pxscene*, origin, direction, maxDistance, hitInfo, filterData, queryFlags, maxHits, hitCall, hitBlock)
-		static GameObject* selectedObject = nullptr;
+		auto cameraDir = scene.getCamera()->getRotation();
+		PxRaycastHit hitInfo;
 		if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, cameraDir, 1000.0f, hitInfo)) {
-			if (Input::isKeyPressed(GLFW_KEY_P))
-			{
-				PrefabManager::instantiate("CubePrefab", scene, glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
-				std::cout << "cube created at: " << hitInfo.position.x << ", " << hitInfo.position.y << ", " << hitInfo.position.z << std::endl;
-			}
+			GameObject* hitObject = static_cast<GameObject*>(hitInfo.actor->userData);
+			UI::handleRaycastSelection(hitObject);
 
-			//check if user data is not null and if not null detect wich class it is from
-			/*GameObject* obj = static_cast<GameObject*>(hitInfo.actor->userData);
-			if (obj)// now show data of the object like obj,getName
-			{
-				ImGui::Text("Object name: %s", obj->getName());
-				//if click, selectec the gm
-				if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT))
-				{
-					seletctedGM = obj;
-				}
+			if (Input::isKeyPressed(GLFW_KEY_P)) {
+				PrefabManager::instantiate("CubePrefab", scene,
+					glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
 			}
-			else
-			{
-				ImGui::Text("Object name: No name");
-			}
-			*/
 		}
 
-		UI::renderImGuiSceneHierarchy(&scene, &selectedObject);
-		UI::renderImGuiObjectEditor(selectedObject);
-
-		//UI::renderImGuiObjectEditor(seletctedGM);
-		ImGui::End();
-
+		// Render UI
+		UI::renderImGuiSceneHierarchy(&scene);
+		UI::renderImGuiObjectEditor();
 		// Render ImGui
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
