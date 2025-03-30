@@ -172,6 +172,9 @@
     <ClInclude Include="CORE\LightComponent.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="CORE\Prefabs\SomePrefabs.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="C:\Users\romai\OneDrive\Bureau\CAT PP.png">

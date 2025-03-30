@@ -195,6 +195,7 @@
     <ClInclude Include="CORE\PhysicsScene.hpp" />
     <ClInclude Include="CORE\Prefabs\PrefabDefinition.hpp" />
     <ClInclude Include="CORE\Prefabs\PrefabManager.hpp" />
+    <ClInclude Include="CORE\Prefabs\SomePrefabs.hpp" />
     <ClInclude Include="CORE\RenderComponent.hpp" />
     <ClInclude Include="CORE\Scene.hpp" />
     <ClInclude Include="CORE\Shader.hpp" />
