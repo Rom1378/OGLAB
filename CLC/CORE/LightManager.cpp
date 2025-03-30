@@ -5,8 +5,8 @@ namespace LightManager
 {
 std::vector<std::shared_ptr<Light>> s_lights;
 
-std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights)
-{
+    std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights)
+    {
 
     std::vector<std::shared_ptr<Light>> relevantLights;
     for (const auto& light : s_lights) {

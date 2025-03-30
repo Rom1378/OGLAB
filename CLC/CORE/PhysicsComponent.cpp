@@ -2,7 +2,6 @@
 #include "SpherePhysics.hpp"
 
 PhysicsComponent::PhysicsComponent(Type t) {
-	// Here you can initialize material or perform other initialization
 	material = Physics::getPhysics()->createMaterial(0.5f, 0.5f, 0.2f); // Friction & restitution
 
 	if (body)
@@ -59,21 +58,6 @@ void PhysicsComponent::setLinearVelocity(const glm::vec3& velocity) {
 	}
 }
 
-/*
-void PhysicsComponent::updateTransform() {
-	if (body) {
-		PxTransform transform = body->getGlobalPose();
-
-		getGameObject()->setPosition(glm::vec3(transform.p.x, transform.p.y, transform.p.z), false);
-
-		// Convertir correctement PxQuat en angles d'Euler (en radians)
-		glm::quat rotationQuat(transform.q.w, -transform.q.x, transform.q.y, transform.q.z);
-		glm::vec3 eulerAngles = glm::eulerAngles(rotationQuat);
-
-		// Ne mettez à jour la rotation que si elle n'a pas été modifiée par l'utilisateur
-		getGameObject()->setRotation(glm::degrees(eulerAngles), false);  // Convertir en degrés
-	}
-}*/
 void PhysicsComponent::updatePhysX() {
 	if (body) {
 		// Get the current transform from the game object
@@ -110,24 +94,6 @@ void PhysicsComponent::updateTransform() {
 	}
 }
 
-
-void PhysicsComponent::debugDrawRotationAxes() {
-	if (!body) return;
-
-	PxTransform transform = body->getGlobalPose();
-	PxVec3 position = transform.p;
-
-	// Draw axes (using your rendering system)
-	float axisLength = 1.0f;
-
-	// X axis (red)
-	//drawDebugLine(position, position + transform.q.rotate(PxVec3(axisLength, 0, 0)), RED);
-	// Y axis (green)
-	//drawDebugLine(position, position + transform.q.rotate(PxVec3(0, axisLength, 0)), GREEN);
-	// Z axis (blue)
-	//drawDebugLine(position, position + transform.q.rotate(PxVec3(0, 0, axisLength)), BLUE);
-}
-
 void PhysicsComponent::releaseAllShapes() {
 	if (!body) return;
 
@@ -146,6 +112,31 @@ void PhysicsComponent::releaseAllShapes() {
 
 	// Clear our tracked shapes
 	this->shapes.clear();
+}
+
+
+void PhysicsComponent::setPosition(const glm::vec3& position) {
+	if (body) {
+		body->setGlobalPose(PxTransform(position.x, position.y, position.z));
+	}
+}
+
+glm::vec3 PhysicsComponent::getScale() {
+	if (!body || body->getNbShapes() == 0) return glm::vec3(1.0f);
+
+	PxShape* shape;
+	body->getShapes(&shape, 1);
+	PxGeometryHolder geomHolder = shape->getGeometry();
+
+	switch (geomHolder.getType()) {
+	case PxGeometryType::eBOX: {
+		PxBoxGeometry box = geomHolder.box();
+		return glm::vec3(box.halfExtents.x, box.halfExtents.y, box.halfExtents.z);
+	}
+							 // Add cases for other geometry types as needed
+	default:
+		return glm::vec3(1.0f);
+	}
 }
 
 void CubePhysics::init() {
@@ -182,55 +173,6 @@ void CubePhysics::init() {
 		std::cerr << "Failed to create rigid body!" << std::endl;
 	}
 }
-/*
-void CubePhysics::init() {
-	if (!material) {
-		std::cerr << "Material creation failed!" << std::endl;
-		return;
-	}
-
-	GameObject* gm = getGameObject();
-	glm::vec3 scale = gm->getScale();
-
-	// Create shape with proper collision geometry
-	PxShape* shape = Physics::getPhysics()->createShape(
-		PxBoxGeometry(0.5f * scale.x, 0.5f * scale.y, 0.5f * scale.z),
-		*material,
-		true
-	);
-
-	// CRITICAL: Set proper local pose
-	shape->setLocalPose(PxTransform(PxIdentity));
-
-	body->attachShape(*shape);
-	shapes.push_back(shape);
-
-	// Set initial transform - must match GameObject's transform
-	PxTransform transform(
-		PxVec3(gm->getPosition().x, gm->getPosition().y, gm->getPosition().z),
-		glmEulerToPxQuat(gm->getRotation())
-	);
-	body->setGlobalPose(transform);
-
-	if (isDynamic) {
-		PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
-		if (dynamic) {
-			// Correct way to unlock all rotations
-			dynamic->setRigidDynamicLockFlags(PxRigidDynamicLockFlags());
-
-			// Set reasonable damping
-			dynamic->setAngularDamping(0.5f);
-
-			// Update mass properties
-			PxRigidBodyExt::updateMassAndInertia(*dynamic, mass);
-
-			// Wake up the actor
-			dynamic->wakeUp();
-		}
-	}
-
-}*/
-
 
 void CubePhysics::applyScale(const glm::vec3& scale) {
 	if (!body) return;
@@ -238,8 +180,6 @@ void CubePhysics::applyScale(const glm::vec3& scale) {
 	// Release existing shapes
 	releaseAllShapes();
 
-	// Create new shape with proper scaled dimensions
-	// Note: The 0.5f factors are because PhysX uses half-extents
 	PxShape* shape = Physics::getPhysics()->createShape(
 		PxBoxGeometry(0.5f * scale.x, 0.5f * scale.y, 0.5f * scale.z),
 		*material,
@@ -260,6 +200,7 @@ void CubePhysics::applyScale(const glm::vec3& scale) {
 		dynamic->wakeUp();
 	}
 }
+
 void PhysicsComponent::setRotation(const glm::vec3& eulerDegrees) {
 	if (body) {
 		// Convert to quaternion (world-space)
@@ -282,46 +223,3 @@ void PhysicsComponent::setRotation(const glm::vec3& eulerDegrees) {
 		));
 	}
 }
-
-/*
-void PhysicsComponent::setRotation(const glm::vec3& eulerAngles) {
-	if (body) {
-		// Euler to Quaternion conversion
-		glm::vec3 radAngles = glm::radians(
-			glm::all(glm::isfinite(eulerAngles)) ? eulerAngles : glm::vec3(0)
-		);
-
-		// GLM's built-in conversion (uses XYZ order)
-		glm::quat q = glm::quat(radAngles);
-
-		// Convert to PhysX format (xyzw -> xyzw)
-		PxQuat pxQuat(q.x, q.y, q.z, q.w);
-		pxQuat.normalize();
-
-		body->setGlobalPose(PxTransform(body->getGlobalPose().p, pxQuat));
-	}
-}
-
-/*
-void PhysicsComponent::setRotation(const glm::vec3& rotation) {
-	if (!body) return;
-
-	// Ensure correct quaternion multiplication order (yaw, pitch, roll)
-	PxQuat quat = PxQuat(glm::radians(rotation.z), PxVec3(0, 0, 1)) *  // Roll
-		PxQuat(glm::radians(rotation.x), PxVec3(1, 0, 0)) *  // Pitch
-		PxQuat(glm::radians(rotation.y), PxVec3(0, 1, 0));   // Yaw
-
-	body->setGlobalPose(PxTransform(body->getGlobalPose().p, quat));
-	return;
-
-	PxTransform newPose = body->getGlobalPose();
-	newPose.q = quat;
-	body->setGlobalPose(newPose);
-
-	// Ensure inertia tensor updates if dynamic
-	PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
-	if (dynamic) {
-		dynamic->setAngularVelocity(PxVec3(0, 0, 0));
-		PxRigidBodyExt::updateMassAndInertia(*dynamic, dynamic->getMass());
-	}
-}*/

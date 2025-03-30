@@ -1,7 +1,6 @@
 #include "CubeRenderer.hpp"
 #include "Mesh/CubeMesh.hpp"
 
-#include "LightManager.hpp" 
 void CubeRenderer::init() {
 
 	// Generate and bind VAO, VBO, and EBO

@@ -2,12 +2,12 @@
 #include "RenderComponent.hpp"
 #include "GameObject.hpp"
 #include <iostream>
+#include "LightManager.hpp" 
 
 class CubeRenderer : public RenderComponent {
 
 protected:
 	
-
 public:
 
 
