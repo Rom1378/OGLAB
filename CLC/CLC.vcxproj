@@ -197,6 +197,7 @@
     <ClInclude Include="CORE\Prefabs\PrefabManager.hpp" />
     <ClInclude Include="CORE\Prefabs\SomePrefabs.hpp" />
     <ClInclude Include="CORE\RenderComponent.hpp" />
+    <ClInclude Include="CORE\RenderComponents\Cursor.hpp" />
     <ClInclude Include="CORE\Scene.hpp" />
     <ClInclude Include="CORE\Shader.hpp" />
     <ClInclude Include="CORE\ShaderProgram.hpp" />
@@ -204,6 +205,8 @@
     <ClInclude Include="CORE\SphereRenderer.hpp" />
     <ClInclude Include="CORE\TextureManager.hpp" />
     <ClInclude Include="CORE\Transform.hpp" />
+    <ClInclude Include="CORE\UI\CameraController.hpp" />
+    <ClInclude Include="CORE\UI\SceneObjectEditor.hpp" />
     <ClInclude Include="CORE\Window.hpp" />
     <ClInclude Include="CORE\RayCastComponent.h" />
   </ItemGroup>

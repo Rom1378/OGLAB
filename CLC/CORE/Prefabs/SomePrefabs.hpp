@@ -6,8 +6,6 @@
 #include "../CubeRenderer.hpp"
 
 
-
-
 void registerPrefabs() {
 	// Register a Cube prefab
 	PrefabManager::registerPrefab(

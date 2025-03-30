@@ -13,6 +13,9 @@
 #include "../CORE/Prefabs/SomePrefabs.hpp"
 
 #include "../CORE/UI/CameraController.hpp"
+#include "../CORE/UI/SceneObjectEditor.hpp"
+
+#include "../CORE/RenderComponents/Cursor.hpp"
 
 using namespace std::chrono;
 
@@ -24,124 +27,6 @@ float getDeltaTime() {
 	lastTime = currentTime;
 	return deltaTime.count(); // Returns time in seconds
 }
-
-void renderImGuiObjectEditor(GameObject* selectedObject) {
-	if (!selectedObject) return;
-
-	// Create a window for the object editor
-	if (ImGui::Begin("Object Editor")) {
-		ImGui::Text("Selected: %s", selectedObject->getName());
-
-		// Position editor
-		glm::vec3 position = selectedObject->getPosition();
-		if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
-			selectedObject->setPosition(position, true); // true to update physics
-		}
-
-		// Option 1: Edit using Euler angles (more intuitive)
-		glm::vec3 rotation = selectedObject->getRotation();
-		if (ImGui::DragFloat3("Rotation (Euler)", glm::value_ptr(rotation), 1.0f)) {
-			selectedObject->setRotation(rotation, true); // true to update physics
-		}
-
-		// Option 2: Edit using quaternion (more precise, but less intuitive)
-		glm::quat rotQuat = selectedObject->getRotationQuaternion();
-		float quatValues[4] = { rotQuat.x, rotQuat.y, rotQuat.z, rotQuat.w };
-		if (ImGui::DragFloat4("Rotation (Quaternion)", quatValues, 0.01f)) {
-			// Normalize the quaternion to prevent distortion
-			glm::quat newQuat(quatValues[3], quatValues[0], quatValues[1], quatValues[2]);
-			newQuat = glm::normalize(newQuat);
-			selectedObject->setRotationQuaternion(newQuat, true);
-		}
-
-		// Add a button to normalize the quaternion explicitly
-		if (ImGui::Button("Normalize Quaternion")) {
-			glm::quat normalized = glm::normalize(selectedObject->getRotationQuaternion());
-			selectedObject->setRotationQuaternion(normalized, true);
-		}
-
-		// Scale editor
-		glm::vec3 scale = selectedObject->getScale();
-		if (ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.1f)) {
-			selectedObject->setScale(scale);
-		}
-	}
-	ImGui::End();
-}
-
-
-
-class UICursorComponent : public RenderComponent {
-public:
-
-	UICursorComponent() : RenderComponent() {
-		init();
-	}
-	UICursorComponent(const UICursorComponent& other) : RenderComponent(other) {
-		init();
-	}
-	void init() override {
-		vertices = { -10.0f,  0.0f,  // Horizontal line
-	 10.0f,  0.0f,
-	 0.0f, -10.0f,  // Vertical line
-	 0.0f,  10.0f };
-		indices = {};
-
-
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
-
-		setShader("cursor");
-	}
-
-	void draw(const std::shared_ptr<Camera> cam) override {
-		draw();
-	}
-	void draw() override {
-
-		auto shader = ShaderManager::getShader("cursor");
-		if (!shader) return;
-
-		shader->use();
-
-		glDisable(GL_DEPTH_TEST);  // UI elements should render on top
-
-		// Compute orthographic projection
-		glm::mat4 projection = glm::ortho(0.0f, (float)Window::getFrameBufferWidth(), 0.0f, (float)Window::getFrameBufferHeight());
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(Window::getFrameBufferWidth() / 2.0f, Window::getFrameBufferHeight() / 2.0f, 0.0f));
-
-		// Use shader program
-
-		// Send matrices to shader
-		GLuint projLoc = glGetUniformLocation(shader->getProgram(), "uProjection");
-		GLuint modelLoc = glGetUniformLocation(shader->getProgram(), "uModel");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-		// Draw crosshair
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_LINES, 0, 4);
-		glBindVertexArray(0);
-
-		glEnable(GL_DEPTH_TEST);
-	}
-	void draw(const glm::mat4& view, const glm::mat4& projection) override {
-		draw();
-	}
-};
-
-
-
 
 int main() {
 	// register prefabs
@@ -165,14 +50,12 @@ int main() {
 	// Initialize PhysX
 	Physics::init();
 
-	GameObject* seletctedGM = nullptr;
 
 	// Create scene
 	Scene scene;
 	scene.init();
 	//add cube prefab
 	auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
-	/*
 {
 	// Load texture
 	auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
@@ -180,8 +63,6 @@ int main() {
 	auto cubeObj = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(100.0f, 100.0f, 100.0f));
 	cubeObj->getComponent<RenderComponent>()->addTexture(txtr);
 	cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
-
-
 
 
 
@@ -195,8 +76,6 @@ int main() {
 	scene.addGameObject(sphereObj);
 
 	spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
-
-
 
 
 
@@ -216,7 +95,6 @@ int main() {
 //sun
 
 }
-*/
 	auto world = std::make_shared<GameObject>("World");
 	world->setScale(glm::vec3(1000.0f, 10.0f, 1000.0f));
 	world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
@@ -243,16 +121,13 @@ int main() {
 
 
 	//LightSpherePrefab
-	//auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
-
-
+	auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
+	scene.addGameObject(sphereObj);
 
 	//gameobject cursor 
 	auto cursor = std::make_shared<GameObject>("Cursor");
 	cursor->addComponent<UICursorComponent>();
 	scene.addGameObject(cursor);
-
-
 
 	// Enable depth testing
 	glEnable(GL_DEPTH_TEST);
@@ -297,19 +172,16 @@ int main() {
 		{
 			scene.getCamera()->setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
 		}
-		UICameraController(scene.getCamera());
 
+		UI::UICameraController(scene.getCamera());
 
 		//draw data of the object touching the ray
-		ImGui::Begin("Raycast");
 		PxRaycastHit hitInfo;
 		auto cameraPos = scene.getCamera()->getPosition();
 		auto cameraDir = scene.getCamera()->getForward();
 		//raycast(pxscene*, origin, direction, maxDistance, hitInfo, filterData, queryFlags, maxHits, hitCall, hitBlock)
+		static GameObject* selectedObject = nullptr;
 		if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, cameraDir, 1000.0f, hitInfo)) {
-			ImGui::Text("Hit object at: %f, %f, %f", hitInfo.position.x, hitInfo.position.y, hitInfo.position.z);
-
-			//if click p, create one cube at this position
 			if (Input::isKeyPressed(GLFW_KEY_P))
 			{
 				PrefabManager::instantiate("CubePrefab", scene, glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
@@ -317,7 +189,7 @@ int main() {
 			}
 
 			//check if user data is not null and if not null detect wich class it is from
-			GameObject* obj = static_cast<GameObject*>(hitInfo.actor->userData);
+			/*GameObject* obj = static_cast<GameObject*>(hitInfo.actor->userData);
 			if (obj)// now show data of the object like obj,getName
 			{
 				ImGui::Text("Object name: %s", obj->getName());
@@ -331,9 +203,13 @@ int main() {
 			{
 				ImGui::Text("Object name: No name");
 			}
+			*/
 		}
 
-		renderImGuiObjectEditor(seletctedGM);
+		UI::renderImGuiSceneHierarchy(&scene, &selectedObject);
+		UI::renderImGuiObjectEditor(selectedObject);
+
+		//UI::renderImGuiObjectEditor(seletctedGM);
 		ImGui::End();
 
 		// Render ImGui
