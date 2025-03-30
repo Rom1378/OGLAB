@@ -11,7 +11,6 @@ std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Came
     std::vector<std::shared_ptr<Light>> relevantLights;
     for (const auto& light : s_lights) {
         // Add logging to verify lights are present
-        std::cout << "Number of lights: " << s_lights.size() << std::endl;
 
         float distance = glm::distance(light->getPosition(), cam->getPosition());
         if (distance < cam->getMaxLightDistance()) {

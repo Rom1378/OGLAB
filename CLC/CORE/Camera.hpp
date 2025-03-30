@@ -199,10 +199,10 @@ public:
 			}
 
 			if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
-				m_speed = 10.0f;
+				m_speed = 32.0f;
 			}
 			else {
-				m_speed = 5.0f;
+				m_speed = 10.0f;
 			}
 		}
 

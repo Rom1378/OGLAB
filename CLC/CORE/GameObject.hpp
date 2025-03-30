@@ -66,11 +66,13 @@ public:
 	void render(std::shared_ptr<Camera> cam);
 
 	// Set position and update physics component if exists
-	void setPosition(const glm::vec3& position);
+	void setPosition(const glm::vec3& position, bool update_physx=true);
 
 	//set rotation and update physics component if exists
 	void setRotation(const glm::vec3& rotation, bool update_physx = true);
 
+	// Add this to your GameObject class
+	void setRotationQuaternion(const glm::quat& rotation, bool update_physx = true);
 	// Set scale and update physics component if exists
 	void setScale(const glm::vec3& scale);
 

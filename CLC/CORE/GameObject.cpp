@@ -23,12 +23,13 @@ void GameObject::render(std::shared_ptr<Camera> cam) {
 }
 
 // Set position and update physics component if exists
-void GameObject::setPosition(const glm::vec3& position) {
+void GameObject::setPosition(const glm::vec3& position, bool update_physx){
 
 	Transform::setPosition(position);
-
-	if (auto physicsComponent = getComponent<PhysicsComponent>()) {
-		physicsComponent->setPosition(position);
+	if (update_physx) {
+		if (auto physicsComponent = getComponent<PhysicsComponent>()) {
+			physicsComponent->setPosition(position);
+		}
 	}
 }
 
@@ -40,6 +41,19 @@ void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
 	if (update_physx) {
 		if (auto physicsComponent = getComponent<PhysicsComponent>())
 			physicsComponent->setRotation(rotation);
+	}
+}
+
+// Add this to your GameObject class
+void GameObject::setRotationQuaternion(const glm::quat& rotation, bool update_physx) {
+	Transform::setRotationQuaternion(rotation);
+
+	if (update_physx) {
+		// Update physics component if it exists
+		auto physicsComponent = getComponent<PhysicsComponent>();
+		if (physicsComponent) {
+			physicsComponent->updatePhysX();
+		}
 	}
 }
 

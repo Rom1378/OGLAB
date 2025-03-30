@@ -92,6 +92,10 @@ public:
 
         setShader("cursor");
     }
+
+    void draw(const std::shared_ptr<Camera> cam) override {
+		draw();
+	}
     void draw() override {
 
         auto shader = ShaderManager::getShader("cursor");
@@ -132,7 +136,7 @@ void registerPrefabs() {
             // Add required components
             auto cubeRenderer = obj->addComponent<CubeRenderer>();
             auto cubePhysics = obj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
-            cubePhysics->setMass(10);
+            cubePhysics->setMass(1);
             })
         .setDefaultPosition(glm::vec3(0.0f, 20.0f, 0.0f))
                 );
@@ -142,7 +146,7 @@ void registerPrefabs() {
         PrefabDefinition("SpherePrefab", [](std::shared_ptr<GameObject> obj) {
             auto sphereRenderer = obj->addComponent<SphereRenderer>();
             auto spherePhysics = obj->addComponent<SpherePhysics>(PhysicsComponent::Type::DYNAMIC);
-            spherePhysics->setMass(10);
+            spherePhysics->setMass(7);
             })
         .setDefaultPosition(glm::vec3(0.0f, 10.0f, 0.0f))
 
@@ -154,7 +158,7 @@ void registerPrefabs() {
         PrefabDefinition("WorldPrefab", [](std::shared_ptr<GameObject> obj) {
             obj->setScale(glm::vec3(100.0f, 1.0f, 100.0f));
             obj->addComponent<CubeRenderer>();
-            obj->addComponent<CubePhysics>();
+            obj->addComponent<CubePhysics>(PhysicsComponent::Type::STATIC);
             })
         .setDefaultPosition(glm::vec3(0.0f, -10.0f, 0.0f))
                 );
@@ -202,16 +206,10 @@ int main() {
     // Create scene
     Scene scene;
     scene.init();
+        //add cube prefab
+		auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
+        /*
     {
-/*
-        auto cubeObj = std::make_shared<GameObject>("Cube");
-        cubeObj->setPosition(glm::vec3(0.0f, 10.0f, -30.0f)); // Positionner le cube au centre
-        auto cubeRenderer = cubeObj->addComponent<CubeRenderer>();
-        auto cubePhysics = cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
-        cubePhysics->setMass(10);
-        scene.addGameObject(cubeObj);
-		cubeRenderer->addTexture(txtr);
-*/
 		// Load texture
 		auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
 
@@ -222,8 +220,6 @@ int main() {
 
 
 
-        //add cube prefab
-		auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
 
         //sphere
         auto sphereObj = std::make_shared<GameObject>("Sphere");
@@ -237,20 +233,7 @@ int main() {
         spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
 
 
-        auto world = std::make_shared<GameObject>("World");
-        world->setScale(glm::vec3(1000.0f, 10.0f, 1000.0f));
-        world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
-        auto wren= world->addComponent<CubeRenderer>();
-        world->addComponent<CubePhysics>();
-        scene.addGameObject(world);
 
-        auto doogtxtr = TextureManager::loadTexture("res/textures/doog.PNG", "doog.PNG");
-		world->getComponent<RenderComponent>()->addTexture(doogtxtr);
-
-        auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
-        camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
-        camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-        scene.setCamera(camera);
 
 
         //textures
@@ -267,6 +250,24 @@ int main() {
 		scene.setCubemap(cb);
 
     //sun
+
+    }
+    */
+        auto world = std::make_shared<GameObject>("World");
+        world->setScale(glm::vec3(1000.0f, 10.0f, 1000.0f));
+        world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
+        auto wren= world->addComponent<CubeRenderer>();
+        world->addComponent<CubePhysics>(CubePhysics::Type::STATIC);
+        scene.addGameObject(world);
+        auto doogtxtr = TextureManager::loadTexture("res/textures/doog.PNG", "doog.PNG");
+		world->getComponent<RenderComponent>()->addTexture(doogtxtr);
+
+        auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
+        camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
+        camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+        scene.setCamera(camera);
+
+
     auto sunLight = std::make_shared<Light>(
         LightType::DIRECTIONAL,  // Light type is DIRECTIONAL for sun
         glm::vec3(0.0f, 0.0f, 0.0f),  // Position (less relevant for directional lights)
@@ -276,11 +277,9 @@ int main() {
     );
     LightManager::addLight(sunLight);
 
-    }
-
 
     //LightSpherePrefab
-    auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
+    //auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
 
 
 
@@ -312,7 +311,8 @@ int main() {
 
         Window::clear();
         Input::update();
-        scene.update(deltaTime);
+        // Update physics with dt = 0.001f
+        scene.update(0.01f);
         scene.render();
 
 
@@ -322,7 +322,7 @@ int main() {
             //instanciate a cube every seconds at 0 40 0
 			static float timer = 0.0f;
 			timer += deltaTime;
-			if (timer > 1.0f)
+			if (timer > 0.6f)
 			{
 				timer = 0.0f;
 				PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 40.0f, 0.0f));
@@ -374,24 +374,76 @@ int main() {
 
             //A ui that allow me to control a gameobject, moving it turning it. adding forces...
 		}
-			if (seletctedGM)
-			{
-				ImGui::Text("Selected object: %s", seletctedGM->getName());
-                //move and rotate with slider
-                    glm::vec3 pos = seletctedGM->getPosition();
-                    glm::vec3 rot = seletctedGM->getRotation();
-                    glm::vec3 scale= seletctedGM->getScale();
-					glm::vec3 col = seletctedGM->getComponent<RenderComponent>()->getColor();
 
-					ImGui::ColorEdit3("Color", glm::value_ptr(col));
-                    ImGui::SliderFloat3("Position", glm::value_ptr(pos), -100.0f, 100.0f);
-                    ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -1.0f, 1.0f);
-                    ImGui::SliderFloat3("Scale", glm::value_ptr(scale), 0.1f, 10.0f);
-                    seletctedGM->setPosition(pos);
-                    seletctedGM->setRotation(rot);
-                    seletctedGM->setScale(scale);
+
+        /*
+        if (seletctedGM)
+        {
+            ImGui::Text("Selected object: %s", seletctedGM->getName());
+            //move and rotate with slider
+            glm::vec3 pos = seletctedGM->getPosition();
+            glm::vec3 rot = seletctedGM->getRotation();
+            glm::vec3 scale = seletctedGM->getScale();
+            glm::vec3 col = seletctedGM->getComponent<RenderComponent>()->getColor();
+
+            ImGui::ColorEdit3("Color", glm::value_ptr(col));
+            ImGui::SliderFloat3("Position", glm::value_ptr(pos), -100.0f, 100.0f);
+            ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -90.0f, 90.0f);
+            ImGui::SliderFloat3("Scale", glm::value_ptr(scale), 0.1f, 10.0f);
+            seletctedGM->setPosition(pos);
+            seletctedGM->setRotation(rot);
+            seletctedGM->setScale(scale);
+            seletctedGM->getComponent<RenderComponent>()->setColor(col);
+
+
+        }*/
+
+
+        if (seletctedGM)
+        {
+            ImGui::Text("Selected object: %s", seletctedGM->getName());
+            //move and rotate with slider
+            glm::vec3 pos = seletctedGM->getPosition();
+            glm::vec3 rot = seletctedGM->getRotation();
+            glm::vec3 scale = seletctedGM->getScale();
+            glm::vec3 col = seletctedGM->getComponent<RenderComponent>()->getColor();
+
+            ImGui::ColorEdit3("Color", glm::value_ptr(col));
+            if (ImGui::SliderFloat3("Position", glm::value_ptr(pos), -100.0f, 100.0f))
+                seletctedGM->setPosition(pos);
+            if (ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -180.0f, 180.0f)){
+                if (auto physics = seletctedGM->getComponent<PhysicsComponent>()) {
+                    // Make kinematic, rotate, then optionally make dynamic again
+                    physics->setRotation(rot);
+
+                    // Optional: Add small delay before making dynamic again
+                    // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                }
+        }
+
+                    if (ImGui::SliderFloat3("Scale", glm::value_ptr(scale), 0.1f, 10.0f))
+                        seletctedGM->setScale(scale);
+
 					seletctedGM->getComponent<RenderComponent>()->setColor(col);
 
+                    if (ImGui::Button("Test 90° Y Rotation")) {
+                        if (seletctedGM) {
+                            glm::vec3 currentRot = seletctedGM->getRotation();
+                            glm::vec3 newRot = currentRot + glm::vec3(0, 90, 0);
+
+                            // Get physics component
+                            if (auto physics = seletctedGM->getComponent<PhysicsComponent>()) {
+                                // Make kinematic, rotate, then optionally make dynamic again
+                                physics->setRotation(newRot);
+
+                                // Optional: Add small delay before making dynamic again
+                                // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                            }
+
+                            // Update game object transform
+                            seletctedGM->setRotation(newRot, false); // Don't trigger physics update again
+                        }
+                    }
 
 			}
 		ImGui::End();

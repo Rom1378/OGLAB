@@ -6,11 +6,13 @@ void Scene::update(float dt) {
 
     m_camera->update(dt);
 
+
     m_physicsScene->update(dt);
 
     for (auto& gameObject : m_gameObjects) {
         gameObject->update(dt);
     }
+
 }
 
 void Scene::render() {

@@ -158,7 +158,10 @@
     <ClCompile Include="CORE\Input.cpp" />
     <ClCompile Include="CORE\Light.cpp" />
     <ClCompile Include="CORE\LightManager.cpp" />
-    <ClCompile Include="CORE\LightManager.hpp" />
+    <ClCompile Include="CORE\LightManager.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="CORE\Physics.cpp" />
     <ClCompile Include="CORE\PhysicsComponent.cpp" />
     <ClCompile Include="CORE\Prefabs\PrefabManager.cpp" />
