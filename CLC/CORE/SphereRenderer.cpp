@@ -12,8 +12,8 @@ void SphereRenderer::draw(const std::shared_ptr<Camera> cam) {
     m_shader->setMat4("view", glm::value_ptr(cam->getViewMatrix()));
     m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
 
-
-    std::vector<std::shared_ptr<Light>> relevantLights = LightManager::getRelevantLights(cam, 128);
+    std::vector<std::shared_ptr<Light>> relevantLights = 
+        LightManager::getRelevantLights(cam, 128);
 
     bool useLighting = !relevantLights.empty();
     m_shader->setBool("useLighting", useLighting);

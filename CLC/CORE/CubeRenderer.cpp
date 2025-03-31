@@ -1,3 +1,4 @@
+#include "LightManager.hpp"
 #include "CubeRenderer.hpp"
 #include "Mesh/CubeMesh.hpp"
 
@@ -53,7 +54,7 @@ void CubeRenderer::draw(const std::shared_ptr<Camera> cam) {
 
 	// Handle lighting
 	std::vector<std::shared_ptr<Light>>
-		relevantLights = LightManager::getRelevantLights(cam, 128);
+	relevantLights = LightManager::getRelevantLights(cam, 128);
 	bool useLighting = !relevantLights.empty();
 
 	m_shader->setBool("useLighting", useLighting);
