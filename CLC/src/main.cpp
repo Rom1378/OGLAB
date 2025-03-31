@@ -135,7 +135,7 @@ int main() {
 			auto cameraPos = scene.getCamera()->getPosition();
 			auto cameraDir = scene.getCamera()->getRotation();
 			PxRaycastHit hitInfo;
-			if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, cameraDir, 1000.0f, hitInfo)) {
+			if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, glm::normalize(cameraDir), 1000.0f, hitInfo)) {
 				GameObject* hitObject = static_cast<GameObject*>(hitInfo.actor->userData);
 				UI::handleRaycastSelection(hitObject);
 				if (Input::isKeyPressed(GLFW_KEY_P)) {
