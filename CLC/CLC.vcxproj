@@ -173,6 +173,7 @@
     <ClCompile Include="CORE\SphereRenderer.cpp" />
     <ClCompile Include="CORE\TextureManager.cpp" />
     <ClCompile Include="CORE\UIGameObjectController.cpp" />
+    <ClCompile Include="CORE\UI\SceneObjectEditor.cpp" />
     <ClCompile Include="CORE\Window.cpp" />
     <ClCompile Include="CORE\RayCastComponent.cpp" />
     <ClCompile Include="src\main.cpp" />

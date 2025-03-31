@@ -4,7 +4,8 @@
 
 void Scene::update(float dt) { 
 
-    m_camera->update(dt);
+    if(m_camera)
+        m_camera->update(dt);
 
 
     m_physicsScene->update(dt);

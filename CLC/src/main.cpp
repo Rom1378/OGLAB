@@ -1,5 +1,3 @@
-#include "../CORE/LightManager.hpp"
-
 #include "../CORE/Scene.hpp"
 #include "../CORE/Window.hpp"
 #include "../CORE/Input.hpp"
@@ -10,91 +8,60 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "../CORE/Engine.hpp"
 #include "../CORE/Prefabs/SomePrefabs.hpp"
-
 #include "../CORE/UI/CameraController.hpp"
+#include "../CORE/RenderComponents/Cursor.hpp"
 #include "../CORE/UI/SceneObjectEditor.hpp"
 
-#include "../CORE/RenderComponents/Cursor.hpp"
-
-using namespace std::chrono;
-
-high_resolution_clock::time_point lastTime = high_resolution_clock::now();
-
-float getDeltaTime() {
-	high_resolution_clock::time_point currentTime = high_resolution_clock::now();
-	duration<float> deltaTime = duration_cast<duration<float>>(currentTime - lastTime);
-	lastTime = currentTime;
-	return deltaTime.count(); // Returns time in seconds
-}
-
 int main() {
-	// register prefabs
-	registerPrefabs();
 
-	// Initialize window
-	Window::WindowProps props;
-	props.title = "CLC";
-	props.width = 1280;
-	props.height = 720;
-	Window::init(props);
-	std::cout << Window::isVSync() << std::endl;
-
-
-	// Initialize input
-	Input::init();
-
-	// Load shaders
-	ShaderManager::loadConfigs("shaders.json");
-
-	// Initialize PhysX
-	Physics::init();
-
+	Engine::init();
 
 	// Create scene
 	Scene scene;
 	scene.init();
 	//add cube prefab
 	auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
-{
-	// Load texture
-	auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
+	{
+		// Load texture
+		auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
 
-	auto cubeObj = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(100.0f, 100.0f, 100.0f));
-	cubeObj->getComponent<RenderComponent>()->addTexture(txtr);
-	cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
-
-
-
-	//sphere
-	auto sphereObj = std::make_shared<GameObject>("Sphere");
-	sphereObj->setPosition(glm::vec3(0.0f, 10.0f, 0.0f)); // Positionner le cube au centre
-	auto sphereRenderer = sphereObj->addComponent<SphereRenderer>();
-	auto spherePhysics = sphereObj->addComponent<SpherePhysics>(PhysicsComponent::Type::DYNAMIC);
-
-	spherePhysics->setMass(10);
-	scene.addGameObject(sphereObj);
-
-	spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
+		auto cubeObj = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(100.0f, 100.0f, 100.0f));
+		cubeObj->getComponent<RenderComponent>()->addTexture(txtr);
+		cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
 
 
 
-	//textures
-	std::vector<std::string> faces = {  "res/textures/CubeMaps/skybox/right.jpg",
-										"res/textures/CubeMaps/skybox/left.jpg",
-										"res/textures/CubeMaps/skybox/top.jpg",
-										"res/textures/CubeMaps/skybox/bottom.jpg",
-										"res/textures/CubeMaps/skybox/front.jpg",
-										"res/textures/CubeMaps/skybox/back.jpg" };
-	//cubemap
-	auto cb = std::make_shared<CubeMap>();
-	cb->init();
-	cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
-	scene.setCubemap(cb);
+		//sphere
+		auto sphereObj = std::make_shared<GameObject>("Sphere");
+		sphereObj->setPosition(glm::vec3(0.0f, 10.0f, 0.0f)); // Positionner le cube au centre
+		auto sphereRenderer = sphereObj->addComponent<SphereRenderer>();
+		auto spherePhysics = sphereObj->addComponent<SpherePhysics>(PhysicsComponent::Type::DYNAMIC);
 
-//sun
+		spherePhysics->setMass(10);
+		scene.addGameObject(sphereObj);
 
-}
+		spherePhysics->applyForce(glm::vec3(0.0f, 0.0f, -100.0f));
+
+
+
+		//textures
+		std::vector<std::string> faces = { "res/textures/CubeMaps/skybox/right.jpg",
+											"res/textures/CubeMaps/skybox/left.jpg",
+											"res/textures/CubeMaps/skybox/top.jpg",
+											"res/textures/CubeMaps/skybox/bottom.jpg",
+											"res/textures/CubeMaps/skybox/front.jpg",
+											"res/textures/CubeMaps/skybox/back.jpg" };
+		//cubemap
+		auto cb = std::make_shared<CubeMap>();
+		cb->init();
+		cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
+		scene.setCubemap(cb);
+
+		//sun
+
+	}
 	auto world = std::make_shared<GameObject>("World");
 	world->setScale(glm::vec3(1000.0f, 10.0f, 1000.0f));
 	world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
@@ -129,6 +96,7 @@ int main() {
 	cursor->addComponent<UICursorComponent>();
 	scene.addGameObject(cursor);
 
+
 	// Enable depth testing
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -137,9 +105,7 @@ int main() {
 
 	// Create the framebuffer
 	Window::CreateFramebuffer(1, 1);
-
 	while (Window::isOpen()) {
-		float deltaTime = getDeltaTime();
 
 		if (Input::isKeyPressed(GLFW_KEY_ESCAPE)) {
 			Input::setMouseLocked(false); // Unlock mouse when Escape is pressed
@@ -147,18 +113,11 @@ int main() {
 		if (Input::isKeyPressed(GLFW_KEY_LEFT_ALT)) {
 			Input::setMouseLocked(true);
 		}
-
-		Window::clear();
-		Input::update();
-		// Update physics with dt = 0.001f
-		scene.update(0.01f);
-		scene.render();
-
 		///////
 		{
 			//instanciate a cube every seconds at 0 40 0
 			static float timer = 0.0f;
-			timer += deltaTime;
+			timer += Engine::get_dt();
 			if (timer > 0.01f)
 			{
 				timer = 0.0f;
@@ -175,33 +134,29 @@ int main() {
 
 		UI::UICameraController(scene.getCamera());
 
-		// In your raycast detection code:
-		// In your raycast code:
-		auto cameraPos = scene.getCamera()->getPosition();
-		auto cameraDir = scene.getCamera()->getRotation();
-		PxRaycastHit hitInfo;
-		if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, cameraDir, 1000.0f, hitInfo)) {
-			GameObject* hitObject = static_cast<GameObject*>(hitInfo.actor->userData);
-			UI::handleRaycastSelection(hitObject);
+		{//playing with rays
 
-			if (Input::isKeyPressed(GLFW_KEY_P)) {
-				PrefabManager::instantiate("CubePrefab", scene,
-					glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+			auto cameraPos = scene.getCamera()->getPosition();
+			auto cameraDir = scene.getCamera()->getRotation();
+			PxRaycastHit hitInfo;
+			if (Physics::raycast(scene.getPhysicsScene()->getScene(), cameraPos, cameraDir, 1000.0f, hitInfo)) {
+				GameObject* hitObject = static_cast<GameObject*>(hitInfo.actor->userData);
+				UI::handleRaycastSelection(hitObject);
+				if (Input::isKeyPressed(GLFW_KEY_P)) {
+					PrefabManager::instantiate("CubePrefab", scene,
+						glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+				}
 			}
 		}
 
-		// Render UI
-		UI::renderImGuiSceneHierarchy(&scene);
-		UI::renderImGuiObjectEditor();
-		// Render ImGui
-		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-
-		Window::update();
-
+		Engine::renderUI(&scene);
+		Engine::update(&scene);
+		Engine::render(&scene);
 	}
 
 	Window::shutdown();
 	return 0;
 }
+
+

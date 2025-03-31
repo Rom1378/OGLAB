@@ -137,7 +137,6 @@ namespace Window
 		}
 		Internal::avgFPS /= Internal::sizeArrayFps;
 
-
 	}
 
 	void clear()

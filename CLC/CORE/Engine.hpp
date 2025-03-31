@@ -2,17 +2,16 @@
 #include "Window.hpp"
 #include "Input.hpp"
 
-
+class Scene;
 namespace Engine{
-    namespace Internal {
-        inline bool running=false;
-    }
 
-
-    bool init();
+    void init();
+    void update(Scene* scene = nullptr);
     void shutdown();
-    void update();
-    void render();
+    void renderUI(Scene* scene = nullptr);
+    void render(Scene* scene = nullptr);
     bool isRunning();
+
+    float get_dt();
 
 }

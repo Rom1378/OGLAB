@@ -1,4 +1,5 @@
 #pragma once
+#include "../LightManager.hpp"
 #include "PrefabManager.hpp"
 #include "../GameObject.hpp"
 #include "../SphereRenderer.hpp"
@@ -6,7 +7,7 @@
 #include "../CubeRenderer.hpp"
 
 
-void registerPrefabs() {
+inline void registerPrefabs() {
 	// Register a Cube prefab
 	PrefabManager::registerPrefab(
 		PrefabDefinition("DynamicCubePrefab", [](std::shared_ptr<GameObject> obj) {
