@@ -6,7 +6,7 @@
 #include "Input.hpp"
 #include <iostream>
 #include "Transform.hpp"
-
+#include "Window.hpp"
 
 
 class Camera : public Transform, public Component {
@@ -19,6 +19,10 @@ public:
 
 
 	void update(float dt) override {
+		if (Window::getViewPortChanged())
+		{
+			setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
+		}
 		updateView();
 	}
 
@@ -160,6 +164,7 @@ public:
 
 
 	void update(float dt) override {
+
 		// Only process mouse input when mouse is locked
 		if (Input::isMouseLocked()) {
 			glm::vec2 mouseDelta = Input::getMouseDelta();
@@ -207,7 +212,7 @@ public:
 		}
 
 		// Always update the view matrix
-		updateView();
+		Camera::update(dt);
 	}
 private:
 

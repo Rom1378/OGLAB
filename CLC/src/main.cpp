@@ -127,11 +127,7 @@ int main() {
 		///////
 
 		Window::drawImGuiInterface();
-		if (Window::getViewPortChanged())
-		{
-			scene.getCamera()->setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
-		}
-
+	
 		UI::UICameraController(scene.getCamera());
 
 		{//playing with rays

@@ -13,5 +13,4 @@ namespace Engine{
     bool isRunning();
 
     float get_dt();
-
 }
