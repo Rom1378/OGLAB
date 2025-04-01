@@ -11,6 +11,7 @@
 #include "imgui_impl_opengl3.h"
 #include "UI/SceneObjectEditor.hpp"
 #include "Scene.hpp"
+#include "LightManager.hpp"
 
 #include <chrono>
 
@@ -43,6 +44,7 @@ namespace Engine {
 		Input::init();
 		ShaderManager::loadConfigs("shaders.json");
 		Physics::init();
+		LightManager::init();
 
 	}
 

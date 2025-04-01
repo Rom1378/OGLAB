@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="res\shaders\simpleDepthShader.frag" />
+    <None Include="res\shaders\simpleDepthShader.vert" />
     <None Include="shaders.json" />
     <None Include="CORE\shaders\standard.frag" />
     <None Include="CORE\shaders\standard.vert" />

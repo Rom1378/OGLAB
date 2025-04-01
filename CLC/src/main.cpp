@@ -148,7 +148,8 @@ int main() {
 
 		Engine::renderUI(&scene);
 		Engine::update(&scene);
-		Engine::render(&scene);
+		LightManager::compute_shadow_mapping(&scene);
+		//Engine::render(&scene);
 	}
 
 	Window::shutdown();

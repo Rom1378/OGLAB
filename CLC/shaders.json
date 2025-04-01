@@ -18,5 +18,9 @@
   "equirectanular2cubemap": {
     "vertex": "res\\shaders\\equirectangular_to_cubemap.vs",
     "fragment": "res\\shaders\\equirectangular_to_cubemap.fs"
+  },
+  "simpleDepthShader": {
+    "vertex": "res\\shaders\\simpleDepthShader.vert",
+    "fragment": "res\\shaders\\simpleDepthShader.frag"
   }
 }

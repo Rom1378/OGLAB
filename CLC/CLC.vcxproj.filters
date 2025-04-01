@@ -18,6 +18,8 @@
     <None Include="shaders.json" />
     <None Include="CORE\shaders\standard.vert" />
     <None Include="CORE\shaders\standard.frag" />
+    <None Include="res\shaders\simpleDepthShader.vert" />
+    <None Include="res\shaders\simpleDepthShader.frag" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
