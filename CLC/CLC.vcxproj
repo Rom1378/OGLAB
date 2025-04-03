@@ -145,6 +145,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="res\shaders\debug_quad.fs" />
+    <None Include="res\shaders\debug_quad.vs" />
     <None Include="res\shaders\simpleDepthShader.frag" />
     <None Include="res\shaders\simpleDepthShader.vert" />
     <None Include="shaders.json" />
@@ -160,10 +162,6 @@
     <ClCompile Include="CORE\Input.cpp" />
     <ClCompile Include="CORE\Light.cpp" />
     <ClCompile Include="CORE\LightManager.cpp" />
-    <ClCompile Include="CORE\LightManager.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="CORE\Physics.cpp" />
     <ClCompile Include="CORE\PhysicsComponent.cpp" />
     <ClCompile Include="CORE\Prefabs\PrefabManager.cpp" />
@@ -191,6 +189,7 @@
     <ClInclude Include="CORE\InterfaceRenderer.hpp" />
     <ClInclude Include="CORE\Light.hpp" />
     <ClInclude Include="CORE\LightComponent.hpp" />
+    <ClInclude Include="CORE\LightManager.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMap.hpp" />
     <ClInclude Include="CORE\Mesh\CubeMesh.hpp" />
     <ClInclude Include="CORE\Physics.hpp" />

@@ -29,6 +29,8 @@ namespace Window
 	void CreateFramebuffer(int width, int height);
 
 
+	void update_viewport();
+
 	void bind_framebuffer();
 	void unbind_framebuffer();
 	void rescale_framebuffer(float width, float height);

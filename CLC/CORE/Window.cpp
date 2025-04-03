@@ -15,6 +15,9 @@ namespace Window
 		inline WindowProps m_props;
 		GLuint fbo, texture, rbo;
 		//opengl scene size 
+
+		float frameBufferX;
+		float frameBufferY;
 		float frameBufferWidth;
 		float frameBufferHeight;
 
@@ -37,6 +40,7 @@ namespace Window
 	//get texture for rendering
 	GLuint getTexture() {
 		return Internal::texture;
+		return 1;
 	}
 
 	void init(const WindowProps& props)
@@ -141,11 +145,18 @@ namespace Window
 
 	void clear()
 	{
+		// Bind our framebuffer
 		glBindFramebuffer(GL_FRAMEBUFFER, Window::Internal::fbo);
-		//glViewport(0, 0, Window::getWidth(), Window::getHeight());
-		glViewport(0, 0, Window::getFrameBufferWidth(), Window::getFrameBufferHeight());
+		
+		// Set viewport to match framebuffer size
+		glViewport(0, 0, Internal::frameBufferWidth, Internal::frameBufferHeight);
+		
+		// Clear both color and depth buffers
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+		// Enable depth testing
+		glEnable(GL_DEPTH_TEST);
 	}
 
 	void shutdown()
@@ -230,6 +241,18 @@ namespace Window
 		glBindFramebuffer(GL_FRAMEBUFFER, Internal::fbo);
 	}
 
+	//a function that size the viewport correctly
+	//	ImVec2 pos = ImGui::GetCursorScreenPos();
+		//ImVec2 avail = ImGui::GetContentRegionAvail();
+		//update viewport
+		//glViewport((int)pos.x, (int)pos.y, (int)avail.x, (int)avail.y);
+	void update_viewport()
+	{
+		// Get the position and size of the viewport
+		// Update the OpenGL viewport
+		glViewport(Internal::frameBufferX, Internal::frameBufferY, Internal::frameBufferWidth, Internal::frameBufferHeight);
+	}
+
 	// here we unbind our framebuffer
 	void unbind_framebuffer()
 	{
@@ -261,6 +284,8 @@ namespace Window
 		Internal::frameBufferHeight = height;
 
 		//should update camera data. (aspect ratio and camera center moved)
+		
+
 
 
 
@@ -397,11 +422,33 @@ namespace Window
 
 		ImGui::End();
 
+		//show 10 openl gl textues in a grid with a contrast slider for eact images
+
+		ImGui::Begin("Textures");
+
+		// Display the OpenGL scene
+		ImVec2 availSize2 = ImGui::GetContentRegionAvail();
+		ImGui::Image((void*)(intptr_t)1, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
+		ImGui::Image((void*)(intptr_t)2, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)(intptr_t)3, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
+		ImGui::Image((void*)(intptr_t)4, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		//contrast control
+		ImGui::End();
 
 		// Create another ImGui window for other contddrols
 		ImGui::Begin("Menu");
 		//show opengl scene fps
 		ImGui::Text("FPS: %.1f", Internal::avgFPS);
+		//turn on/off polygonem ode
+		if (ImGui::Button("Polygon Mode")) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
+		if (ImGui::Button("Fill Mode")) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
 		ImGui::End();
 
 

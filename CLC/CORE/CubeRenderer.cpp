@@ -49,12 +49,17 @@ void CubeRenderer::draw(const std::shared_ptr<Camera> cam) {
 
 	// Handle textures
 	m_shader->setBool("useTexture", !m_textures.empty());
-	if (!m_textures.empty())
+	if (!m_textures.empty()) {
 		bindTextures();
+	}
+	
+	// Bind shadow map before rendering
+	if (m_shader != ShaderManager::getShader("simpleDepthShader")) {
+		LightManager::bindShadowMap(m_shader);
+	}
 
 	// Handle lighting
-	std::vector<std::shared_ptr<Light>>
-	relevantLights = LightManager::getRelevantLights(cam, 128);
+	std::vector<std::shared_ptr<Light>> relevantLights = LightManager::getRelevantLights(cam, 128);
 	bool useLighting = !relevantLights.empty();
 
 	m_shader->setBool("useLighting", useLighting);
@@ -76,7 +81,7 @@ void CubeRenderer::draw(const std::shared_ptr<Camera> cam) {
 		m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
 		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
 		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
-		}
+	}
 
 	// Set object color
 	m_shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);

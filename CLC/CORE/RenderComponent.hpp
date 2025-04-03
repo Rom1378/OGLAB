@@ -85,6 +85,16 @@ public:
 		}
 	}
 
+	void setShader(std::shared_ptr<ShaderProgram> shader)
+	{
+		m_shader = shader;
+	}
+
+	std::shared_ptr<ShaderProgram> getShader() const
+	{
+		return m_shader;
+	}
+
 
 protected:
 

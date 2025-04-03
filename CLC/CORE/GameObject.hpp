@@ -76,6 +76,18 @@ public:
 	// Set scale and update physics component if exists
 	void setScale(const glm::vec3& scale);
 
+	//set shader for all render components
+	void setShader(std::shared_ptr<ShaderProgram> shader)
+	{
+		for (auto& component : m_components)
+		{
+			if (auto renderComponent = std::dynamic_pointer_cast<RenderComponent>(component))
+			{
+				renderComponent->setShader(shader);
+			}
+		}
+	}
+
 
 	const char* getName() const { return m_name.c_str(); }
 	

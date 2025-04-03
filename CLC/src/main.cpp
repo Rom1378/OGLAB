@@ -23,6 +23,8 @@ int main() {
 	scene.init();
 	//add cube prefab
 	auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
+
+	/*
 	{
 		// Load texture
 		auto txtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
@@ -61,9 +63,9 @@ int main() {
 
 		//sun
 
-	}
+	}*/
 	auto world = std::make_shared<GameObject>("World");
-	world->setScale(glm::vec3(1000.0f, 10.0f, 1000.0f));
+	world->setScale(glm::vec3(100.0f, 10.0f, 100.0f));
 	world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
 	auto wren = world->addComponent<CubeRenderer>();
 	world->addComponent<CubePhysics>(CubePhysics::Type::STATIC);
@@ -77,19 +79,20 @@ int main() {
 	scene.setCamera(camera);
 
 
+	// Set up directional light (sun)
 	auto sunLight = std::make_shared<Light>(
-		LightType::DIRECTIONAL,  // Light type is DIRECTIONAL for sun
-		glm::vec3(0.0f, 0.0f, 0.0f),  // Position (less relevant for directional lights)
-		glm::vec3(0.0f, -1.0f, 0.0f),  // Direction - pointing downward, simulating sun from above
-		glm::vec3(1.0f, 0.95f, 0.8f),  // Warm sunlight color (slightly warm white)
-		1.0f  // Intensity
+		LightType::DIRECTIONAL,
+		glm::vec3(-2.0f, 4.0f, -1.0f),  // Position high up
+		glm::vec3(-0.5f, -1.0f, -0.3f),  // Direction - angled for better shadows
+		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
+		1.0f                              // Full intensity
 	);
 	LightManager::addLight(sunLight);
 
 
 	//LightSpherePrefab
-	auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
-	scene.addGameObject(sphereObj);
+	//auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
+	//scene.addGameObject(sphereObj);
 
 	//gameobject cursor 
 	auto cursor = std::make_shared<GameObject>("Cursor");
@@ -102,36 +105,38 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
+	
+	//polygon mode
+
 
 	// Create the framebuffer
-	Window::CreateFramebuffer(1, 1);
+	Window::CreateFramebuffer(1280, 720); // Initialize with proper size
 	while (Window::isOpen()) {
-
+		// Handle input
 		if (Input::isKeyPressed(GLFW_KEY_ESCAPE)) {
-			Input::setMouseLocked(false); // Unlock mouse when Escape is pressed
+			Input::setMouseLocked(false);
 		}
 		if (Input::isKeyPressed(GLFW_KEY_LEFT_ALT)) {
 			Input::setMouseLocked(true);
 		}
-		///////
+
+		// Cube spawning logic
 		{
-			//instanciate a cube every seconds at 0 40 0
 			static float timer = 0.0f;
 			timer += Engine::get_dt();
-			if (timer > 0.01f)
-			{
+			if (timer > 221) {
 				timer = 0.0f;
 				PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 40.0f, 0.0f));
 			}
 		}
-		///////
+
 
 		Window::drawImGuiInterface();
-	
+		// Update camera controller
 		UI::UICameraController(scene.getCamera());
 
-		{//playing with rays
-
+		// Handle raycast selection
+		{
 			auto cameraPos = scene.getCamera()->getPosition();
 			auto cameraDir = scene.getCamera()->getRotation();
 			PxRaycastHit hitInfo;
@@ -148,8 +153,9 @@ int main() {
 
 		Engine::renderUI(&scene);
 		Engine::update(&scene);
-		LightManager::compute_shadow_mapping(&scene);
-		//Engine::render(&scene);
+
+		//LightManager::compute_shadow_mapping(&scene);
+		Engine::render(&scene);
 	}
 
 	Window::shutdown();

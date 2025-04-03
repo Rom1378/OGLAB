@@ -20,6 +20,8 @@
     <None Include="CORE\shaders\standard.frag" />
     <None Include="res\shaders\simpleDepthShader.vert" />
     <None Include="res\shaders\simpleDepthShader.frag" />
+    <None Include="res\shaders\debug_quad.vs" />
+    <None Include="res\shaders\debug_quad.fs" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -76,12 +78,6 @@
     <ClCompile Include="CORE\CubeMap.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\LightManager.hpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="CORE\LightManager.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="CORE\SphereRenderer.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -92,6 +88,9 @@
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\UI\SceneObjectEditor.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CORE\LightManager.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -187,6 +186,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\RenderComponents\Cursor.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="CORE\LightManager.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
