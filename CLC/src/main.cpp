@@ -23,7 +23,7 @@ int main() {
 	scene.init();
 
 	//remove gravaity
-	scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
+	//scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
 	//scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
 
 
@@ -76,7 +76,7 @@ int main() {
 
 	}*/
 	auto world = std::make_shared<GameObject>("World");
-	world->setScale(glm::vec3(10.0f, 10.0f, 10.0f));
+	world->setScale(glm::vec3(220.0f, 10.0f, 220.0f));
 	world->setPosition(glm::vec3(0.0f, -0.0f, 0.0f));
 	auto wren = world->addComponent<CubeRenderer>();
 	world->addComponent<CubePhysics>(CubePhysics::Type::STATIC);
@@ -93,7 +93,7 @@ int main() {
 	// Set up directional light (sun)
 	auto sunLight = std::make_shared<Light>(
 		LightType::DIRECTIONAL,
-		glm::vec3(-2.0f, 20.0f, -1.0f),  // Position high up
+		glm::vec3(-2.0f, 200.0f, -1.0f),  // Position high up
 		glm::vec3(-0.5f, -1.0f, -0.3f),  // Direction - angled for better shadows
 		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
 		1.0f                              // Full intensity
@@ -140,9 +140,9 @@ int main() {
 		{
 			static float timer = 0.0f;
 			timer += Engine::get_dt();
-			if (timer > 221) {
+			if (timer > 1) {
 				timer = 0.0f;
-				PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 40.0f, 0.0f));
+				PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 140.0f, 0.0f));
 			}
 		}
 

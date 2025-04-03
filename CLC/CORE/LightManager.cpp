@@ -10,13 +10,13 @@ namespace LightManager
 	std::vector<std::shared_ptr<Light>> s_lights;
 
 	unsigned int depthMapFBO;
-	const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 	unsigned int depthMap;
 	glm::mat4 storedLightSpaceMatrix;
 
 
-			float far_plane = 500.0f; // Increased for larger scenes
-			float orthoSize = 100.0f; // Adjust based on your scene size
+			float far_plane = 900.0f; // Increased for larger scenes
+			float orthoSize = 20.0f; // Adjust based on your scene size
 	
 			float getFarPlane() {
 				return far_plane;
@@ -248,9 +248,7 @@ namespace LightManager
 	void compute_shadow_mapping(Scene* scene) {
 			if (s_lights.empty()) return;
 
-			// In compute_shadow_mapping()
-			float near_plane = 0.1f;
-		//ortho size will impact the size of the shadow map
+			float near_plane = 0.001f;
 			glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 			glm::mat4 lightView = glm::lookAt(
 				s_lights[0]->getPosition(),
@@ -258,18 +256,12 @@ namespace LightManager
 				glm::vec3(0.0, 1.0, 0.0)
 			);
 
-			//cout light pos
-				std::cout << "Light position: " << s_lights[0]->getPosition().x << ", " << s_lights[0]->getPosition().y << ", " << s_lights[0]->getPosition().z << std::endl;
-
-
 			storedLightSpaceMatrix = lightProjection * lightView;
-
 			// Render scene to depth map
 			auto depthShader = ShaderManager::getShader("simpleDepthShader");
 			auto shader = ShaderManager::getShader("standard");
 			depthShader->use();
 			depthShader->setMat4("lightSpaceMatrix", storedLightSpaceMatrix);
-
 
 			// 1. Render depth map
 			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -286,7 +278,9 @@ namespace LightManager
 					renderComp->setShader(depthShader);
 				}
 			}
+			glCullFace(GL_FRONT);
 			scene->render();
+			glCullFace(GL_BACK);
 			// Restore original shaders
 			size_t i = 0;
 			for (auto& obj : gms) {
@@ -335,10 +329,10 @@ namespace LightManager
 
 */
 
-				shader->use();
+				//shader->use();
 
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, depthMap);
+				//glActiveTexture(GL_TEXTURE1);
+				//glBindTexture(GL_TEXTURE_2D, depthMap);
 
 				scene->render();
 
