@@ -15,6 +15,24 @@ namespace LightManager
 	glm::mat4 storedLightSpaceMatrix;
 
 
+			float far_plane = 500.0f; // Increased for larger scenes
+			float orthoSize = 100.0f; // Adjust based on your scene size
+	
+			float getFarPlane() {
+				return far_plane;
+			}
+			void setFarPlane(float farPlane) {
+				far_plane = farPlane;
+			}
+			float getOrthoSize() {
+				return orthoSize;
+			}
+			void setOrthoSize(float orthoSize) {
+				LightManager::orthoSize = orthoSize;
+			}
+
+
+
 	unsigned int quadVAO = 0;
 	unsigned int quadVBO;
 
@@ -230,19 +248,15 @@ namespace LightManager
 	void compute_shadow_mapping(Scene* scene) {
 			if (s_lights.empty()) return;
 
-
-			// Set up light space matrix
-
-			float near_plane = 1.0f, far_plane = 7.5f;
-			//lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
-			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-
+			// In compute_shadow_mapping()
+			float near_plane = 0.1f;
+		//ortho size will impact the size of the shadow map
+			glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, near_plane, far_plane);
 			glm::mat4 lightView = glm::lookAt(
 				s_lights[0]->getPosition(),
 				glm::vec3(0.0f),
 				glm::vec3(0.0, 1.0, 0.0)
 			);
-
 
 			//cout light pos
 				std::cout << "Light position: " << s_lights[0]->getPosition().x << ", " << s_lights[0]->getPosition().y << ", " << s_lights[0]->getPosition().z << std::endl;
@@ -262,7 +276,29 @@ namespace LightManager
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			glClear(GL_DEPTH_BUFFER_BIT);
 
-			renderScene(depthShader);
+			//set depth shader for rendering
+			auto& gms = scene->getGameObjects();
+			//save shaders
+			std::vector<std::shared_ptr<ShaderProgram>> originalShaders;
+			for (auto& obj : gms) {
+				if (auto renderComp = obj->getComponent<RenderComponent>()) {
+					originalShaders.push_back(renderComp->getShader());
+					renderComp->setShader(depthShader);
+				}
+			}
+			scene->render();
+			// Restore original shaders
+			size_t i = 0;
+			for (auto& obj : gms) {
+				if (auto renderComp = obj->getComponent<RenderComponent>()) {
+					if (i < originalShaders.size()) {
+						renderComp->setShader(originalShaders[i++]);
+					}
+				}
+			}
+
+
+			//renderScene(depthShader);
 
 
 				Window::bind_framebuffer();
@@ -285,7 +321,7 @@ namespace LightManager
 				//shader->use();
 				//shader->setInt("shadowMap", 1);
 
-
+/*
 				shader->use();
 
 				glm::mat4 projection = scene->getCamera()->getProjectionMatrix();
@@ -296,10 +332,17 @@ namespace LightManager
 				shader->setVec3("viewPos", scene->getCamera()->getPosition());
 				shader->setVec3("lightPos", s_lights[0]->getPosition());
 				shader->setMat4("lightSpaceMatrix", storedLightSpaceMatrix);
+
+*/
+
+				shader->use();
+
 				glActiveTexture(GL_TEXTURE1);
 				glBindTexture(GL_TEXTURE_2D, depthMap);
 
-				renderScene(shader);
+				scene->render();
+
+				//renderScene(shader);
 
 				//glBindVertexArray(planeVAO);
 				//glDrawArrays(GL_TRIANGLES, 0, 6);

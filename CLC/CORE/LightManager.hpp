@@ -26,6 +26,14 @@ namespace LightManager {
     void renderQuad();
 
 
+    float getFarPlane();
+    void setFarPlane(float farPlane);
+    float getNearPlane();
+    void setNearPlane(float nearPlane);
+float getOrthoSize();
+	void setOrthoSize(float orthoSize);
+
+
 
     
 

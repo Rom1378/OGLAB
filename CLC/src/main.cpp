@@ -21,8 +21,19 @@ int main() {
 	// Create scene
 	Scene scene;
 	scene.init();
+
+	//remove gravaity
+	scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
+	//scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
+
+
 	//add cube prefab
+	
+
 	auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
+
+	prefCube->setPosition(glm::vec3(0.0f, 10.0f, 0.0f));
+
 
 	/*
 	{
@@ -65,8 +76,8 @@ int main() {
 
 	}*/
 	auto world = std::make_shared<GameObject>("World");
-	world->setScale(glm::vec3(100.0f, 10.0f, 100.0f));
-	world->setPosition(glm::vec3(0.0f, -150.0f, 0.0f));
+	world->setScale(glm::vec3(10.0f, 10.0f, 10.0f));
+	world->setPosition(glm::vec3(0.0f, -0.0f, 0.0f));
 	auto wren = world->addComponent<CubeRenderer>();
 	world->addComponent<CubePhysics>(CubePhysics::Type::STATIC);
 	scene.addGameObject(world);
@@ -82,7 +93,7 @@ int main() {
 	// Set up directional light (sun)
 	auto sunLight = std::make_shared<Light>(
 		LightType::DIRECTIONAL,
-		glm::vec3(-2.0f, 4.0f, -1.0f),  // Position high up
+		glm::vec3(-2.0f, 20.0f, -1.0f),  // Position high up
 		glm::vec3(-0.5f, -1.0f, -0.3f),  // Direction - angled for better shadows
 		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
 		1.0f                              // Full intensity
@@ -120,6 +131,11 @@ int main() {
 			Input::setMouseLocked(true);
 		}
 
+
+		//sunLight->setPosition(camera->getPosition()+glm::vec3(0,0,-21));
+
+
+
 		// Cube spawning logic
 		{
 			static float timer = 0.0f;
@@ -149,6 +165,40 @@ int main() {
 				}
 			}
 		}
+
+		//change light pos
+		ImGui::Begin("Light");
+		glm::vec3 lightPos = sunLight->getPosition();
+		if (ImGui::DragFloat3("Light Position", glm::value_ptr(lightPos), 0.1f)) {
+			sunLight->setPosition(lightPos);
+		}
+		glm::vec3 lightDir = sunLight->getDirection();
+		if (ImGui::DragFloat3("Light Direction", glm::value_ptr(lightDir), 0.1f)) {
+			sunLight->setDirection(lightDir);
+		}
+		glm::vec3 lightColor = sunLight->getColor();
+		if (ImGui::ColorEdit3("Light Color", glm::value_ptr(lightColor))) {
+			sunLight->setColor(lightColor);
+		}
+		float lightIntensity = sunLight->getIntensity();
+		if (ImGui::DragFloat("Light Intensity", &lightIntensity, 0.01f, 0.0f, 10.0f)) {
+			sunLight->setIntensity(lightIntensity);
+		}
+		ImGui::End();
+
+		//farplan and ortho size edit
+		ImGui::Begin("LGITH");
+		float farPlane = LightManager::getFarPlane();
+		if (ImGui::DragFloat("Far Plane", &farPlane, 0.1f, 0.0f, 10000.0f)) {
+			LightManager::setFarPlane(farPlane);
+		}
+		float orthoSize = LightManager::getOrthoSize();
+		if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 10000.0f)) {
+			LightManager::setOrthoSize(orthoSize);
+		}
+			ImGui::End();
+
+
 
 
 		Engine::renderUI(&scene);
