@@ -20,11 +20,39 @@ namespace LightManager {
 		GLuint depthMapTexture;
 		glm::mat4 lightSpaceMatrix;
 		int resolution;
+		float farPlane = 900.0f; // Increased for larger scenes
+		float nearPlane = 0.001f; // Adjust based on your scene size
+		float orthoSize = 20.0f; // Adjust based on your scene size
+
 
 
 	public:
 
+
+
+		float getFarPlane() {
+			return farPlane;
+		}
+		void setFarPlane(float farPlane) {
+			this->farPlane = farPlane;
+		}
+		float getNearPlane() {
+			return nearPlane;
+		}
+		void setNearPlane(float nearPlane)
+		{
+			this->nearPlane = nearPlane;
+		}
+		float getOrthoSize()
+	{
+			return orthoSize;
+		}
+		void setOrthoSize(float orthoSize) {
+						this->orthoSize = orthoSize;
+		}
+
 		ShadowMapper() : depthMapFBO(0), depthMapTexture(0), resolution(2048) {}
+
 		~ShadowMapper() {
 			if (depthMapFBO) {
 				glDeleteFramebuffers(1, &depthMapFBO);
@@ -70,8 +98,7 @@ namespace LightManager {
 			glClear(GL_DEPTH_BUFFER_BIT);
 
 			// 2. Calculate light matrices
-			float near_plane = 0.001f, far_plane = 900.0f;
-			glm::mat4 lightProjection = glm::ortho(-20.f, 20.f, -20.f, 20.f, near_plane, far_plane);
+			glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
 			glm::mat4 lightView = glm::lookAt(light->getPosition(), glm::vec3(0.0f), glm::vec3(0, 1, 0));
 			lightSpaceMatrix = lightProjection * lightView;
 
@@ -91,24 +118,14 @@ namespace LightManager {
 
     
     void init();
-	void compute_shadow_mapping(Scene* scene);
+	//void compute_shadow_mapping(Scene* scene);
     void bindShadowMap(std::shared_ptr<ShaderProgram> shader);
 
 
-    unsigned int getDepthMap();
+	//unsigned int getDepthMap();
 
 
 	ShadowMapper* getShadowMapper();
-
-    float getFarPlane();
-    void setFarPlane(float farPlane);
-    float getNearPlane();
-    void setNearPlane(float nearPlane);
-float getOrthoSize();
-	void setOrthoSize(float orthoSize);
-
-
-
     
 
 

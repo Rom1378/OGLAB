@@ -115,7 +115,7 @@ namespace Engine {
 			debugShader->setFloat("near_plane", 1.0f);
 			debugShader->setFloat("far_plane", 100.0f);
 			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, LightManager::getDepthMap());
+			glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
 			//LightManager::renderQuad();
 		}
 	}

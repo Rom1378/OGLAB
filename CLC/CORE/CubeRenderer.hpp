@@ -69,6 +69,7 @@ public:
 
         }
 
+
         // Bind shadow map (now handled by LightManager)
         LightManager::bindShadowMap(m_shader);
 

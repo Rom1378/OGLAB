@@ -188,13 +188,13 @@ int main() {
 
 		//farplan and ortho size edit
 		ImGui::Begin("LGITH");
-		float farPlane = LightManager::getFarPlane();
+		float farPlane = LightManager::getShadowMapper()->getFarPlane();
 		if (ImGui::DragFloat("Far Plane", &farPlane, 0.1f, 0.0f, 10000.0f)) {
-			LightManager::setFarPlane(farPlane);
+			LightManager::getShadowMapper()->setFarPlane(farPlane);
 		}
-		float orthoSize = LightManager::getOrthoSize();
+		float orthoSize = LightManager::getShadowMapper()->getOrthoSize();
 		if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 10000.0f)) {
-			LightManager::setOrthoSize(orthoSize);
+			LightManager::getShadowMapper()->setOrthoSize(orthoSize);
 		}
 			ImGui::End();
 

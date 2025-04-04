@@ -17,36 +17,12 @@ namespace LightManager
 
 	std::vector<std::shared_ptr<Light>> s_lights;
 
-	unsigned int depthMapFBO;
-	const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
-	unsigned int depthMap;
-	glm::mat4 storedLightSpaceMatrix;
-
-
-	float far_plane = 900.0f; // Increased for larger scenes
-	float orthoSize = 20.0f; // Adjust based on your scene size
-
-	float getFarPlane() {
-		return far_plane;
-	}
-	void setFarPlane(float farPlane) {
-		far_plane = farPlane;
-	}
-	float getOrthoSize() {
-		return orthoSize;
-	}
-	void setOrthoSize(float orthoSize) {
-		LightManager::orthoSize = orthoSize;
-	}
-
-
-	unsigned int getDepthMap() {
-		return depthMap;
-	}
 
 	void init() {
 		//init shadow mapper
 		shadowMapper.initialize();
+
+		/*
 
 		// Generate and bind framebuffer
 		glGenFramebuffers(1, &depthMapFBO);
@@ -96,10 +72,12 @@ namespace LightManager
 		while ((err = glGetError()) != GL_NO_ERROR) {
 			std::cerr << "OpenGL error in LightManager::init: " << err << std::endl;
 		}
+		*/
 
 
 
 	}
+	/*
 	void compute_shadow_mapping(Scene* scene) {
 		if (s_lights.empty()) return;
 
@@ -147,6 +125,7 @@ namespace LightManager
 		}
 
 	}
+	*/
 
 	void bindShadowMap(std::shared_ptr<ShaderProgram> shader) {
 		if (!shader) {
@@ -165,7 +144,7 @@ namespace LightManager
 
 		// Activate texture unit 1 and bind the depth map
 		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, depthMap);
+		glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
 		shader->setInt("shadowMap", LightManager::getShadowMapper()->getDepthMapTexture());  // Use texture unit 1
 
 		// Set light space matrix uniform
