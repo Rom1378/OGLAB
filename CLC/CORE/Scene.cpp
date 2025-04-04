@@ -16,6 +16,24 @@ void Scene::update(float dt) {
 
 }
 
+
+void Scene::renderShadowCasters(const glm::mat4& lightMatrix) {
+    std::shared_ptr<ShaderProgram> shadowShader = ShaderManager::getShader("simpleDepthShader");
+    shadowShader->use();
+    shadowShader->setMat4("lightSpaceMatrix", lightMatrix);
+
+    for (auto obj : shadowCasters) {
+        obj->renderRawGeometry(lightMatrix); // No material binding!
+    }
+}
+
+void Scene::renderMainPass() {
+    // Normal rendering with materials
+    for (auto obj : m_gameObjects) {
+        obj->renderWithMaterials(m_camera);
+    }
+}
+
 void Scene::render() {
 
     glm::mat4 view = m_camera->getViewMatrix();
@@ -50,4 +68,9 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
     if (auto physicsComponent = gameObject->getComponent<PhysicsComponent>()) {
         m_physicsScene->addActor(physicsComponent->getActor());
     }
+    if (auto physicsComponent = gameObject->getComponent<RenderComponent>()) {
+		if (physicsComponent->m_isShadowCaster) {
+			shadowCasters.push_back(gameObject);
+		}
+	}
 }

@@ -17,10 +17,17 @@ class RenderComponent : public Component
 
 
 public:
+	bool m_isShadowCaster = false;
+	bool m_isShadowReceiver = false;
+
+
 	RenderComponent() : Component(), m_color(glm::vec4(1, 1, 1, 1)), m_renderer(nullptr), m_shader(nullptr), VAO(0), VBO(0), EBO(0) { }
 	virtual void draw(const glm::mat4& view, const glm::mat4& projection) {};
 	virtual void draw(const std::shared_ptr<Camera> cam) {};
 	virtual void draw()  {};
+
+	virtual void renderRawGeometry(const glm::mat4& lightSpaceMatrix) {};// Shadow pass
+	virtual void renderWithMaterials(const std::shared_ptr<Camera>& cam) {}; // Main pass
 
 	void setRenderer(std::shared_ptr<InterfaceRenderer> renderer)
 	{

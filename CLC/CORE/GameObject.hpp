@@ -88,6 +88,30 @@ public:
 		}
 	}
 
+	//render raw geometry for all render components
+	void renderRawGeometry(const glm::mat4& lightSpaceMatrix)
+	{
+		for (auto& component : m_components)
+		{
+			if (auto renderComponent = std::dynamic_pointer_cast<RenderComponent>(component))
+			{
+				renderComponent->renderRawGeometry(lightSpaceMatrix);
+			}
+		}
+	}
+	//render with materials for all render components
+	void renderWithMaterials(const std::shared_ptr<Camera>& cam)
+	{
+		for (auto& component : m_components)
+		{
+			if (auto renderComponent = std::dynamic_pointer_cast<RenderComponent>(component))
+			{
+				renderComponent->renderWithMaterials(cam);
+			}
+		}
+	}
+
+
 
 	const char* getName() const { return m_name.c_str(); }
 	

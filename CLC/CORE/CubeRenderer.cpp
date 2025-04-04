@@ -3,6 +3,8 @@
 #include "Mesh/CubeMesh.hpp"
 
 void CubeRenderer::init() {
+	m_isShadowCaster= true;
+	m_isShadowReceiver = true;
 
 	// Generate and bind VAO, VBO, and EBO
 	glGenVertexArrays(1, &VAO);
@@ -38,6 +40,8 @@ void CubeRenderer::init() {
 }
 
 void CubeRenderer::draw(const std::shared_ptr<Camera> cam) {
+	renderWithMaterials(cam);
+	return;
 	if (!m_shader) return;
 
 	m_shader->use();

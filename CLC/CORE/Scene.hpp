@@ -20,6 +20,10 @@ public:
 	void update(float dt);
 	void render();
 
+
+	void renderShadowCasters(const glm::mat4& lightMatrix);
+	void renderMainPass();
+
 	std::shared_ptr<GameObject> createGameObject();
 	void destroyGameObject(std::shared_ptr<GameObject> gameObject);
 
@@ -34,6 +38,9 @@ public:
 
 protected:
 	std::vector<std::shared_ptr<GameObject>> m_gameObjects;
+
+	std::vector<std::shared_ptr<GameObject>> shadowCasters;
+
 	std::shared_ptr<Camera> m_camera;
 	std::shared_ptr<CubeMap> m_cubemap;
 	std::shared_ptr<PhysicsScene> m_physicsScene;

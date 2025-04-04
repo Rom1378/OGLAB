@@ -11,7 +11,7 @@
 #include "imgui_impl_opengl3.h"
 #include "UI/SceneObjectEditor.hpp"
 #include "Scene.hpp"
-#include "LightManager.hpp"
+//#include "LightManager.hpp"
 
 #include <chrono>
 
@@ -19,12 +19,7 @@ using namespace std::chrono;
 high_resolution_clock::time_point lastTime = high_resolution_clock::now();
 
 
-void checkopenglerror() {
-	int err;
-	while ((err = glGetError()) != GL_NO_ERROR) {
-		std::cerr << "OpenGL error in Engine::update: " << err << std::endl;
-	}
-}
+
 
 namespace Engine {
 	bool m_isRunning = false;
@@ -67,10 +62,33 @@ namespace Engine {
 		scene->update(m_dt);
 
 
-		// First compute shadow maps
-		//scene->render();
-		LightManager::compute_shadow_mapping(scene);
 
+
+		// First compute shadow maps
+		//LightManager::compute_shadow_mapping(scene);
+		renderFrame(scene, LightManager::getShadowMapper());
+
+	}
+
+	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
+		// 1. Shadow Pass
+		shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
+
+		// 2. Main Pass
+		Window::bind_framebuffer();
+		Window::update_viewport();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Bind shadow map to shader
+		auto mainShader = ShaderManager::getShader("standard");
+		mainShader->use();
+		mainShader->setInt("shadowMap", 1);
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, shadowMapper->getDepthMapTexture());
+		mainShader->setMat4("lightSpaceMatrix", shadowMapper->getLightSpaceMatrix());
+
+		// Render scene normally
+		scene->renderMainPass();
 	}
 
 	void renderUI(Scene* scene) {
@@ -85,10 +103,9 @@ namespace Engine {
 
 	}
 	void render(Scene* scene) {
-		Window::bind_framebuffer();
+		//Window::bind_framebuffer();
+		//Window::update_viewport();
 		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// Render scene with shadows
 		//scene->render();
 
 		// Optional: Render debug quad in a separate window
@@ -99,7 +116,7 @@ namespace Engine {
 			debugShader->setFloat("far_plane", 100.0f);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, LightManager::getDepthMap());
-			LightManager::renderQuad();
+			//LightManager::renderQuad();
 		}
 	}
 	bool isRunning() { return m_isRunning; }
