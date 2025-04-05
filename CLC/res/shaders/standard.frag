@@ -15,7 +15,7 @@ struct Light {
 in vec3 FragPos;  // Fragment position in world space
 in vec3 Normal;   // Transformed normal
 in vec2 TexCoords;  // Texture coordinates
-in vec4 FragPosLightSpace;  // Add this line
+in vec4 FragPosLightSpace;
 
 out vec4 FragColor;
 
@@ -39,16 +39,14 @@ float ShadowCalculation(vec4 fragPosLightSpace)
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     // transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
-    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    // get closest depth value from light's perspective
     float closestDepth = texture(shadowMap, projCoords.xy).r; 
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
-    // calculate bias (based on depth map resolution and slope)
+    // calculate bias
     vec3 normal = normalize(Normal);
     vec3 lightDir = normalize(lightPos - FragPos);
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005) * 0.1;
-    // check whether current frag pos is in shadow
-    // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
     // PCF
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
@@ -57,12 +55,11 @@ float ShadowCalculation(vec4 fragPosLightSpace)
         for(int y = -1; y <= 1; ++y)
         {
             float pcfDepth = texture(shadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth  ? 1.0 : 0.0;        
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
         }    
     }
     shadow /= 9.0;
     
-    // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(projCoords.z > 1.0)
         shadow = 0.0;
         
@@ -70,13 +67,21 @@ float ShadowCalculation(vec4 fragPosLightSpace)
 }
 
 void main() {
-    // Base ambient light
-    vec3 resultColor = objectColor * 0.1; 
-
-    vec3 color = texture(diffuseTexture, TexCoords).rgb;
+    // Determine the base color
+    vec3 baseColor = objectColor; // Start with object color
+    
+    // If using texture, replace base color with texture color
+    if (useTexture) {
+        baseColor = texture(texture1, TexCoords).rgb;
+    }
+    
+    // Get diffuse texture contribution (assuming it's a multiplier)
+    vec3 diffuseTex = texture(diffuseTexture, TexCoords).rgb;
+    
     vec3 norm = normalize(Normal);
     vec3 lightColor = lights[0].color;
 
+    // Lighting calculations
     vec3 lightDir = normalize(lights[0].position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
@@ -84,27 +89,16 @@ void main() {
     vec3 ambient = 0.3 * lightColor;
 
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
     vec3 specular = spec * lightColor;    
-    // calculate shadow
-    float shadow = ShadowCalculation(FragPosLightSpace);                      
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
     
-    // Apply texture if enabled
-    vec4 finalColor = vec4(lighting, 1.0);
-    if (useTexture) {
-        vec4 texColor = texture(texture1, TexCoords);
-        finalColor.rgb *= texColor.rgb;
-        finalColor.a *= texColor.a;
-    }
-
-    FragColor = finalColor;
-
-    // Lighting calculations
-    if (useLighting) {
-        // Your commented-out lighting code can go here if needed
-    }
+    // Calculate shadow
+    float shadow = ShadowCalculation(FragPosLightSpace);                      
+    
+    // Combine all components
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * baseColor * diffuseTex;
+    
+    // Final color output
+    FragColor = vec4(lighting, 1.0);
 }

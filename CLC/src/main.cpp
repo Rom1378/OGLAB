@@ -82,7 +82,12 @@ int main() {
 	world->addComponent<CubePhysics>(CubePhysics::Type::STATIC);
 	scene.addGameObject(world);
 	auto doogtxtr = TextureManager::loadTexture("res/textures/doog.PNG", "doog.PNG");
+	auto cattxtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
 	world->getComponent<RenderComponent>()->addTexture(doogtxtr);
+
+	auto sphere = PrefabManager::instantiate("SpherePrefab", scene, glm::vec3(0.0f, 10.0f, 0.0f));
+	//add velocity
+	sphere->getComponent<PhysicsComponent>()->setLinearVelocity(glm::vec3(10.0f, 30.0f, 0.0f));
 
 	auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
 	camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
@@ -142,7 +147,8 @@ int main() {
 			timer += Engine::get_dt();
 			if (timer > 1) {
 				timer = 0.0f;
-				PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 140.0f, 0.0f));
+				auto c = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 140.0f, 0.0f));
+				c->getComponent<RenderComponent>()->addTexture(cattxtr);
 			}
 		}
 

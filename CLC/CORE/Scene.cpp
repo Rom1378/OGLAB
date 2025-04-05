@@ -69,7 +69,7 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
         m_physicsScene->addActor(physicsComponent->getActor());
     }
     if (auto physicsComponent = gameObject->getComponent<RenderComponent>()) {
-		if (physicsComponent->m_isShadowCaster) {
+		if (physicsComponent->getIsShadowCaster()) {
 			shadowCasters.push_back(gameObject);
 		}
 	}

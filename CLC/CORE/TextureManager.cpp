@@ -24,6 +24,8 @@ namespace TextureManager
 
 	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name)
 	{
+		std::cout << "Loading texture: " << path << std::endl;
+
 		//first check if the texture hasnt already been loaded :
 		auto it = Internal::textures.find(name);
 		if (it != Internal::textures.end())

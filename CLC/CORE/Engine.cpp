@@ -63,11 +63,6 @@ namespace Engine {
 
 
 
-
-		// First compute shadow maps
-		//LightManager::compute_shadow_mapping(scene);
-		renderFrame(scene, LightManager::getShadowMapper());
-
 	}
 
 	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
@@ -87,8 +82,6 @@ namespace Engine {
 		glBindTexture(GL_TEXTURE_2D, shadowMapper->getDepthMapTexture());
 		mainShader->setMat4("lightSpaceMatrix", shadowMapper->getLightSpaceMatrix());
 
-		// Render scene normally
-		scene->renderMainPass();
 	}
 
 	void renderUI(Scene* scene) {
@@ -103,10 +96,9 @@ namespace Engine {
 
 	}
 	void render(Scene* scene) {
-		//Window::bind_framebuffer();
-		//Window::update_viewport();
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//scene->render();
+		renderFrame(scene, LightManager::getShadowMapper());
+		// Render scene normally
+		scene->renderMainPass();
 
 		// Optional: Render debug quad in a separate window
 		if (0) {
