@@ -89,8 +89,7 @@ void Mesh::Draw(std::shared_ptr<ShaderProgram> shader,
 
 	shader->setBool("useLighting", useLighting);
 	shader->setBool("useShadows", useShadows);
-	//A
-	// shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
 
 

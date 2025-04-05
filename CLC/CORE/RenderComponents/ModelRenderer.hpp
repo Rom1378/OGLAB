@@ -21,9 +21,10 @@ public:
 		auto shader = ShaderManager::getShader("simpleDepthShader");
 		shader->use();
 		shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
+		shader->setMat4("model", glm::value_ptr(getGameObject()->getModelMatrix()));
 
 		for (auto& mesh : meshes) {
-			mesh.Draw(shader, lightSpaceMatrix, true, true); // No lighting or shadows
+			mesh.drawRawGeometry();
 		}
 	}
 
