@@ -30,6 +30,8 @@ void SphereRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+
 }
 
 void SphereRenderer::init() {

@@ -22,9 +22,7 @@ namespace LightManager {
 		int resolution;
 		float farPlane = 900.0f; // Increased for larger scenes
 		float nearPlane = 0.001f; // Adjust based on your scene size
-		float orthoSize = 20.0f; // Adjust based on your scene size
-
-
+		float orthoSize = 100.0f; // Adjust based on your scene size
 
 	public:
 
@@ -49,6 +47,10 @@ namespace LightManager {
 		}
 		void setOrthoSize(float orthoSize) {
 						this->orthoSize = orthoSize;
+		}
+
+		glm::mat4 getLightSpaceMatrix() {
+			return lightSpaceMatrix;
 		}
 
 		ShadowMapper() : depthMapFBO(0), depthMapTexture(0), resolution(2048) {}

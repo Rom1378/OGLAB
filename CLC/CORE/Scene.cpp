@@ -1,5 +1,4 @@
 #include "Scene.hpp"
-
 #include "PhysicsComponent.hpp"
 
 void Scene::update(float dt) { 
@@ -32,6 +31,8 @@ void Scene::renderMainPass() {
     for (auto obj : m_gameObjects) {
         obj->renderWithMaterials(m_camera);
     }
+
+
 }
 
 void Scene::render() {
@@ -46,6 +47,7 @@ void Scene::render() {
         //gameObject->render(view, projection);
         gameObject->render(m_camera);
     }
+
 
 
 }

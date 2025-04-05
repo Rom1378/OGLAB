@@ -9,6 +9,11 @@ struct Texture
 {
 	unsigned int id;
 	int width, height;
+
+	std::string type;
+	std::string path; // we store the path of the texture to compare with other textures (e.g. when loading a model)
+
+	
 };
 
 	struct HDRTextureInfo {

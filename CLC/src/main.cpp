@@ -13,6 +13,7 @@
 #include "../CORE/UI/CameraController.hpp"
 #include "../CORE/RenderComponents/Cursor.hpp"
 #include "../CORE/UI/SceneObjectEditor.hpp"
+#include "../CORE/RenderComponents/ModelRenderer.hpp"
 
 int main() {
 
@@ -75,6 +76,13 @@ int main() {
 		//sun
 
 	}*/
+	//loading 3d model
+	auto catv2=std::make_shared<GameObject>("Cat");
+	catv2->setPosition(glm::vec3(0.0f, 100.0f, 0.0f));
+	catv2->addComponent<ModelRenderer>("res/obj/Cat_v1_/12221_Cat_v1_l3.obj");
+	scene.addGameObject(catv2);
+	
+
 	auto world = std::make_shared<GameObject>("World");
 	world->setScale(glm::vec3(220.0f, 10.0f, 220.0f));
 	world->setPosition(glm::vec3(0.0f, -0.0f, 0.0f));
@@ -104,6 +112,8 @@ int main() {
 		1.0f                              // Full intensity
 	);
 	LightManager::addLight(sunLight);
+
+
 
 
 	//LightSpherePrefab

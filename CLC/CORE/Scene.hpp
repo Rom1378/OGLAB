@@ -36,6 +36,7 @@ public:
 	inline std::shared_ptr<CubeMap> getCubemap() { return m_cubemap; }
 	inline std::shared_ptr<PhysicsScene> getPhysicsScene() { return m_physicsScene; }
 
+
 protected:
 	std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 

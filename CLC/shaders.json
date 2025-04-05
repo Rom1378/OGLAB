@@ -26,5 +26,9 @@
   "debugDepthQuad": {
     "vertex": "res\\shaders\\debug_quad.vs",
     "fragment": "res\\shaders\\debug_quad.fs"
+  },
+  "assimpModel": {
+    "vertex": "res\\shaders\\assimpmodel.vs",
+    "fragment": "res\\shaders\\assimpmodel.fs"
   }
 }
