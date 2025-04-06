@@ -61,7 +61,8 @@ float ShadowCalculation(vec4 fragPosLightSpace) {
 void main() {
     vec3 baseColor = objectColor;
     if (useTexture) {
-        baseColor = texture(material.diffuse1, TexCoords).rgb;
+        vec4 texColor = texture(material.diffuse1, TexCoords);
+        baseColor = texColor.a > 0.1 ? texColor.rgb : objectColor;
     }
 
     if (!useLighting || numLights == 0) {

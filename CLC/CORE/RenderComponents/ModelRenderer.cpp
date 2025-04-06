@@ -34,6 +34,7 @@ void ModelRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	m_shader->setBool("useLighting", !relevantLights.empty());
 	m_shader->setInt("numLights", relevantLights.size());
 
+	/*
 	for (size_t i = 0; i < relevantLights.size(); i++) {
 		std::string base = "lights[" + std::to_string(i) + "].";
 
@@ -49,12 +50,18 @@ void ModelRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 		//m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
 		//m_shader->setVec3(base + "color", relevantLights[i]->getColor());
 		//m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
-
 	}
-	// Draw all meshes
-	for (unsigned int i = 0; i < meshes.size(); i++) {
+	*/
 
-		meshes[i].Draw(m_shader, LightManager::getShadowMapper()->getLightSpaceMatrix(), true, true);
+	for (size_t i = 0; i < relevantLights.size(); i++) {
+		std::string base = "lights[" + std::to_string(i) + "].";
+		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
+		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
+		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
+	}
+	for (unsigned int i = 0; i < meshes.size(); i++) {
+		meshes[i].Draw(m_shader, LightManager::getShadowMapper()->getLightSpaceMatrix(),
+			!relevantLights.empty(), true);
 	}
 
 }

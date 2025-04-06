@@ -70,38 +70,40 @@ void Mesh::Draw(std::shared_ptr<ShaderProgram> shader) {
 	glActiveTexture(GL_TEXTURE0);
 }
 
+
 void Mesh::Draw(std::shared_ptr<ShaderProgram> shader,
 	const glm::mat4& lightSpaceMatrix,
 	bool useLighting,
 	bool useShadows) {
-	// Bind shadow map first to unit 15 if needed
+
+	// Shadow map
 	if (useShadows) {
-		glActiveTexture(GL_TEXTURE15);
-		shader->setInt("shadowMap", 15);
+		glActiveTexture(GL_TEXTURE10);
+		shader->setInt("shadowMap", 10);
 		glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
 	}
 
-	// Bind model textures starting from unit 0
-	
+	// Material properties
 	shader->setBool("useTexture", !textures.empty());
 	shader->setBool("useLighting", useLighting);
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 
+	// Bind first diffuse texture if it exists
 	for (unsigned int i = 0; i < textures.size(); i++) {
-		glActiveTexture(GL_TEXTURE0 + i);
-		std::string uniformName;
 		if (textures[i].type == "texture_diffuse") {
-			uniformName = "material.diffuse1"; // Just use diffuse1 for the first diffuse texture
-			shader->setInt(uniformName.c_str(), i);
+			glActiveTexture(GL_TEXTURE0);
+			shader->setInt("material.diffuse1", 0);
 			glBindTexture(GL_TEXTURE_2D, textures[i].id);
-			break; // Only use the first diffuse texture for now
+			break;
 		}
 	}
 
+	// Draw mesh
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
+	// Reset to default texture unit
 	glActiveTexture(GL_TEXTURE0);
 }
 
