@@ -7,6 +7,13 @@ struct Light {
     float intensity;
 };
 
+
+
+struct Material {
+    sampler2D diffuse1;
+    // Add more textures if needed
+};
+
 #define MAX_LIGHTS 128
 in vec3 FragPos;
 in vec3 Normal;
@@ -20,7 +27,9 @@ uniform bool useLighting;
 uniform Light lights[MAX_LIGHTS];
 uniform vec3 objectColor;
 uniform bool useTexture;
-uniform sampler2D texture_diffuse1;
+
+uniform Material material;  // Changed from individual sampler2D to Material struct
+
 uniform sampler2D shadowMap;
 uniform vec3 viewPos;
 
@@ -52,7 +61,7 @@ float ShadowCalculation(vec4 fragPosLightSpace) {
 void main() {
     vec3 baseColor = objectColor;
     if (useTexture) {
-        baseColor = texture(texture_diffuse1, TexCoords).rgb;
+        baseColor = texture(material.diffuse1, TexCoords).rgb;
     }
 
     if (!useLighting || numLights == 0) {

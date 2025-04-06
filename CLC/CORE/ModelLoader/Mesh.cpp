@@ -82,37 +82,20 @@ void Mesh::Draw(std::shared_ptr<ShaderProgram> shader,
 	}
 
 	// Bind model textures starting from unit 0
-	unsigned int diffuseNr = 1;
-	unsigned int specularNr = 1;
 	
 	shader->setBool("useTexture", !textures.empty());
-
 	shader->setBool("useLighting", useLighting);
-	shader->setBool("useShadows", useShadows);
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-
-
 
 	for (unsigned int i = 0; i < textures.size(); i++) {
 		glActiveTexture(GL_TEXTURE0 + i);
-
-		std::string number;
-		std::string name = textures[i].type;
 		std::string uniformName;
-
-		if (name == "texture_diffuse") {
-			number = std::to_string(diffuseNr++);
-			uniformName = "material.diffuse" + number;
+		if (textures[i].type == "texture_diffuse") {
+			uniformName = "material.diffuse1"; // Just use diffuse1 for the first diffuse texture
+			shader->setInt(uniformName.c_str(), i);
+			glBindTexture(GL_TEXTURE_2D, textures[i].id);
+			break; // Only use the first diffuse texture for now
 		}
-		else if (name == "texture_specular") {
-			number = std::to_string(specularNr++);
-			uniformName = "material.specular" + number;
-		}
-
-		shader->setInt(uniformName.c_str(), i);
-		//shader->setInt("texture_diffuse1", i);
-
-		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
 
 	glBindVertexArray(VAO);

@@ -12,6 +12,8 @@ public:
 	void init() override;
 	void draw(const glm::mat4& view, const glm::mat4& projection) override;
 
+	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override;
+
 	void bindTextures() {
 
 		glActiveTexture(GL_TEXTURE0);

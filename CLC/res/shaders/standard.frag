@@ -23,7 +23,7 @@ uniform int numLights;
 uniform bool useLighting;
 uniform Light lights[MAX_LIGHTS];
 uniform vec3 objectColor;
-uniform sampler2D texture1;
+uniform sampler2D texture_diffuse1;
 uniform bool useTexture;
 
 uniform sampler2D diffuseTexture;
@@ -72,33 +72,34 @@ void main() {
     
     // If using texture, replace base color with texture color
     if (useTexture) {
-        baseColor = texture(texture1, TexCoords).rgb;
+        baseColor = texture(texture_diffuse1, TexCoords).rgb;
     }
-    
-    // Get diffuse texture contribution (assuming it's a multiplier)
-    vec3 diffuseTex = texture(diffuseTexture, TexCoords).rgb;
-    
+    if (numLights == 0 || !useLighting) {
+        FragColor = vec4(baseColor, 1.0);
+        return;
+    }
     vec3 norm = normalize(Normal);
-    vec3 lightColor = lights[0].color;
+    vec3 lightColor = lights[0].color * lights[0].intensity;
 
-    // Lighting calculations
+    // Ambient
+    vec3 ambient = 0.1 * lightColor;
+    
+    // Diffuse
     vec3 lightDir = normalize(lights[0].position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * lightColor;
 
-    vec3 ambient = 0.3 * lightColor;
-
+    // Specular
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(norm, halfwayDir), 0.0), 64.0);
-    vec3 specular = spec * lightColor;    
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);
+    vec3 specular = spec * lightColor;
     
-    // Calculate shadow
-    float shadow = ShadowCalculation(FragPosLightSpace);                      
+    // Shadow
+    float shadow = ShadowCalculation(FragPosLightSpace);
     
-    // Combine all components
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * baseColor * diffuseTex;
-    
-    // Final color output
+    // Final color
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * baseColor;
     FragColor = vec4(lighting, 1.0);
-}
+    
+    }

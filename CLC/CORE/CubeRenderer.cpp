@@ -36,70 +36,11 @@ void CubeRenderer::init() {
 	setShader("standard");
 	m_shader->use();
 
-
 }
 
 void CubeRenderer::draw(const std::shared_ptr<Camera> cam) {
 	renderWithMaterials(cam);
-	/*
-	if (!m_shader) return;
-
-	m_shader->use();
-
-	// Set matrix uniforms
-	m_shader->setMat4("model", glm::value_ptr(this->getGameObject()->getModelMatrix()));
-	m_shader->setMat4("view", glm::value_ptr(cam->getViewMatrix()));
-	m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
-
-	// Handle textures
-	m_shader->setBool("useTexture", !m_textures.empty());
-	if (!m_textures.empty()) {
-		bindTextures();
 	}
-	
-	// Bind shadow map before rendering
-	if (m_shader != ShaderManager::getShader("simpleDepthShader")) {
-		LightManager::bindShadowMap(m_shader);
-	}
-
-	// Handle lighting
-	std::vector<std::shared_ptr<Light>> relevantLights = LightManager::getRelevantLights(cam, 128);
-	bool useLighting = !relevantLights.empty();
-
-	m_shader->setBool("useLighting", useLighting);
-	m_shader->setInt("numLights", relevantLights.size());
-
-	for (size_t i = 0; i < relevantLights.size(); i++) {
-		std::string base = "lights[" + std::to_string(i) + "].";
-
-		// Set light type
-		int lightType = 0; // Default to Point Light
-		switch (relevantLights[i]->getType()) {
-		case LightType::POINT: lightType = 0; break;
-		case LightType::DIRECTIONAL: lightType = 1; break;
-		case LightType::SPOT: lightType = 2; break;
-		}
-		m_shader->setInt(base + "type", lightType);
-
-		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
-		m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
-		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
-		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
-	}
-
-	// Set object color
-	m_shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
-
-	// Draw cube
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
-
-	// Unbind textures if used
-	if (!m_textures.empty())
-		unBindTextures();
-		*/
-}
 
 
 void CubeRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
@@ -127,20 +68,34 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	m_shader->setMat4("model", glm::value_ptr(getGameObject()->getModelMatrix()));
 	m_shader->setMat4("view", glm::value_ptr(cam->getViewMatrix()));
 	m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
+	m_shader->setMat4("lightSpaceMatrix", LightManager::getShadowMapper()->getLightSpaceMatrix());
 
 	// Material properties
 	m_shader->setBool("useTexture", !m_textures.empty());
 	m_shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
+	m_shader->setVec3("viewPos", cam->getPosition());
 
 	// Bind textures if available
 	if (!m_textures.empty()) {
-		bindTextures();
+		//bindTextures();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_textures[0]->id);
+		m_shader->setInt("texture_diffuse1", 0);
 	}
 
 	// Lighting (same as your existing draw() code)
 	std::vector<std::shared_ptr<Light>> relevantLights = LightManager::getRelevantLights(cam, 128);
 	m_shader->setBool("useLighting", !relevantLights.empty());
 	m_shader->setInt("numLights", relevantLights.size());
+
+
+	for (size_t i = 0; i < relevantLights.size(); i++) {
+		std::string base = "lights[" + std::to_string(i) + "].";
+		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
+		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
+		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
+	}
+	/*
 
 	for (size_t i = 0; i < relevantLights.size(); i++) {
 		std::string base = "lights[" + std::to_string(i) + "].";
@@ -152,26 +107,35 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 		case LightType::DIRECTIONAL: lightType = 1; break;
 		case LightType::SPOT: lightType = 2; break;
 		}
-		m_shader->setInt(base + "type", lightType);
+		//m_shader->setInt(base + "type", lightType);
 
 		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
-		m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
-		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
-		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
+		//m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
+		//m_shader->setVec3(base + "color", relevantLights[i]->getColor());
+		//m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
 
-	}
-
-	//obj color
+	}*/
 
 	// Bind shadow map (now handled by LightManager)
-	LightManager::bindShadowMap(m_shader);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
+	m_shader->setInt("shadowMap", 1);
+	m_shader->setVec3("lightPos", relevantLights[0]->getPosition());
+	//LightManager::bindShadowMap(m_shader);
 
 	// Draw
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
-	if (!m_textures.empty()) {
-		unBindTextures();
-	}
+
+	// Reset texture binding
+	glActiveTexture(GL_TEXTURE0);
+}
+
+
+CubeRenderer::~CubeRenderer() {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }

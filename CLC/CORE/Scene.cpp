@@ -27,6 +27,10 @@ void Scene::renderShadowCasters(const glm::mat4& lightMatrix) {
 }
 
 void Scene::renderMainPass() {
+    //cubemaps
+    if (m_cubemap)
+		m_cubemap->draw(m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
+    
     // Normal rendering with materials
     for (auto obj : m_gameObjects) {
         obj->renderWithMaterials(m_camera);
@@ -41,8 +45,8 @@ void Scene::render() {
     glm::mat4 projection = m_camera->getProjectionMatrix();
 
     //drawcubemap
-    //if (m_cubemap)
-    //    m_cubemap->draw(view,projection);
+    if (m_cubemap)
+        m_cubemap->draw(view,projection);
     for (auto& gameObject : m_gameObjects) {
         //gameObject->render(view, projection);
         gameObject->render(m_camera);

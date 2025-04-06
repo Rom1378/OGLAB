@@ -124,10 +124,10 @@ namespace Window
 			glfwMakeContextCurrent(backup_current_context);
 		}
 		glfwSwapBuffers(Internal::m_window);
-		GLenum err;
-		while ((err = glGetError()) != GL_NO_ERROR) {
-			std::cerr << "OpenGL error: " << err << std::endl;
-		}
+		//GLenum err;
+		//while ((err = glGetError()) != GL_NO_ERROR) {
+		//	std::cerr << "OpenGL error: " << err << std::endl;
+		//}
 
 		//calculate fps
 		float currentTime = glfwGetTime();
@@ -434,6 +434,12 @@ namespace Window
 		ImGui::Image((void*)(intptr_t)3, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::SameLine();
 		ImGui::Image((void*)(intptr_t)4, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((void*)(intptr_t)5, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
+		ImGui::Image((void*)(intptr_t)6, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image((void*)(intptr_t)7, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::SameLine();
+ImGui::Image((void*)(intptr_t)8, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		//contrast control
 		ImGui::End();
 

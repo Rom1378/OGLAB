@@ -156,7 +156,6 @@
     <None Include="CORE\shaders\standard.vert" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CORE\Component.cpp" />
     <ClCompile Include="CORE\CubeMap.cpp" />
     <ClCompile Include="CORE\CubeRenderer.cpp" />
     <ClCompile Include="CORE\Engine.cpp" />
@@ -184,6 +183,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CORE\Camera.hpp" />
+    <ClInclude Include="CORE\Debug.hpp" />
     <ClInclude Include="CORE\ModelLoader\Mesh.hpp" />
     <ClInclude Include="CORE\Component.hpp" />
     <ClInclude Include="CORE\CubeMap.hpp" />

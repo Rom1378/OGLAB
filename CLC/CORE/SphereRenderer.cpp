@@ -23,7 +23,7 @@ void SphereRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
 
 	// Handle textures
-	m_shader->setBool("useTexture", !m_textures.empty());
+	//m_shader->setBool("useTexture", !m_textures.empty());
 	if (!m_textures.empty()) {
 		bindTextures();
 	}

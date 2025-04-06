@@ -67,15 +67,20 @@ int main() {
 											"res/textures/CubeMaps/skybox/bottom.jpg",
 											"res/textures/CubeMaps/skybox/front.jpg",
 											"res/textures/CubeMaps/skybox/back.jpg" };
+
+		//sun
+
+	}*/
+
 		//cubemap
+
 		auto cb = std::make_shared<CubeMap>();
 		cb->init();
 		cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
 		scene.setCubemap(cb);
 
-		//sun
 
-	}*/
+
 	//loading 3d model
 	auto catv2=std::make_shared<GameObject>("Cat");
 	catv2->setPosition(glm::vec3(0.0f, 100.0f, 0.0f));

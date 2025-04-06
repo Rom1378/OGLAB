@@ -61,8 +61,6 @@ namespace Engine {
 		m_dt = getDeltaTime();
 		scene->update(m_dt);
 
-
-
 	}
 
 	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
@@ -75,12 +73,12 @@ namespace Engine {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Bind shadow map to shader
-		auto mainShader = ShaderManager::getShader("standard");
-		mainShader->use();
-		mainShader->setInt("shadowMap", 1);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, shadowMapper->getDepthMapTexture());
-		mainShader->setMat4("lightSpaceMatrix", shadowMapper->getLightSpaceMatrix());
+		//auto mainShader = ShaderManager::getShader("standard");
+		//mainShader->use();
+		//mainShader->setInt("shadowMap", 1);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, shadowMapper->getDepthMapTexture());
+		//mainShader->setMat4("lightSpaceMatrix", shadowMapper->getLightSpaceMatrix());
 
 	}
 

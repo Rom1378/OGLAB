@@ -29,6 +29,7 @@ namespace Input
         glfwSetKeyCallback(window, Internal::key_callback);
         glfwSetMouseButtonCallback(window, Internal::mouse_button_callback);
         glfwSetWindowFocusCallback(window, Internal::window_focus_callback);
+       
     }
 
 
