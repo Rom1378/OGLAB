@@ -1,6 +1,6 @@
 #include "LightManager.hpp"
 #include <iostream>
-#include "Camera.hpp"
+#include "../Cameras/Camera.hpp"
 #include <glm/glm.hpp>
 
 

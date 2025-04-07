@@ -1,6 +1,4 @@
 #include "../CORE/Scene.hpp"
-#include "../CORE/Window.hpp"
-#include "../CORE/Input.hpp"
 #include "../CORE/Shader.hpp"
 #include <iostream>
 #include <PxPhysicsAPI.h>
@@ -14,6 +12,7 @@
 #include "../CORE/RenderComponents/Cursor.hpp"
 #include "../CORE/UI/SceneObjectEditor.hpp"
 #include "../CORE/RenderComponents/ModelRenderer.hpp"
+#include "../CORE/Cameras/CameraMC.hpp"
 
 int main() {
 
@@ -86,7 +85,17 @@ int main() {
 	catv2->setPosition(glm::vec3(0.0f, 100.0f, 0.0f));
 	catv2->addComponent<ModelRenderer>("res/obj/Cat_v1_/12221_Cat_v1_l3.obj");
 	scene.addGameObject(catv2);
-	
+	catv2->setRotationQuaternion(glm::vec3(-90.0, 0.0, 0.0));
+
+
+	auto futureFive = std::make_shared<GameObject>("FuturisticFive");
+	futureFive->setPosition(glm::vec3(100.0f, 100.0f, 0.0f));
+	futureFive->addComponent<ModelRenderer>("res/obj/FuturisticFive/Five_Wheeler-(Wavefront OBJ).obj");
+	scene.addGameObject(futureFive);
+	futureFive->setRotationQuaternion(glm::vec3(-90.0, 0.0, 0.0));
+
+
+
 
 	auto world = std::make_shared<GameObject>("World");
 	world->setScale(glm::vec3(220.0f, 10.0f, 220.0f));
@@ -166,6 +175,8 @@ int main() {
 				c->getComponent<RenderComponent>()->addTexture(cattxtr);
 			}
 		}
+
+		catv2->rotate(glm::vec3(0, 5, 0));
 
 
 		Window::drawImGuiInterface();

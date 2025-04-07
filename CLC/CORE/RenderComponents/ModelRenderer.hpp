@@ -1,6 +1,6 @@
 
-#include "../RenderComponent.hpp"
-#include "../LightManager.hpp"
+#include "../RenderComponents/RenderComponent.hpp"
+#include "../Lights/LightManager.hpp"
 #include <glm/glm.hpp>
 #include "../ModelLoader/Mesh.hpp" 
 #include <assimp/Importer.hpp>

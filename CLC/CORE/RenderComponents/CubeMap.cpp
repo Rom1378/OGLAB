@@ -1,5 +1,5 @@
 #include "CubeMap.hpp"
-#include "Mesh/CubeMap.hpp"
+#include "../Mesh/CubeMap.hpp"
 
 void CubeMap::init() {
 
@@ -10,7 +10,6 @@ void CubeMap::init() {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * MeshData::CubeMap::vertices.size(), MeshData::CubeMap::vertices.data(), GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
 
 	// Set default shader
 	setShader("cubemap");
@@ -66,4 +65,31 @@ void CubeMap::draw(const glm::mat4& view, const glm::mat4& projection) {
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 
+}
+
+void CubeMap::bindTextures() {
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, m_textures[0]->id);
+	m_shader->setInt("skybox", 0);
+}
+
+void CubeMap::setHDRTexture(const std::string& path) {
+	// Load with dimension info
+	auto hdrInfo = TextureManager::loadHDRTextureWithInfo(path);
+	if (!hdrInfo.texture || hdrInfo.width == 0) {
+		std::cerr << "Failed to load HDR texture: " << path << std::endl;
+		return;
+	}
+
+	// Convert with automatic resolution
+	auto cubemap = TextureManager::convertHDRToCubemap(hdrInfo);
+	if (!cubemap) {
+		std::cerr << "Failed to convert HDR to cubemap" << std::endl;
+		return;
+	}
+
+	// Store result
+	m_textures.clear();
+	addTexture(cubemap);
 }

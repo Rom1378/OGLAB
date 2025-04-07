@@ -45,6 +45,9 @@ namespace UI {
 
 	void renderImGuiObjectEditor() {
 		if (!g_SelectedObject) return;
+		ImGui::Begin(" ransform editor");
+		ImGui::Text("aaaaaaaaa");
+			ImGui::End();
 
 		if (ImGui::Begin("Object Editor")) {
 			ImGui::Text("Selected: %s", g_SelectedObject->getName());

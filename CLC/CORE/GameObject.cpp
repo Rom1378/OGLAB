@@ -1,5 +1,5 @@
 #include "GameObject.hpp"
-#include "PhysicsComponent.hpp"
+#include "PhysicsComponents/PhysicsComponent.hpp"
 
 
 // Update all components

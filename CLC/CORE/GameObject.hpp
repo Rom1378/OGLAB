@@ -4,7 +4,7 @@
 #include <string>
 #include "Component.hpp"
 #include "Transform.hpp"
-#include "RenderComponent.hpp"
+#include "RenderComponents/RenderComponent.hpp"
 
 class PhysicsComponent;
 

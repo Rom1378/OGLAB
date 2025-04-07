@@ -1,5 +1,5 @@
 #include "Light.hpp"
-#include "GameObject.hpp"
+#include "../GameObject.hpp"
 
 
 void Light::update(float dt) {

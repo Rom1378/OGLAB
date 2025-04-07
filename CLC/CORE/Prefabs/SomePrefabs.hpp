@@ -1,10 +1,11 @@
 #pragma once
-#include "../LightManager.hpp"
+#include "../Lights/LightManager.hpp"
 #include "PrefabManager.hpp"
 #include "../GameObject.hpp"
-#include "../SphereRenderer.hpp"
-#include "../SpherePhysics.hpp"
-#include "../CubeRenderer.hpp"
+#include "../RenderComponents/SphereRenderer.hpp"
+#include "../PhysicsComponents/SpherePhysics.hpp"
+#include "../RenderComponents/CubeRenderer.hpp"
+#include "../PhysicsComponents/CubePhysics.hpp"
 
 
 inline void registerPrefabs() {

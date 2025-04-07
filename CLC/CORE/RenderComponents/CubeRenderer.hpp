@@ -1,6 +1,6 @@
 #pragma once
 #include "RenderComponent.hpp"
-#include "GameObject.hpp"
+#include "../GameObject.hpp"
 #include <iostream>
 
 class CubeRenderer : public RenderComponent {

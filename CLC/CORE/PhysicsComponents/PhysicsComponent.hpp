@@ -6,9 +6,9 @@
 #include <iostream>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
-#include "../CORE/Component.hpp"
-#include "../CORE/GameObject.hpp"
-#include "Physics.hpp"
+#include "../Component.hpp"
+#include "../GameObject.hpp"
+#include "../Physics.hpp"
 #include "PxActor.h"
 #include "PxRigidDynamic.h"
 #include "PxRigidStatic.h"
@@ -73,23 +73,8 @@ public:
 
 	inline PxRigidActor* getActor() { return body; }
 	inline void setUserData(void* data) { body->userData = data; }
-	~PhysicsComponent() {
-		if (body) {
-			body->release();
-		}
-		if (material) {
-			material->release();
-		}
-	}
-};
 
-class CubePhysics : public PhysicsComponent {
-public:
-	CubePhysics(Type t = Type::STATIC) : PhysicsComponent(t) {	}
-
-	void init();
-
-    void applyScale(const glm::vec3& scale);
+	~PhysicsComponent();
 };
 
 

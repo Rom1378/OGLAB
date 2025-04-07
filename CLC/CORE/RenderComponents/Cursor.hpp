@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../RenderComponent.hpp"
-#include "../Window.hpp"
+#include "../RenderComponents/RenderComponent.hpp"
+#include "../Window/Window.hpp"
 
 class UICursorComponent : public RenderComponent {
 public:
@@ -70,4 +70,9 @@ public:
 	void draw(const glm::mat4& view, const glm::mat4& projection) override {
 		draw();
 	}
+
+	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {
+		draw();
+	}
+
 };

@@ -1,6 +1,6 @@
-#include "LightManager.hpp"
+#include "../Lights/LightManager.hpp"
 #include "CubeRenderer.hpp"
-#include "Mesh/CubeMesh.hpp"
+#include "../Mesh/CubeMesh.hpp"
 
 void CubeRenderer::init() {
 	m_isShadowCaster= true;

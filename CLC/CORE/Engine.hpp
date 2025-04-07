@@ -1,10 +1,10 @@
 #pragma once
-#include "Window.hpp"
-#include "Input.hpp"
+#include "Window/Window.hpp"
+#include "Window/Input.hpp"
 
 class Scene;
 //define class ShadowMapper
-#include "LightManager.hpp"
+#include "Lights/LightManager.hpp"
 
 
 namespace Engine{

@@ -1,5 +1,5 @@
 #include "Scene.hpp"
-#include "PhysicsComponent.hpp"
+#include "PhysicsComponents/PhysicsComponent.hpp"
 
 void Scene::update(float dt) { 
 

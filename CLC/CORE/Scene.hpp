@@ -2,8 +2,8 @@
 #include <memory>
 #include <vector>
 #include "GameObject.hpp"
-#include "Camera.hpp"
-#include "CubeMap.hpp"
+#include "Cameras/Camera.hpp"
+#include "RenderComponents/CubeMap.hpp"
 #include "PhysicsScene.hpp"
 
 

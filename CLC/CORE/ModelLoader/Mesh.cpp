@@ -1,6 +1,6 @@
 #include "Mesh.hpp"
 #include <iostream>
-#include "../LightManager.hpp"
+#include "../Lights/LightManager.hpp"
 
 Mesh::Mesh(std::vector<Vertex> vertices,
 	std::vector<unsigned int> indices,

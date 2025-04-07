@@ -1,5 +1,5 @@
 #include "SphereRenderer.hpp"
-#include "LightManager.hpp"
+#include "../Lights/LightManager.hpp"
 
 
 

@@ -1,6 +1,4 @@
 #include "Engine.hpp"
-#include "Window.hpp"
-#include "Input.hpp"
 #include "Physics.hpp"
 #include "Shader.hpp"
 #include "Prefabs/SomePrefabs.hpp"
@@ -17,9 +15,6 @@
 
 using namespace std::chrono;
 high_resolution_clock::time_point lastTime = high_resolution_clock::now();
-
-
-
 
 namespace Engine {
 	bool m_isRunning = false;

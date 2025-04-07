@@ -185,6 +185,12 @@ std::string ShaderProgram::processShaderSource(const std::string& source) {
     }
     return processed.str();
 }
+
+void ShaderProgram::loadFromFiles(const std::string& vertexPath, const std::string& fragmentPath) {
+    try {
+        std::string vertexSource = processShaderSource(loadShaderSource(vertexPath));
+        std::string fragmentSource = processShaderSource(loadShaderSource(fragmentPath));
+
         GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
         GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
 

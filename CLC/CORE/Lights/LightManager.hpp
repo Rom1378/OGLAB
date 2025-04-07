@@ -1,10 +1,10 @@
 #pragma once
-#include "ShaderProgram.hpp"
+#include "../ShaderProgram.hpp"
 #include "Light.hpp"
 #include <vector>
 #include <memory>
 #include <iostream>
-#include "Scene.hpp"
+#include "../Scene.hpp"
 #include <memory>
 
 class Camera;

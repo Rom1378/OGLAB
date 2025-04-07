@@ -1,6 +1,6 @@
 #pragma once
 #include "RenderComponent.hpp"
-#include "GameObject.hpp"
+#include "../GameObject.hpp"
 #include <vector>
 #include <glm/glm.hpp>
 #include <array>

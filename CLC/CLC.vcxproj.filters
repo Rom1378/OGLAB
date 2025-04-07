@@ -35,19 +35,19 @@
     <ClCompile Include="CORE\Engine.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\Input.cpp">
+    <ClCompile Include="CORE\Window\Input.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\Window.cpp">
+    <ClCompile Include="CORE\Window\Window.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\ShaderProgram.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\RenderComponent.cpp">
+    <ClCompile Include="CORE\RenderComponents\RenderComponent.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\PhysicsComponent.cpp">
+    <ClCompile Include="CORE\PhysicsComponents\PhysicsComponent.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\GameObject.cpp">
@@ -59,10 +59,7 @@
     <ClCompile Include="CORE\Scene.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\SpherePhysics.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="CORE\RayCastComponent.cpp">
+    <ClCompile Include="CORE\PhysicsComponents\SpherePhysics.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\UIGameObjectController.cpp">
@@ -74,28 +71,37 @@
     <ClCompile Include="CORE\Prefabs\PrefabManager.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\CubeMap.cpp">
+    <ClCompile Include="CORE\RenderComponents\CubeMap.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\SphereRenderer.cpp">
+    <ClCompile Include="CORE\RenderComponents\SphereRenderer.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\CubeRenderer.cpp">
+    <ClCompile Include="CORE\RenderComponents\CubeRenderer.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\Light.cpp">
+    <ClCompile Include="CORE\Lights\Light.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\UI\SceneObjectEditor.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="CORE\LightManager.cpp">
+    <ClCompile Include="CORE\Lights\LightManager.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\ModelLoader\Mesh.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="CORE\RenderComponents\ModelRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CORE\PhysicsComponents\CubePhysics.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CORE\Cameras\Camera.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="CORE\Cameras\CameraMC.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
@@ -109,10 +115,10 @@
     <ClInclude Include="CORE\Transform.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\RenderComponent.hpp">
+    <ClInclude Include="CORE\RenderComponents\RenderComponent.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\InterfaceRenderer.hpp">
+    <ClInclude Include="CORE\RenderComponents\InterfaceRenderer.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Shader.hpp">
@@ -124,22 +130,22 @@
     <ClInclude Include="CORE\Engine.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\Input.hpp">
+    <ClInclude Include="CORE\Window\Input.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\Window.hpp">
+    <ClInclude Include="CORE\Window\Window.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Scene.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\Camera.hpp">
+    <ClInclude Include="CORE\Cameras\Camera.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\PhysicsComponent.hpp">
+    <ClInclude Include="CORE\PhysicsComponents\PhysicsComponent.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\CubeRenderer.hpp">
+    <ClInclude Include="CORE\RenderComponents\CubeRenderer.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Physics.hpp">
@@ -148,13 +154,10 @@
     <ClInclude Include="CORE\PhysicsScene.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\SphereRenderer.hpp">
+    <ClInclude Include="CORE\RenderComponents\SphereRenderer.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\SpherePhysics.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="CORE\RayCastComponent.h">
+    <ClInclude Include="CORE\PhysicsComponents\SpherePhysics.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\TextureManager.hpp">
@@ -169,16 +172,13 @@
     <ClInclude Include="CORE\Prefabs\PrefabDefinition.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\CubeMap.hpp">
+    <ClInclude Include="CORE\RenderComponents\CubeMap.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Mesh\CubeMap.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\Light.hpp">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="CORE\LightComponent.hpp">
+    <ClInclude Include="CORE\Lights\Light.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Prefabs\SomePrefabs.hpp">
@@ -193,7 +193,7 @@
     <ClInclude Include="CORE\RenderComponents\Cursor.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="CORE\LightManager.hpp">
+    <ClInclude Include="CORE\Lights\LightManager.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\ModelLoader\Mesh.hpp">
@@ -203,6 +203,12 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="CORE\Debug.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="CORE\PhysicsComponents\CubePhysics.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="CORE\Cameras\CameraMC.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
