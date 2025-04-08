@@ -1,4 +1,4 @@
-penGL Playground
+OpenGL Playground
 
 ![Project Screenshot](ca.png)
 
