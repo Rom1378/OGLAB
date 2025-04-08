@@ -95,6 +95,14 @@ int main() {
 	futureFive->setRotationQuaternion(glm::vec3(-90.0, 0.0, 0.0));
 
 
+	//sony_pvm-1341__sony_playstation
+	auto sony = std::make_shared<GameObject>("Sony");
+	sony->setPosition(glm::vec3(0.0f, 100.0f, 100.0f));
+	sony->addComponent<ModelRenderer>("res/obj/sony_pvm-1341__sony_playstation/sony_pvm-1341__sony_playstation.glb");
+	scene.addGameObject(sony);
+	//scale
+	sony->setScale(glm::vec3(50.0f, 50.0f, 50.0f));
+
 
 
 	auto world = std::make_shared<GameObject>("World");
@@ -169,7 +177,7 @@ int main() {
 		{
 			static float timer = 0.0f;
 			timer += Engine::get_dt();
-			if (timer > 1) {
+			if (timer > 111) {
 				timer = 0.0f;
 				auto c = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(0.0f, 140.0f, 0.0f));
 				c->getComponent<RenderComponent>()->addTexture(cattxtr);

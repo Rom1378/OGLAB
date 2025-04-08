@@ -1,12 +1,20 @@
-## Setup Instructions
+penGL Playground
 
-### Install Dependencies
-1. Install `vcpkg` if not already installed:
-2. Install required libraries:
-	vcpkg install glm glfw3 assimp glad imgui imgui[glfw-binding] imgui[opengl3-binding] physx imgui[docking-experimental]
-3. Open Visual Studio and set `CMake Toolchain` to `vcpkg/scripts/buildsystems/vcpkg.cmake`.
+![Project Screenshot](ca.png)
 
-### Building
-Open the `.sln` file in Visual Studio and build the project.
+A personal playground for experimenting with OpenGL and real-time graphics techniques. Current features include:
 
+- PhysX-powered basic cube and sphere collision physics
+- 3D model loading using Assimp
+- Shadow mapping implementation
+- Modern OpenGL rendering pipeline
+- Immediate-mode UI with ImGui
 
+**Acknowledgements**: Special thanks to [LearnOpenGL](https://learnopengl.com) for their tutorials.
+
+### Dependencies
+```bash
+vcpkg install glm glfw3 assimp glad imgui \
+    imgui[glfw-binding] imgui[opengl3-binding] \
+    physx imgui[docking-experimental]
+```
