@@ -418,7 +418,7 @@ namespace Window
 
 		// Display the OpenGL scene
 		ImVec2 availSize = ImGui::GetContentRegionAvail();
-		ImGui::Image((void*)(intptr_t)Window::getTexture(), availSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)Window::getTexture(), availSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 
@@ -428,18 +428,18 @@ namespace Window
 
 		// Display the OpenGL scene
 		ImVec2 availSize2 = ImGui::GetContentRegionAvail();
-		ImGui::Image((void*)(intptr_t)1, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)1, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::SameLine();
-		ImGui::Image((void*)(intptr_t)2, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-		ImGui::Image((void*)(intptr_t)3, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)2, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)3, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::SameLine();
-		ImGui::Image((void*)(intptr_t)4, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-		ImGui::Image((void*)(intptr_t)5, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)4, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)5, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::SameLine();
-		ImGui::Image((void*)(intptr_t)6, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-			ImGui::Image((void*)(intptr_t)7, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
-			ImGui::SameLine();
-ImGui::Image((void*)(intptr_t)8, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)6, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)7, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
+		ImGui::Image((ImTextureID)(intptr_t)8, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		//contrast control
 		ImGui::End();
 
