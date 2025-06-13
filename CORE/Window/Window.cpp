@@ -89,7 +89,10 @@ namespace Window
 		// Initialiser ImGui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.IniFilename = "../../../Config/imgui.ini";
+
 		io.MouseDrawCursor = true; // Force ImGui to draw the cursor
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls

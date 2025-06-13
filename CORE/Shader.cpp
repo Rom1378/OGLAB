@@ -92,6 +92,7 @@ namespace ShaderManager
         }
         catch (const std::exception& e)
         {
+            system("cd");
             throw std::runtime_error("Error loading shader configs: " + std::string(e.what()));
         }
     }

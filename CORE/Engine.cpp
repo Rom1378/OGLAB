@@ -40,7 +40,7 @@ namespace Engine {
 		Window::init(props);
 		std::cout << Window::isVSync() << std::endl;
 		Input::init();
-		ShaderManager::loadConfigs("shaders.json");
+		ShaderManager::loadConfigs("../../../Config/shaders.json");
 		Physics::init();
 		LightManager::init();
 

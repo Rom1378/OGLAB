@@ -11,10 +11,3 @@ A personal playground for experimenting with OpenGL and real-time graphics techn
 - Immediate-mode UI with ImGui
 
 **Acknowledgements**: Special thanks to [LearnOpenGL](https://learnopengl.com) for their tutorials.
-
-### Dependencies
-```bash
-vcpkg install glm glfw3 assimp glad imgui \
-    imgui[glfw-binding] imgui[opengl3-binding] \
-    physx imgui[docking-experimental]
-```

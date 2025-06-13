@@ -28,7 +28,7 @@ int main() {
 
 
 	//add cube prefab
-	
+
 
 	auto prefCube = PrefabManager::instantiate("DynamicCubePrefab", scene);
 
@@ -71,17 +71,17 @@ int main() {
 
 	}*/
 
-		//cubemap
+	//cubemap
 
-		auto cb = std::make_shared<CubeMap>();
-		cb->init();
-		cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
-		scene.setCubemap(cb);
+	auto cb = std::make_shared<CubeMap>();
+	cb->init();
+	cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
+	scene.setCubemap(cb);
 
-
+	/*
 
 	//loading 3d model
-	auto catv2=std::make_shared<GameObject>("Cat");
+	auto catv2 = std::make_shared<GameObject>("Cat");
 	catv2->setPosition(glm::vec3(0.0f, 100.0f, 0.0f));
 	catv2->addComponent<ModelRenderer>("res/obj/Cat_v1_/12221_Cat_v1_l3.obj");
 	scene.addGameObject(catv2);
@@ -103,7 +103,7 @@ int main() {
 	//scale
 	sony->setScale(glm::vec3(50.0f, 50.0f, 50.0f));
 
-
+	*/
 
 	auto world = std::make_shared<GameObject>("World");
 	world->setScale(glm::vec3(220.0f, 10.0f, 220.0f));
@@ -153,7 +153,7 @@ int main() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDepthFunc(GL_LESS);
-	
+
 	//polygon mode
 
 
@@ -184,7 +184,7 @@ int main() {
 			}
 		}
 
-		catv2->rotate(glm::vec3(0, 5, 0));
+		//catv2->rotate(glm::vec3(0, 5, 0));
 
 
 		Window::drawImGuiInterface();
@@ -236,7 +236,7 @@ int main() {
 		if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 10000.0f)) {
 			LightManager::getShadowMapper()->setOrthoSize(orthoSize);
 		}
-			ImGui::End();
+		ImGui::End();
 
 
 
@@ -251,5 +251,4 @@ int main() {
 	Window::shutdown();
 	return 0;
 }
-
 

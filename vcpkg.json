@@ -1,0 +1,16 @@
+{
+  "name": "clc",
+  "version": "0.1.0",
+  "dependencies": [
+    "glfw3",
+    "glm",
+    "glad",
+    {
+      "name": "imgui",
+      "features": [ "glfw-binding", "opengl3-binding", "docking-experimental" ]
+    },
+    "physx",
+    "assimp",
+    "nlohmann-json"
+  ]
+}
