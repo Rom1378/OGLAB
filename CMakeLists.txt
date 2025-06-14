@@ -68,6 +68,12 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 
+
+#find_package(stb CONFIG REQUIRED)  # If using vcpkg's stb port
+#target_link_libraries(your_target PRIVATE stb::stb)
+#target_include_directories(your_target SYSTEM PRIVATE ${STB_INCLUDE_DIRS})
+
+
 if(TARGET unofficial::omniverse-physx-sdk::gpu-library)
         if(UNIX)
             # Add rpath setting to find .so libraries on unix based systems

@@ -13,7 +13,7 @@ class Camera;
 
 namespace LightManager {
 
-	
+
 
 	class ShadowMapper {
 		GLuint depthMapFBO;
@@ -42,11 +42,11 @@ namespace LightManager {
 			this->nearPlane = nearPlane;
 		}
 		float getOrthoSize()
-	{
+		{
 			return orthoSize;
 		}
 		void setOrthoSize(float orthoSize) {
-						this->orthoSize = orthoSize;
+			this->orthoSize = orthoSize;
 		}
 
 		glm::mat4 getLightSpaceMatrix() {
@@ -63,9 +63,9 @@ namespace LightManager {
 				glDeleteTextures(1, &depthMapTexture);
 			}
 		}
-		 GLuint getDepthMapFBO() const { return depthMapFBO; }
-		 GLuint getDepthMapTexture() const { return depthMapTexture; }
-		 glm::mat4 getLightSpaceMatrix() const { return lightSpaceMatrix; }
+		GLuint getDepthMapFBO() const { return depthMapFBO; }
+		GLuint getDepthMapTexture() const { return depthMapTexture; }
+		glm::mat4 getLightSpaceMatrix() const { return lightSpaceMatrix; }
 
 		void initialize(int resolution = 2048) {
 			// Create depth texture
@@ -116,25 +116,31 @@ namespace LightManager {
 	};
 
 
-    extern std::vector<std::shared_ptr<Light>> s_lights;
 
-    
-    void init();
+	
+
+	extern std::vector<std::shared_ptr<Light>> s_lights;
+
+
+	void init();
+	void shutdown();
+
+
 	//void compute_shadow_mapping(Scene* scene);
-    void bindShadowMap(std::shared_ptr<ShaderProgram> shader);
+	void bindShadowMap(std::shared_ptr<ShaderProgram> shader);
 
 
 	//unsigned int getDepthMap();
 
 
 	ShadowMapper* getShadowMapper();
-    
 
 
-    std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights);
-    void addLight(const std::shared_ptr<Light> light);
-    void clearLights();
-    const std::vector<std::shared_ptr<Light>>& getLights();
+
+	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights);
+	void addLight(const std::shared_ptr<Light> light);
+	void clearLights();
+	const std::vector<std::shared_ptr<Light>>& getLights();
 
 
 }

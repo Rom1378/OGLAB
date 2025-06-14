@@ -19,6 +19,7 @@ namespace Input
 
     void init();
     void update();
+	void shutdown();
 
     // Mouse input
     const glm::vec2& getMousePosition();

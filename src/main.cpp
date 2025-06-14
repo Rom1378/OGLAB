@@ -248,7 +248,7 @@ int main() {
 		Engine::render(&scene);
 	}
 
-	Window::shutdown();
+	Engine::shutdown();
 	return 0;
 }
 

@@ -7,19 +7,17 @@
 
 struct Texture
 {
-	unsigned int id;
-	int width, height;
+	unsigned int id = 0; // OpenGL texture ID
+	int width = 0, height = 0; // dimensions of the texture
 
-	std::string type;
+	std::string type = "";
 	std::string path; // we store the path of the texture to compare with other textures (e.g. when loading a model)
-
-
 };
 
 struct HDRTextureInfo {
-	std::shared_ptr<Texture> texture;
-	int width;
-	int height;
+	std::shared_ptr<Texture> texture = nullptr;
+	int width = 0;
+	int height = 0;
 };
 
 namespace TextureManager

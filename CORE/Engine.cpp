@@ -47,6 +47,14 @@ namespace Engine {
 	}
 
 	void shutdown() {
+		LightManager::shutdown();
+		Physics::shutdown();
+		ShaderManager::cleanup();
+		TextureManager::clear();
+		Input::shutdown();
+		Window::shutdown();
+		m_isRunning = false;
+		std::cout << "Engine shutdown complete." << std::endl;
 	}
 
 	void update(Scene* scene) {
