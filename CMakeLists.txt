@@ -17,19 +17,12 @@ find_package(unofficial-omniverse-physx-sdk CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
-
-
-
 #collect sources
-
 file(GLOB_RECURSE engine CORE/*.c CORE/*.cpp CORE/*.h CORE/*.hpp)
 file(GLOB_RECURSE sources_src src/*.c src/*.cpp src/*.h src/*.hpp)
 file(GLOB_RECURSE resources res/*)
-#file(GLOB_RECURSE config Config/*)
 
-#set(sources ${sources_src} ${engine} ${resources} ${config})
 set(sources ${sources_src} ${engine} ${resources})
-#add_executable(${PROJECT_NAME} ${sources} "src/devScene.cpp")
 add_executable(${PROJECT_NAME} ${sources})
 
 
@@ -39,26 +32,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-#target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-
-
 # this copies all resource files in the build directory
 # we need this, because we want to work with paths relative to the executable
 file(COPY res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 #file(COPY Config DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-
-
-################################################################################
-# Include directories
-################################################################################
-#if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-#    target_include_directories(${PROJECT_NAME} PUBLIC
-#        "$ENV{VcpkgRoot}/installed/x64-windows/include/physx;"
-#        "$ENV{VcpkgRoot}/installed/x64-windows/include/nlohmann"
-#    )
-#endif()
 
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE
@@ -70,13 +48,6 @@ target_link_libraries(${PROJECT_NAME}
     assimp::assimp
     nlohmann_json::nlohmann_json
 )
-
-
-
-#find_package(stb CONFIG REQUIRED)  # If using vcpkg's stb port
-#target_link_libraries(your_target PRIVATE stb::stb)
-#target_include_directories(your_target SYSTEM PRIVATE ${STB_INCLUDE_DIRS})
-
 
 if(TARGET unofficial::omniverse-physx-sdk::gpu-library)
         if(UNIX)

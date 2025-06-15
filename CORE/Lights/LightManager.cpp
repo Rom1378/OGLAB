@@ -13,6 +13,7 @@ namespace LightManager
 	}
 
 	std::vector<std::shared_ptr<Light>> s_lights;
+	std::unordered_map<std::string, std::shared_ptr<Texture>> lights; //TODO: update imple it use this instead of s_lights
 
 
 	void init() {

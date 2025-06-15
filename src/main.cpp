@@ -34,7 +34,6 @@ int main() {
 
 		Window::drawImGuiInterface();
 
-		
 
 		Engine::renderUI(&scene);
 		Engine::update(&scene);
