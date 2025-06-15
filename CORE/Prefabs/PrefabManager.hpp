@@ -14,7 +14,6 @@ namespace PrefabManager {
 
     std::shared_ptr<GameObject> instantiate(
         const std::string& prefabName,
-        Scene& scene,
         const glm::vec3& position = glm::vec3(0.0f)
     );
 };

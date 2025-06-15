@@ -9,7 +9,6 @@
 #include "imgui_impl_opengl3.h"
 #include "UI/SceneObjectEditor.hpp"
 #include "Scene.hpp"
-//#include "LightManager.hpp"
 
 #include <chrono>
 
@@ -87,6 +86,7 @@ namespace Engine {
 
 	void renderUI(Scene* scene) {
 
+		scene->onImGuiRender();
 		// Render UI
 		UI::renderImGuiSceneHierarchy(scene);
 		UI::renderImGuiObjectEditor();

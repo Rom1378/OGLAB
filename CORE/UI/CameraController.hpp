@@ -7,6 +7,10 @@
 
 namespace UI {
 	void UICameraController(std::shared_ptr<Camera> cam) {
+		if (!cam) {
+			LOG_WARN("camera is null");
+			return;
+		}
 		//an Imgui that allow me to control the camera parameters
 		ImGui::Begin("Camera");
 		glm::vec3 pos = cam->getPosition();

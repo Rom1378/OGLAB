@@ -9,11 +9,7 @@
 
 class Camera;
 
-
-
 namespace LightManager {
-
-
 
 	class ShadowMapper {
 		GLuint depthMapFBO;
@@ -115,10 +111,6 @@ namespace LightManager {
 
 	};
 
-
-
-	
-
 	extern std::vector<std::shared_ptr<Light>> s_lights;
 
 
@@ -129,16 +121,14 @@ namespace LightManager {
 	//void compute_shadow_mapping(Scene* scene);
 	void bindShadowMap(std::shared_ptr<ShaderProgram> shader);
 
-
 	//unsigned int getDepthMap();
-
-
 	ShadowMapper* getShadowMapper();
 
 
 
 	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights);
-	void addLight(const std::shared_ptr<Light> light);
+	void addLight(const std::shared_ptr<Light> light); //TODO: added map and names to light so you can ask lightmanager for the light you want
+	//std::shared_ptr getLight(const char * name...
 	void clearLights();
 	const std::vector<std::shared_ptr<Light>>& getLights();
 

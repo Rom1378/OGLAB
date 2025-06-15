@@ -2,7 +2,6 @@
 #include "PhysicsComponents/PhysicsComponent.hpp"
 
 void Scene::update(float dt) { 
-
     if(m_camera)
         m_camera->update(dt);
 
@@ -12,6 +11,8 @@ void Scene::update(float dt) {
     for (auto& gameObject : m_gameObjects) {
         gameObject->update(dt);
     }
+
+    onUpdate();
 
 }
 
@@ -36,11 +37,9 @@ void Scene::renderMainPass() {
         obj->renderWithMaterials(m_camera);
     }
 
-
 }
 
 void Scene::render() {
-
     glm::mat4 view = m_camera->getViewMatrix();
     glm::mat4 projection = m_camera->getProjectionMatrix();
 
@@ -52,8 +51,7 @@ void Scene::render() {
         gameObject->render(m_camera);
     }
 
-
-
+    onRender();
 }
 
 std::shared_ptr<GameObject> Scene::createGameObject() {
@@ -70,6 +68,10 @@ void Scene::destroyGameObject(std::shared_ptr<GameObject> gameObject) {
 }
 
 void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
+    if (!gameObject)
+        ENGINE_ASSERT(gameObject, "Cannot add null GameObject to Scene");
+
+
     m_gameObjects.push_back(gameObject);
     if (auto physicsComponent = gameObject->getComponent<PhysicsComponent>()) {
         m_physicsScene->addActor(physicsComponent->getActor());
@@ -80,3 +82,5 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
 		}
 	}
 }
+
+

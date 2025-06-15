@@ -2,9 +2,11 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include "Debug.hpp"
 #include "Component.hpp"
 #include "Transform.hpp"
 #include "RenderComponents/RenderComponent.hpp"
+
 
 class PhysicsComponent;
 

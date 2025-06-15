@@ -11,12 +11,19 @@ class Scene {
 public:
 	Scene() : m_camera(nullptr), m_cubemap(nullptr) {
 		m_physicsScene = std::make_shared<PhysicsScene>();
-	}
-	virtual ~Scene() = default;
-	virtual void init() {
 		m_physicsScene->init();
 	}
+
+
+	virtual ~Scene() = default;
+	virtual void init() {}
 	virtual void shutdown() {}
+	virtual void onUpdate() {}
+	virtual void onRender() {}
+	virtual void onImGuiRender() {}
+
+
+
 	void update(float dt);
 	void render();
 
@@ -37,6 +44,7 @@ public:
 	inline std::shared_ptr<PhysicsScene> getPhysicsScene() { return m_physicsScene; }
 
 
+
 protected:
 	std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 
@@ -45,5 +53,8 @@ protected:
 	std::shared_ptr<Camera> m_camera;
 	std::shared_ptr<CubeMap> m_cubemap;
 	std::shared_ptr<PhysicsScene> m_physicsScene;
+
+
+
 
 };

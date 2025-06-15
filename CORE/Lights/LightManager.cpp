@@ -6,9 +6,6 @@
 
 namespace LightManager
 {
-
-
-
 	ShadowMapper shadowMapper;
 
 	ShadowMapper* getShadowMapper() {

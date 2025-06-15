@@ -29,14 +29,18 @@ file(GLOB_RECURSE resources res/*)
 
 #set(sources ${sources_src} ${engine} ${resources} ${config})
 set(sources ${sources_src} ${engine} ${resources})
+#add_executable(${PROJECT_NAME} ${sources} "src/devScene.cpp")
 add_executable(${PROJECT_NAME} ${sources})
+
 
 
 #Include dirs
 target_include_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/CORE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+#target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 
 
 # this copies all resource files in the build directory
