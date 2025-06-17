@@ -67,7 +67,7 @@ namespace Engine {
 
 	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
 		// 1. Shadow Pass
-		shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
+		shadowMapper->renderShadowPass(scene, LightManager::getLight("SunLight"));
 
 		// 2. Main Pass
 		Window::bind_framebuffer();
@@ -97,9 +97,24 @@ namespace Engine {
 
 	}
 	void render(Scene* scene) {
-		renderFrame(scene, LightManager::getShadowMapper());
+		renderFrame(scene, LightManager::getShadowMapper()); // == renderShaderPass TODO
+
 		// Render scene normally
 		scene->renderMainPass();
+
+		// Render UI pass 
+		scene->renderUIPass();
+
+		// --- PASS 1: Shadow Mapping (if needed) ---
+		//if (LightManager::hasShadows()) {
+	//		renderShadowPass(scene, LightManager::getShadowMapper());
+		//}
+
+		// --- PASS 2: Main Geometry (3D world) ---
+		//scene->renderMainPass(); // Uses depth testing, lighting, etc.
+
+		// --- PASS 3: UI Rendering (Cursor, HUD, etc.) ---
+		//renderUIPass(scene); // Disables depth test, renders last
 
 		// Optional: Render debug quad in a separate window
 		if (0) {

@@ -1,16 +1,14 @@
 #include "devScene.hpp"
 
 void DevScene::init() {
-	auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
-	addGameObject(prefCube);
+	//auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
+	//addGameObject(prefCube);
 
-	prefCube->setPosition(glm::vec3(0.0f, 10.0f, 0.0f));
+	//prefCube->setPosition(glm::vec3(0.0f, 10.0f, 0.0f));
 
 	//remove gravaity
 	//scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
 	//scene.getPhysicsScene()->getScene()->setGravity(PxVec3(0, 0, 0));
-
-
 
 	/*
 	{
@@ -20,8 +18,6 @@ void DevScene::init() {
 		auto cubeObj = PrefabManager::instantiate("DynamicCubePrefab", scene, glm::vec3(100.0f, 100.0f, 100.0f));
 		cubeObj->getComponent<RenderComponent>()->addTexture(txtr);
 		cubeObj->addComponent<CubePhysics>(PhysicsComponent::Type::DYNAMIC);
-
-
 
 		//sphere
 		auto sphereObj = std::make_shared<GameObject>("Sphere");
@@ -50,37 +46,11 @@ void DevScene::init() {
 
 	//cubemap
 
+	/*
 	auto cb = std::make_shared<CubeMap>();
 	cb->init();
 	cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
 	setCubemap(cb);
-
-	/*
-
-	//loading 3d model
-	auto catv2 = std::make_shared<GameObject>("Cat");
-	catv2->setPosition(glm::vec3(0.0f, 100.0f, 0.0f));
-	catv2->addComponent<ModelRenderer>("res/obj/Cat_v1_/12221_Cat_v1_l3.obj");
-	scene.addGameObject(catv2);
-	catv2->setRotationQuaternion(glm::vec3(-90.0, 0.0, 0.0));
-
-
-	auto futureFive = std::make_shared<GameObject>("FuturisticFive");
-	futureFive->setPosition(glm::vec3(100.0f, 100.0f, 0.0f));
-	futureFive->addComponent<ModelRenderer>("res/obj/FuturisticFive/Five_Wheeler-(Wavefront OBJ).obj");
-	scene.addGameObject(futureFive);
-	futureFive->setRotationQuaternion(glm::vec3(-90.0, 0.0, 0.0));
-
-
-	//sony_pvm-1341__sony_playstation
-	auto sony = std::make_shared<GameObject>("Sony");
-	sony->setPosition(glm::vec3(0.0f, 100.0f, 100.0f));
-	sony->addComponent<ModelRenderer>("res/obj/sony_pvm-1341__sony_playstation/sony_pvm-1341__sony_playstation.glb");
-	scene.addGameObject(sony);
-	//scale
-	sony->setScale(glm::vec3(50.0f, 50.0f, 50.0f));
-
-	*/
 
 	auto world = std::make_shared<GameObject>("World");
 	world->setScale(glm::vec3(220.0f, 10.0f, 220.0f));
@@ -95,6 +65,7 @@ void DevScene::init() {
 	auto sphere = PrefabManager::instantiate("SpherePrefab", glm::vec3(0.0f, 10.0f, 0.0f));
 	//add velocity
 	sphere->getComponent<PhysicsComponent>()->setLinearVelocity(glm::vec3(10.0f, 30.0f, 0.0f));
+	*/
 
 	auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
 	camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
@@ -110,7 +81,7 @@ void DevScene::init() {
 		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
 		1.0f                              // Full intensity
 	);
-	LightManager::addLight(sunLight);
+	LightManager::addLight(sunLight, "SunLight");
 
 
 	//LightSpherePrefab
@@ -132,34 +103,52 @@ void DevScene::onUpdate() {
 		auto c = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(0.0f, 140.0f, 0.0f));
 		c->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 	}
+	if (Input::isKeyJustPressed(GLFW_KEY_F1)) {
+		currentMode = EDIT;
+		LOG("Switched to EDIT mode");
+	}
+	else if (Input::isKeyJustPressed(GLFW_KEY_F2)) {
+		currentMode = PLAY;
+		LOG("Switched to PLAY mode");
+	}
+	// Handle raycast selection
+		if (!m_camera) {
+			LOG_WARN("m_camera is null");
+		}
+		else {
+
+			auto cameraPos = m_camera->getPosition();
+			auto cameraDir = m_camera->getRotation();
+			if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(cameraDir), 1000.0f, hitInfo)) {
+				hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
+
+
+				if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+					if (currentMode == EDIT) {
+						// If in EDIT mode, add a cube at the hit position
+					auto cube=	PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+					cube->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
+					addGameObject(cube);
+					}
+					else if (currentMode == PLAY) {
+						// If in PLAY mode, select the nearest object under the cursor
+						if (hitRaycastObject) {
+							selectedHitRaycastObject = hitRaycastObject;
+						}
+					}
+				}
+			}
+		}
+
+
 }
 
 void DevScene::onImGuiRender() {
 	// Edit camera controller
 	UI::UICameraController(getCamera());
 
-	// Handle raycast selection
-	{
-		if (!m_camera)
-		{
-			LOG_WARN("m_camera is null");
-		}
-		else {
-
-			auto cameraPos = getCamera()->getPosition();
-			auto cameraDir = getCamera()->getRotation();
-			PxRaycastHit hitInfo;
-			if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(cameraDir), 1000.0f, hitInfo)) {
-				GameObject* hitObject = static_cast<GameObject*>(hitInfo.actor->userData);
-				UI::handleRaycastSelection(hitObject);
-				if (Input::isKeyPressed(GLFW_KEY_P)) {
-					addGameObject(
-						PrefabManager::instantiate("CubePrefab",
-							glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z)));
-				}
-			}
-		}
-	}
+	UI::handleRaycastSelection(selectedHitRaycastObject);
+	
 
 	//change light pos
 	ImGui::Begin("Light");

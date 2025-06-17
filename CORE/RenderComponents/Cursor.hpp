@@ -3,13 +3,24 @@
 #include "../RenderComponents/RenderComponent.hpp"
 #include "../Window/Window.hpp"
 
-class UICursorComponent : public RenderComponent {
+class UIComponent : public RenderComponent {
 public:
-
-	UICursorComponent() : RenderComponent() {
+	UIComponent() : RenderComponent() {
 		init();
 	}
-	UICursorComponent(const UICursorComponent& other) : RenderComponent(other) {
+	virtual void init() override {	}
+	//virtual void render(std::shared_ptr<Camera> cam) {}
+	virtual void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {	}
+
+};
+
+class UICursorComponent : public UIComponent {
+public:
+
+	UICursorComponent() : UIComponent() {
+		init();
+	}
+	UICursorComponent(const UICursorComponent& other) : UIComponent(other) {
 		init();
 	}
 	void init() override {
@@ -18,7 +29,6 @@ public:
 	 0.0f, -10.0f,  // Vertical line
 	 0.0f,  10.0f };
 		indices = {};
-
 
 		glGenVertexArrays(1, &VAO);
 		glGenBuffers(1, &VBO);
@@ -36,17 +46,14 @@ public:
 		setShader("cursor");
 	}
 
-	void draw(const std::shared_ptr<Camera> cam) override {
-		draw();
-	}
-	void draw() override {
+	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {
 
 		auto shader = ShaderManager::getShader("cursor");
 		if (!shader) return;
 
 		shader->use();
 
-		glDisable(GL_DEPTH_TEST);  // UI elements should render on top
+		glDisable(GL_DEPTH_TEST);
 
 		// Compute orthographic projection
 		glm::mat4 projection = glm::ortho(0.0f, (float)Window::getFrameBufferWidth(), 0.0f, (float)Window::getFrameBufferHeight());
@@ -67,12 +74,6 @@ public:
 
 		glEnable(GL_DEPTH_TEST);
 	}
-	void draw(const glm::mat4& view, const glm::mat4& projection) override {
-		draw();
-	}
 
-	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {
-		draw();
-	}
 
 };

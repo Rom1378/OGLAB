@@ -1,5 +1,6 @@
 #include "Scene.hpp"
 #include "PhysicsComponents/PhysicsComponent.hpp"
+#include "renderComponents/Cursor.hpp"
 
 void Scene::update(float dt) { 
     if(m_camera)
@@ -38,7 +39,15 @@ void Scene::renderMainPass() {
     }
 
 }
+void Scene::renderUIPass() {
+	// Render UI components
+	for (auto& uiComponent : UIcomponents) {
+        uiComponent->renderWithMaterials(m_camera);
+		//uiComponent->render(m_camera);
+	}
+}
 
+/*
 void Scene::render() {
     glm::mat4 view = m_camera->getViewMatrix();
     glm::mat4 projection = m_camera->getProjectionMatrix();
@@ -52,7 +61,7 @@ void Scene::render() {
     }
 
     onRender();
-}
+}*/
 
 std::shared_ptr<GameObject> Scene::createGameObject() {
     auto gameObject = std::make_shared<GameObject>();
@@ -80,6 +89,9 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
 		if (physicsComponent->getIsShadowCaster()) {
 			shadowCasters.push_back(gameObject);
 		}
+	}
+	if (auto uiComponent = gameObject->getComponent<UIComponent>()) {
+		UIcomponents.push_back(gameObject);
 	}
 }
 

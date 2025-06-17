@@ -8,6 +8,7 @@
 #define ENGINE_ASSERT(x, msg) assert((x) && msg)
 
 // Use ANSI escape codes for colors
+#define LOG(msg)	   std::cout << "\033[1;34m[LOG]   \033[0m" << msg << std::endl
 #define LOG_OK(msg)    std::cout << "\033[1;32m[OK]    \033[0m" << msg << std::endl
 #define LOG_WARN(msg)  std::cout << "\033[1;33m[WARN]  \033[0m" << msg << std::endl
 #define LOG_ERROR(msg) std::cerr << "\033[1;31m[ERROR] \033[0m" << msg << std::endl

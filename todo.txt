@@ -1,6 +1,7 @@
 Add cool fps camera
 Improve textures binding for model renderer
 Add more lights to shaders computation
+Improve light manager
 Add loading model instead of showing white window
 Reduce memory leak
 Implement scene save, load, saving all object states

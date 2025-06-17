@@ -30,6 +30,7 @@ public:
 
 	void renderShadowCasters(const glm::mat4& lightMatrix);
 	void renderMainPass();
+	void renderUIPass();
 
 	std::shared_ptr<GameObject> createGameObject();
 	void destroyGameObject(std::shared_ptr<GameObject> gameObject);
@@ -48,7 +49,9 @@ public:
 protected:
 	std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 
-	std::vector<std::shared_ptr<GameObject>> shadowCasters;
+	std::vector<std::shared_ptr<GameObject>> shadowCasters; //this is not even used.... TODO
+
+	std::vector<std::shared_ptr<GameObject>> UIcomponents;
 
 	std::shared_ptr<Camera> m_camera;
 	std::shared_ptr<CubeMap> m_cubemap;
