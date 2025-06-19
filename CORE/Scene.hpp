@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "GameObject.hpp"
 #include "Cameras/Camera.hpp"
 #include "RenderComponents/CubeMap.hpp"
 #include "PhysicsScene.hpp"
+#include "RenderComponents/Cursor.hpp"
 
 
 class Scene {
@@ -25,7 +25,6 @@ public:
 
 
 	void update(float dt);
-	void render();
 
 
 	void renderShadowCasters(const glm::mat4& lightMatrix);
@@ -36,7 +35,9 @@ public:
 	void destroyGameObject(std::shared_ptr<GameObject> gameObject);
 
 	void addGameObject(std::shared_ptr<GameObject> gameObject);
-	inline std::vector<std::shared_ptr<GameObject>>& getGameObjects() { return m_gameObjects; }
+	inline std::vector<std::shared_ptr<GameObject>> const& getGameObjects() { return m_gameObjects; }
+	inline std::vector<std::shared_ptr<GameObject>> const& getShadowCasters() { return m_shadowCasters; }
+	inline std::vector<std::shared_ptr<GameObject>> const& getUIComponents() { return m_UIcomponents; }
 
 	inline void setCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
 	inline std::shared_ptr<Camera> getCamera() { return m_camera; }
@@ -49,9 +50,9 @@ public:
 protected:
 	std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 
-	std::vector<std::shared_ptr<GameObject>> shadowCasters; //this is not even used.... TODO
+	std::vector<std::shared_ptr<GameObject>> m_shadowCasters; //this is not even used.... TODO
 
-	std::vector<std::shared_ptr<GameObject>> UIcomponents;
+	std::vector<std::shared_ptr<GameObject>> m_UIcomponents;
 
 	std::shared_ptr<Camera> m_camera;
 	std::shared_ptr<CubeMap> m_cubemap;

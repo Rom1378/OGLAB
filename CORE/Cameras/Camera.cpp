@@ -1,4 +1,7 @@
 #include "Camera.hpp"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 
 Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane) :
@@ -91,3 +94,29 @@ void Camera::setFarPlane(float far) {
 	}
 }
 
+
+void Camera::onImGuiRender() {
+	ImGui::Begin("Camera");
+	glm::vec3 pos = getPosition();
+	glm::vec3 rot = getRotation();
+	float fov = getFOV();
+	float aspectRatio = getAspectRatio();
+	float nearPlane = getNearPlane();
+	float farPlane = getFarPlane();
+
+	ImGui::SliderFloat("FOV", &fov, 1.0f, 179.0f);
+	ImGui::SliderFloat("Aspect Ratio", &aspectRatio, 0.1f, 10.0f);
+	ImGui::SliderFloat("Near Plane", &nearPlane, 0.1f, 100.0f);
+	ImGui::SliderFloat("Far Plane", &farPlane, 100.0f, 10000.0f);
+	setFOV(fov);
+	setAspectRatio(aspectRatio);
+	setNearPlane(nearPlane);
+	setFarPlane(farPlane);
+
+
+	ImGui::SliderFloat3("Position", glm::value_ptr(pos), -100.0f, 100.0f);
+	ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -180.0f, 180.0f);
+	setPosition(pos);
+	setRotation(rot);
+	ImGui::End();
+}

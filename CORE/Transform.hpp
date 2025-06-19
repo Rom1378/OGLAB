@@ -27,7 +27,7 @@ public:
 	void setRotationQuaternion(const glm::quat& quaternion) {
 		m_rotationQuat = quaternion;
 		// Update Euler angles for compatibility
-		m_rotation = glm::degrees(glm::eulerAngles(m_rotationQuat));
+		m_rotation = glm::degrees(glm::eulerAngles(glm::normalize(m_rotationQuat)));
 	}
 
 	void setScale(const glm::vec3& scale) { m_scale = scale; }

@@ -3,8 +3,11 @@
 #include "Window/Input.hpp"
 
 class Scene;
+
 //define class ShadowMapper
-#include "Lights/LightManager.hpp"
+namespace LightManager {
+    class ShadowMapper;
+}
 
 
 namespace Engine{

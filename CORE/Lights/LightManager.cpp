@@ -1,4 +1,7 @@
 #include "LightManager.hpp"
+#include "Light.hpp"
+#include "CORE/Scene.hpp"
+
 #include <iostream>
 #include "../Cameras/Camera.hpp"
 #include <glm/glm.hpp>
@@ -12,8 +15,28 @@ namespace LightManager
 		return &shadowMapper;
 	}
 
-	//std::vector<std::shared_ptr<Light>> s_lights;
-	std::unordered_map<std::string, std::shared_ptr<Light>> lights; //TODO: update imple it use this instead of s_lights
+	void ShadowMapper::renderShadowPass(Scene* scene, const std::shared_ptr<Light> light) {
+		// 1. Configure render target
+		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glViewport(0, 0, resolution, resolution);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		// 2. Calculate light matrices
+		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+		glm::mat4 lightView = glm::lookAt(light->getPosition(), glm::vec3(0.0f), glm::vec3(0, 1, 0));
+		lightSpaceMatrix = lightProjection * lightView;
+
+		// 3. Render all shadow casters
+		glCullFace(GL_FRONT);
+		scene->renderShadowCasters(lightSpaceMatrix);
+		glCullFace(GL_BACK);
+
+		// 4. Reset state
+		Window::bind_framebuffer();
+	}
+
+	std::vector<std::shared_ptr<Light>> lights;
+	//std::unordered_map<std::string, std::shared_ptr<Light>> lights; //TODO: update imple it use this instead of s_lights
 
 
 	void init() {
@@ -54,7 +77,7 @@ namespace LightManager
 		// Set light position for shadow calculations
 		if (!lights.empty()) {
 			//shader->setVec3("lightPos", lights[0]->getPosition());
-			shader->setVec3("lightPos", lights["SunLight"]->getPosition());
+			shader->setVec3("lightPos", lights[0]->getPosition());
 		}
 	}
 
@@ -64,9 +87,9 @@ namespace LightManager
 		for (const auto& light : lights) {
 			// Add logging to verify lights are present
 
-			float distance = glm::distance(light.second->getPosition(), cam->getPosition());
+			float distance = glm::distance(light->getPosition(), cam->getPosition());
 			if (distance < cam->getMaxLightDistance()) {
-				relevantLights.push_back(light.second);
+				relevantLights.push_back(light);
 			}
 			if (relevantLights.size() >= maxLights) break;
 		}
@@ -80,28 +103,39 @@ namespace LightManager
 		std::cout << "Adding light. Current size after: " << s_lights.size() << std::endl;
 	}
 	*/
-	void addLight(const std::shared_ptr<Light> light, const std::string& name) {
-		//s_lights.push_back(light);
-		lights[name] = light;
+	void addLight(const std::shared_ptr<Light> light) {
+		lights.push_back(light);
 	
 	}
 
-	void clearLights() {
+	void removeLight(const std::shared_ptr<Light> light) {
+
+		lights.erase(std::remove_if(lights.begin(), lights.end(), 
+			[&light](const std::weak_ptr<Light>& weak) {
+				return weak.lock() == light;
+			}), lights.end());
+	}
+
+
+	void clear() {
 		//s_lights.clear();
 		lights.clear();
 	}
 
 	//const std::vector<std::shared_ptr<Light>>& getLights() {
-	std::unordered_map<std::string, std::shared_ptr<Light>> const& getLights() {
-		return lights;
+	//std::unordered_map<std::string, std::shared_ptr<Light>> const& getLights() {
+	//	return lights;
 		//return s_lights;
+	//}
+	const std::vector<std::shared_ptr<Light>>& getLights() {
+		return lights;
 	}
 
-	std::shared_ptr<Light> getLight(const char* name) {
-		auto it = lights.find(name);
-		if (it != lights.end()) {
-			return it->second;
-		}
-		return nullptr; // Return nullptr if light not found
-	}
+	//std::shared_ptr<Light> getLight(const char* name) {
+	//	auto it = lights.find(name);
+	//	if (it != lights.end()) {
+	//		return it->second;
+	//	}
+	//	return nullptr; // Return nullptr if light not found
+	//}
 }

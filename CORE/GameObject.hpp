@@ -6,6 +6,7 @@
 #include "Component.hpp"
 #include "Transform.hpp"
 #include "RenderComponents/RenderComponent.hpp"
+#include "Lights/LightManager.hpp"
 
 
 class PhysicsComponent;
@@ -32,6 +33,7 @@ public:
 	std::shared_ptr<T> addComponent(Args&&... args)
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
+
 		std::shared_ptr<T> component = std::make_shared<T>(std::forward<Args>(args)...);
 		component->setGameObject(this);
 		m_components.push_back(component);
@@ -41,6 +43,7 @@ public:
 		{
 			physicsComponent->setUserData(this);
 		}
+
 		return component;
 	}	
 
@@ -113,7 +116,12 @@ public:
 		}
 	}
 
-
+	void onImGuiRender() {
+		for (auto& component : m_components)
+		{
+			component->onImGuiRender();
+		}
+	}
 
 	const char* getName() const { return m_name.c_str(); }
 	

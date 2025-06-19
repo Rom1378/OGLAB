@@ -46,7 +46,6 @@ void DevScene::init() {
 
 	//cubemap
 
-	/*
 	auto cb = std::make_shared<CubeMap>();
 	cb->init();
 	cb->setHDRTexture("res/textures/CubeMaps/small_harbour_sunset_4k.hdr");
@@ -65,7 +64,6 @@ void DevScene::init() {
 	auto sphere = PrefabManager::instantiate("SpherePrefab", glm::vec3(0.0f, 10.0f, 0.0f));
 	//add velocity
 	sphere->getComponent<PhysicsComponent>()->setLinearVelocity(glm::vec3(10.0f, 30.0f, 0.0f));
-	*/
 
 	auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
 	camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
@@ -74,14 +72,17 @@ void DevScene::init() {
 
 
 	// Set up directional light (sun)
-	sunLight = std::make_shared<Light>(
-		LightType::DIRECTIONAL,
+	//sunLight = std::make_shared<Light>(
+		                           // Full intensity
+	//);
+	auto sunLightObj = std::make_shared<GameObject>("SunLight");
+	sunLightObj->addComponent<Light>(LightType::DIRECTIONAL,
 		glm::vec3(-2.0f, 200.0f, -1.0f),  // Position high up
 		glm::vec3(-0.5f, -1.0f, -0.3f),  // Direction - angled for better shadows
 		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
-		1.0f                              // Full intensity
-	);
-	LightManager::addLight(sunLight, "SunLight");
+		1.0f);
+
+//	LightManager::addLight(sunLight);//should be when creating the light
 
 
 	//LightSpherePrefab
@@ -118,8 +119,8 @@ void DevScene::onUpdate() {
 		else {
 
 			auto cameraPos = m_camera->getPosition();
-			auto cameraDir = m_camera->getRotation();
-			if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(cameraDir), 1000.0f, hitInfo)) {
+
+			if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_camera->getForward()), 1000.0f, hitInfo)) {
 				hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
 
 
@@ -144,41 +145,77 @@ void DevScene::onUpdate() {
 }
 
 void DevScene::onImGuiRender() {
-	// Edit camera controller
-	UI::UICameraController(getCamera());
 
-	UI::handleRaycastSelection(selectedHitRaycastObject);
-	
+	ImGui::BeginGroup();
+	ImGui::BeginChild("Dev Scene", ImVec2(0, 0)); // Leave room for 1 line below us
 
-	//change light pos
-	ImGui::Begin("Light");
-	glm::vec3 lightPos = sunLight->getPosition();
-	if (ImGui::DragFloat3("Light Position", glm::value_ptr(lightPos), 0.1f)) {
-		sunLight->setPosition(lightPos);
-	}
-	glm::vec3 lightDir = sunLight->getDirection();
-	if (ImGui::DragFloat3("Light Direction", glm::value_ptr(lightDir), 0.1f)) {
-		sunLight->setDirection(lightDir);
-	}
-	glm::vec3 lightColor = sunLight->getColor();
-	if (ImGui::ColorEdit3("Light Color", glm::value_ptr(lightColor))) {
-		sunLight->setColor(lightColor);
-	}
-	float lightIntensity = sunLight->getIntensity();
-	if (ImGui::DragFloat("Light Intensity", &lightIntensity, 0.01f, 0.0f, 10.0f)) {
-		sunLight->setIntensity(lightIntensity);
-	}
-	ImGui::End();
+			if (ImGui::BeginTabBar("##ScenesTabs", ImGuiTabBarFlags_None))
+			{
+				if (ImGui::BeginTabItem("Scene Hierarchy"))
+				{
+					UI::renderImGuiSceneHierarchy(this);
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("camera"))
+				{
+					//ObjectSelector(shadowCaster);
+					ImGui::EndTabItem();
+				}
+			ImGui::EndTabBar();
+			}
 
-	//farplan and ortho size edit
-	ImGui::Begin("LGITH");
-	float farPlane = LightManager::getShadowMapper()->getFarPlane();
-	if (ImGui::DragFloat("Far Plane", &farPlane, 0.1f, 0.0f, 10000.0f)) {
-		LightManager::getShadowMapper()->setFarPlane(farPlane);
-	}
-	float orthoSize = LightManager::getShadowMapper()->getOrthoSize();
-	if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 10000.0f)) {
-		LightManager::getShadowMapper()->setOrthoSize(orthoSize);
-	}
-	ImGui::End();
+
+
+
+			UI::UICameraController(getCamera());
+
+			UI::handleRaycastSelection(selectedHitRaycastObject);
+
+
+
+		// === Right Column: Lighting and Shadows ===
+		ImGui::BeginChild("RightPanel", ImVec2(0, 0), true);
+
+		/*
+		if (ImGui::CollapsingHeader("Sun Light", ImGuiTreeNodeFlags_DefaultOpen)) {
+			glm::vec3 lightPos = sunLight->getPosition();
+			if (ImGui::DragFloat3("Position", glm::value_ptr(lightPos), 0.1f)) {
+				sunLight->setPosition(lightPos);
+			}
+
+			glm::vec3 lightDir = sunLight->getDirection();
+			if (ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.1f)) {
+				sunLight->setDirection(lightDir);
+			}
+
+			glm::vec3 lightColor = sunLight->getColor();
+			if (ImGui::ColorEdit3("Color", glm::value_ptr(lightColor))) {
+				sunLight->setColor(lightColor);
+			}
+
+			float lightIntensity = sunLight->getIntensity();
+			if (ImGui::DragFloat("Intensity", &lightIntensity, 0.01f, 0.0f, 10.0f)) {
+				sunLight->setIntensity(lightIntensity);
+			}
+		}*/
+
+		if (ImGui::CollapsingHeader("Shadow Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
+			float farPlane = LightManager::getShadowMapper()->getFarPlane();
+			if (ImGui::DragFloat("Far Plane", &farPlane, 0.1f, 0.0f, 10000.0f)) {
+				LightManager::getShadowMapper()->setFarPlane(farPlane);
+			}
+
+			float orthoSize = LightManager::getShadowMapper()->getOrthoSize();
+			if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 10000.0f)) {
+				LightManager::getShadowMapper()->setOrthoSize(orthoSize);
+			}
+		}
+
+		ImGui::EndChild();
+
+		// Reset columns
+		ImGui::Columns(1);
+
+		ImGui::EndChild();
+		ImGui::EndGroup();
 }

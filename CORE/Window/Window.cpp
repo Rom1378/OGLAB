@@ -348,8 +348,8 @@ namespace Window
 			ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
-			ImGuiWindowFlags_NoNavFocus |
-			ImGuiWindowFlags_NoBackground);
+			ImGuiWindowFlags_NoNavFocus);
+			//ImGuiWindowFlags_NoBackground);
 
 		// Create the docking space
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");

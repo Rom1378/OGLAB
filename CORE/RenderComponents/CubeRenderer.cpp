@@ -1,4 +1,5 @@
 #include "../Lights/LightManager.hpp"
+#include "../Lights/Light.hpp"
 #include "CubeRenderer.hpp"
 #include "../Mesh/CubeMesh.hpp"
 

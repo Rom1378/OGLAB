@@ -1,5 +1,6 @@
 #pragma once
 #include "../Lights/LightManager.hpp"
+#include "../Lights/Light.hpp"
 #include "PrefabManager.hpp"
 #include "../GameObject.hpp"
 #include "../RenderComponents/SphereRenderer.hpp"
@@ -49,7 +50,7 @@ inline void registerPrefabs() {
 			sphereRenderer->setColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0));
 			auto spherePhysics = obj->addComponent<SpherePhysics>(PhysicsComponent::Type::DYNAMIC);
 			auto light = obj->addComponent<Light>(LightType::POINT, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 1.0f), 1.0f);
-			LightManager::addLight(light, "lightsphere");
+			//LightManager::addLight(light);
 			spherePhysics->setMass(3);
 			//add movement
 			})

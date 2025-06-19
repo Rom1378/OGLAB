@@ -9,6 +9,74 @@ namespace UI {
 	void renderImGuiSceneHierarchy(Scene* scene) {
 		if (!scene) return;
 
+		auto& gameObjects = scene->getGameObjects();
+		auto& shadowCaster = scene->getShadowCasters();
+		auto& uIComponents = scene->getUIComponents();
+
+
+		// Left
+		static int selectedObjectIndex = 0;
+		static std::shared_ptr<GameObject> selectedObj = nullptr;
+
+		auto ObjectSelector = [&](std::vector<std::shared_ptr<GameObject>> const& objs)
+			{
+				ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_ResizeX);
+				for (int i = 0; i < objs.size(); i++)
+				{
+					char label[128];
+					snprintf(label, 128, objs[i]->getName());
+					if (ImGui::Selectable(label, selectedObjectIndex == i)) {
+						selectedObjectIndex = i;
+						selectedObj = objs[i];
+					}
+				}
+				ImGui::EndChild();
+			};
+
+		ImGui::BeginGroup();
+		ImGui::Columns(2, nullptr, true);
+
+		ImGui::BeginChild("Objects", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+		//ImGui::Text("MyObject: %d", selected);
+		ImGui::Separator();
+		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+		{
+			if (ImGui::BeginTabItem("Games Objects"))
+			{
+				ObjectSelector(gameObjects);
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Shadow casters"))
+			{
+				ObjectSelector(shadowCaster);
+				ImGui::EndTabItem();
+			}
+			if (ImGui::BeginTabItem("Ui Components")) {
+				ObjectSelector(uIComponents);
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
+		}
+		ImGui::EndChild();
+		ImGui::NextColumn();
+
+		if (selectedObj) {
+			ImGui::BeginChild("Object editor", ImVec2(0, 0)); // Leave room for 1 line below us
+			ImGui::Text("selected object: %s", selectedObj->getName());
+			//renderImGuiObjectEditor();
+			selectedObj->onImGuiRender();
+
+
+			ImGui::EndChild();
+
+		}
+
+		ImGui::EndGroup();
+
+
+
+		/*
+
 		if (ImGui::Begin("Scene Hierarchy")) {
 			// Search filter
 			static char searchFilter[256] = "";
@@ -41,13 +109,11 @@ namespace UI {
 			ImGui::EndChild();
 		}
 		ImGui::End();
+		*/
 	}
 
 	void renderImGuiObjectEditor() {
 		if (!g_SelectedObject) return;
-		ImGui::Begin(" ransform editor");
-		ImGui::Text("aaaaaaaaa");
-			ImGui::End();
 
 		if (ImGui::Begin("Object Editor")) {
 			ImGui::Text("Selected: %s", g_SelectedObject->getName());

@@ -9,6 +9,7 @@
 #include "../Window/Window.hpp"
 
 
+
 class Camera : public Transform, public Component {
 public:
 	Camera(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f);
@@ -41,6 +42,7 @@ public:
 	float getMaxLightDistance() const { return maxLightDistance; }
 	void setMaxLightDistance(float distance) { maxLightDistance = distance; }
 
+	void onImGuiRender() override;
 
 protected:
 	glm::vec3 m_forward{ 0.0f, 0.0f, -1.0f }; // Forward direction

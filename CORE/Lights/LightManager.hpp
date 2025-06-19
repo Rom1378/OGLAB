@@ -1,13 +1,14 @@
 #pragma once
 #include "../ShaderProgram.hpp"
-#include "Light.hpp"
+//#include "Light.hpp"
 #include <vector>
 #include <memory>
 #include <iostream>
-#include "../Scene.hpp"
 #include <memory>
 
 class Camera;
+class Light;
+class Scene;
 
 namespace LightManager {
 
@@ -89,29 +90,11 @@ namespace LightManager {
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}
 
-		void renderShadowPass(Scene* scene, const std::shared_ptr<Light> light) {
-			// 1. Configure render target
-			glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-			glViewport(0, 0, resolution, resolution);
-			glClear(GL_DEPTH_BUFFER_BIT);
-
-			// 2. Calculate light matrices
-			glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
-			glm::mat4 lightView = glm::lookAt(light->getPosition(), glm::vec3(0.0f), glm::vec3(0, 1, 0));
-			lightSpaceMatrix = lightProjection * lightView;
-
-			// 3. Render all shadow casters
-			glCullFace(GL_FRONT);
-			scene->renderShadowCasters(lightSpaceMatrix);
-			glCullFace(GL_BACK);
-
-			// 4. Reset state
-			Window::bind_framebuffer();
-		}
+		void renderShadowPass(Scene* scene, const std::shared_ptr<Light> light);
 
 	};
 
-	extern std::vector<std::shared_ptr<Light>> s_lights;
+	//extern std::vector<std::shared_ptr<Light>> s_lights;
 
 
 	void init();
@@ -128,11 +111,12 @@ namespace LightManager {
 
 	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights);
 	//void addLight(const std::shared_ptr<Light> light); //TODO: added map and names to light so you can ask lightmanager for the light you want
-	void addLight(const std::shared_ptr<Light> light, const std::string& name);
-	std::shared_ptr<Light> getLight(const char* name);
-	void clearLights();
-//	const std::vector<std::shared_ptr<Light>>& getLights();
-	const std::unordered_map<std::string, std::shared_ptr<Light>>& getLights();
+	void addLight(const std::shared_ptr<Light> light);
+	void removeLight(const std::shared_ptr<Light> light);
+	//std::shared_ptr<Light> getLight(const std::string& name);
+	void clear();
+	const std::vector<std::shared_ptr<Light>>& getLights();
+	//const std::unordered_map<std::string, std::shared_ptr<Light>>& getLights();
 
 
 }

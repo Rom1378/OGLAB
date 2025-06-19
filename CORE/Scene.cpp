@@ -23,7 +23,7 @@ void Scene::renderShadowCasters(const glm::mat4& lightMatrix) {
     shadowShader->use();
     shadowShader->setMat4("lightSpaceMatrix", lightMatrix);
 
-    for (auto obj : shadowCasters) {
+    for (auto obj : m_shadowCasters) {
         obj->renderRawGeometry(lightMatrix); // No material binding!
     }
 }
@@ -41,7 +41,7 @@ void Scene::renderMainPass() {
 }
 void Scene::renderUIPass() {
 	// Render UI components
-	for (auto& uiComponent : UIcomponents) {
+	for (auto& uiComponent : m_UIcomponents) {
         uiComponent->renderWithMaterials(m_camera);
 		//uiComponent->render(m_camera);
 	}
@@ -87,11 +87,11 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
     }
     if (auto physicsComponent = gameObject->getComponent<RenderComponent>()) {
 		if (physicsComponent->getIsShadowCaster()) {
-			shadowCasters.push_back(gameObject);
+			m_shadowCasters.push_back(gameObject);
 		}
 	}
 	if (auto uiComponent = gameObject->getComponent<UIComponent>()) {
-		UIcomponents.push_back(gameObject);
+		m_UIcomponents.push_back(gameObject);
 	}
 }
 

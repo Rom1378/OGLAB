@@ -1,3 +1,4 @@
+#include "CORE/Lights/LightManager.hpp"
 #include "Engine.hpp"
 #include "Physics.hpp"
 #include "Shader.hpp"
@@ -67,7 +68,7 @@ namespace Engine {
 
 	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
 		// 1. Shadow Pass
-		shadowMapper->renderShadowPass(scene, LightManager::getLight("SunLight"));
+		shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
 
 		// 2. Main Pass
 		Window::bind_framebuffer();
@@ -88,8 +89,7 @@ namespace Engine {
 
 		scene->onImGuiRender();
 		// Render UI
-		UI::renderImGuiSceneHierarchy(scene);
-		UI::renderImGuiObjectEditor();
+		
 
 		// Render ImGui
 		ImGui::Render();
