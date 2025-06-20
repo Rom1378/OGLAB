@@ -75,6 +75,8 @@ public:
 	inline void setUserData(void* data) { body->userData = data; }
 
 	~PhysicsComponent();
+
+
 };
 
 

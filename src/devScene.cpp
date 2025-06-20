@@ -70,24 +70,13 @@ void DevScene::init() {
 	camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
 	setCamera(camera);
 
-
-	// Set up directional light (sun)
-	//sunLight = std::make_shared<Light>(
-		                           // Full intensity
-	//);
 	auto sunLightObj = std::make_shared<GameObject>("SunLight");
 	sunLightObj->addComponent<Light>(LightType::DIRECTIONAL,
 		glm::vec3(-2.0f, 200.0f, -1.0f),  // Position high up
 		glm::vec3(-0.5f, -1.0f, -0.3f),  // Direction - angled for better shadows
 		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
 		1.0f);
-
-//	LightManager::addLight(sunLight);//should be when creating the light
-
-
-	//LightSpherePrefab
-	//auto sphereObj = PrefabManager::instantiate("LightSpherePrefab", scene);
-	//scene.addGameObject(sphereObj);
+	addGameObject(sunLightObj);
 
 	//gameobject cursor 
 	auto cursor = std::make_shared<GameObject>("Cursor");
@@ -197,7 +186,7 @@ void DevScene::onImGuiRender() {
 			if (ImGui::DragFloat("Intensity", &lightIntensity, 0.01f, 0.0f, 10.0f)) {
 				sunLight->setIntensity(lightIntensity);
 			}
-		}*/
+		}
 
 		if (ImGui::CollapsingHeader("Shadow Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
 			float farPlane = LightManager::getShadowMapper()->getFarPlane();
@@ -210,6 +199,7 @@ void DevScene::onImGuiRender() {
 				LightManager::getShadowMapper()->setOrthoSize(orthoSize);
 			}
 		}
+		*/
 
 		ImGui::EndChild();
 

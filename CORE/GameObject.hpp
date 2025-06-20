@@ -7,14 +7,17 @@
 #include "Transform.hpp"
 #include "RenderComponents/RenderComponent.hpp"
 #include "Lights/LightManager.hpp"
-
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+#include <typeinfo>
 
 class PhysicsComponent;
 
 class GameObject : public Transform
 {
 public:
-	
+
 	GameObject() : Transform() {}
 	GameObject(const char* name) : Transform(), m_name(name) {}
 	template<typename T>
@@ -27,7 +30,7 @@ public:
 		component->init();
 		return component;
 	}
-	
+
 	//addComponent with arguments of the T constructor
 	template<typename T, typename... Args>
 	std::shared_ptr<T> addComponent(Args&&... args)
@@ -45,7 +48,7 @@ public:
 		}
 
 		return component;
-	}	
+	}
 
 
 	template<typename T>
@@ -71,7 +74,7 @@ public:
 	void render(std::shared_ptr<Camera> cam);
 
 	// Set position and update physics component if exists
-	void setPosition(const glm::vec3& position, bool update_physx=true);
+	void setPosition(const glm::vec3& position, bool update_physx = true);
 
 	//set rotation and update physics component if exists
 	void setRotation(const glm::vec3& rotation, bool update_physx = true);
@@ -117,14 +120,31 @@ public:
 	}
 
 	void onImGuiRender() {
-		for (auto& component : m_components)
+		static int selectedComponentIndex = 0;
+		static std::shared_ptr<Component> selectedComp = nullptr;
+		ImGui::Columns(2, nullptr, true);
+
+		ImGui::BeginChild("GameObject Components");
+		for (int i = 0; i < m_components.size(); i++)
 		{
-			component->onImGuiRender();
+			char label[128];
+			//snprintf(label, 128, getCompom_components[i].get()));
+			snprintf(label, 128, "Component: %d", i);
+			if (ImGui::Selectable(label, selectedComponentIndex == i)) {
+				selectedComponentIndex = i;
+				selectedComp = m_components[i];
+			}
 		}
+		ImGui::EndChild();
+
+		ImGui::NextColumn();
+
+		if (selectedComp)
+			selectedComp->onImGuiRender();
 	}
 
 	const char* getName() const { return m_name.c_str(); }
-	
+
 private:
 	std::vector<std::shared_ptr<Component>> m_components;
 	//gameobject name

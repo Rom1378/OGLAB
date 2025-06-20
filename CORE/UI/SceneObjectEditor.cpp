@@ -20,7 +20,7 @@ namespace UI {
 
 		auto ObjectSelector = [&](std::vector<std::shared_ptr<GameObject>> const& objs)
 			{
-				ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_ResizeX);
+				ImGui::BeginChild("left pane", ImVec2(0, 0), ImGuiChildFlags_ResizeX);
 				for (int i = 0; i < objs.size(); i++)
 				{
 					char label[128];
@@ -36,7 +36,7 @@ namespace UI {
 		ImGui::BeginGroup();
 		ImGui::Columns(2, nullptr, true);
 
-		ImGui::BeginChild("Objects", ImVec2(0, -ImGui::GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+		ImGui::BeginChild("Game objects"); // Leave room for 1 line below us
 		//ImGui::Text("MyObject: %d", selected);
 		ImGui::Separator();
 		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))

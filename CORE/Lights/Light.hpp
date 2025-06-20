@@ -34,6 +34,9 @@ public:
     glm::vec3 getPosition() const { return m_position; }
     void setPosition(glm::vec3 position) { m_position = position; }
 
+    void onImGuiRender() override;
+
+
 private:
     LightType type;
     glm::vec3 color;

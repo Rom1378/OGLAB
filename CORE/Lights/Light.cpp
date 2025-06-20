@@ -14,17 +14,34 @@ Light::~Light() {
 void Light::init() {
     try {
         auto self = shared_from_this();
-        LightManager::addLight(self);
-    }
-    catch (const std::bad_weak_ptr& e) {
-        LOG_ERROR("shared_from_this failed in Light::init()\n");
-    }
+		LightManager::addLight(self);
+	}
+	catch (const std::bad_weak_ptr& e) {
+		LOG_ERROR("shared_from_this failed in Light::init()\n");
+	}
 }
 
 void Light::update(float dt) {
-    if (auto gameObject = this->getGameObject()) {
-        m_position = gameObject->getPosition();
+	if (auto gameObject = this->getGameObject()) {
+		m_position = gameObject->getPosition();
 
-    }
+	}
+}
+
+void Light::onImGuiRender() {
+	glm::vec3 lightDir = getDirection();
+	if (ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.1f)) {
+		setDirection(lightDir);
+	}
+
+	glm::vec3 lightColor = getColor();
+	if (ImGui::ColorEdit3("Color", glm::value_ptr(lightColor))) {
+		setColor(lightColor);
+	}
+
+	float lightIntensity = getIntensity();
+	if (ImGui::DragFloat("Intensity", &lightIntensity, 0.01f, 0.0f, 10.0f)) {
+		setIntensity(lightIntensity);
+	}
 }
 
