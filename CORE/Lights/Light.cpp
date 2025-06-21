@@ -4,7 +4,9 @@
 
 
 Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, glm::vec3 color, float intensity)
-    : Transform(position, direction), type(type), color(color), intensity(intensity) {
+    :// Transform(position, direction), TODO ADD LOCAL TRANSFORMATION FOR NOW ONLY USING GAMEOBJECT TRANSFORM
+	type(type), color(color), intensity(intensity) {
+	setPosition(position);
 }
 
 Light::~Light() {
@@ -23,16 +25,18 @@ void Light::init() {
 
 void Light::update(float dt) {
 	if (auto gameObject = this->getGameObject()) {
-		m_position = gameObject->getPosition();
+		//setPosition()
+		//:w
+		// m_position = gameObject->getPosition();
 
 	}
 }
 
 void Light::onImGuiRender() {
-	glm::vec3 lightDir = getDirection();
-	if (ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.1f)) {
-		setDirection(lightDir);
-	}
+	//glm::vec3 lightDir = getGameObject()->getRotation();
+	//if (ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.1f)) {
+	//	getGameObject()->setRotation(lightDir);
+	//}
 
 	glm::vec3 lightColor = getColor();
 	if (ImGui::ColorEdit3("Color", glm::value_ptr(lightColor))) {

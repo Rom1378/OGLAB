@@ -92,7 +92,7 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 
 	for (size_t i = 0; i < relevantLights.size(); i++) {
 		std::string base = "lights[" + std::to_string(i) + "].";
-		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
+		m_shader->setVec3(base + "position", relevantLights[i]->getWorldPosition());
 		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
 		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
 	}
@@ -121,7 +121,7 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
 	m_shader->setInt("shadowMap", 1);
-	m_shader->setVec3("lightPos", relevantLights[0]->getPosition());
+	m_shader->setVec3("lightPos", relevantLights[0]->getWorldPosition());
 	//LightManager::bindShadowMap(m_shader);
 
 	// Draw

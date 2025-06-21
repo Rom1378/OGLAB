@@ -70,8 +70,8 @@ void SphereRenderer::draw(const std::shared_ptr<Camera> cam) {
 		}
 		m_shader->setInt(base + "type", lightType);
 
-		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
-		m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
+		m_shader->setVec3(base + "position", relevantLights[i]->getWorldPosition());
+		m_shader->setVec3(base + "direction", relevantLights[i]->getWorldDirection());
 		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
 		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
 	}

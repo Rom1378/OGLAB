@@ -64,3 +64,4 @@ protected:
 	glm::vec3 m_scale;
 
 }; // class Transform
+

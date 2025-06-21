@@ -140,7 +140,32 @@ public:
 		ImGui::NextColumn();
 
 		if (selectedComp)
+		{
+			//transform
+			glm::vec3 position = getPosition();
+			glm::vec3 rotation = getRotation(); // Euler degrees
+			glm::vec3 scale = getScale();
+
+			if (ImGui::TreeNode("Transform")) {
+				if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
+					setPosition(position);
+				}
+
+				if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
+					setRotation(rotation);  // Will update quaternion
+				}
+
+				if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
+					setScale(scale);
+				}
+
+				ImGui::TreePop();
+			}
+
+
+			//component specifications
 			selectedComp->onImGuiRender();
+		}
 	}
 
 	const char* getName() const { return m_name.c_str(); }

@@ -8,7 +8,7 @@
 
 enum class LightType { POINT, DIRECTIONAL, SPOT };
 
-class Light : public Component, Transform, public std::enable_shared_from_this<Light> {
+class Light : public TransformableComponent, public std::enable_shared_from_this<Light> {
 public:
 
     Light(LightType type, glm::vec3 position, glm::vec3 direction, glm::vec3 color, float intensity);
@@ -28,11 +28,11 @@ public:
     float getIntensity() const { return intensity; }
     void setIntensity(float intensity) { this->intensity = intensity; }
 
-    glm::vec3 getDirection() const { return getRotation(); }
-    void setDirection(glm::vec3 direction) { this->m_rotation = direction; }
+    //glm::vec3 getDirection() const { return getRotation(); }
+    //void setDirection(glm::vec3 direction) { this->m_rotation = direction; }
 
-    glm::vec3 getPosition() const { return m_position; }
-    void setPosition(glm::vec3 position) { m_position = position; }
+    //glm::vec3 getPosition() const { return m_position; }
+    //void setPosition(glm::vec3 position) { m_position = position; }
 
     void onImGuiRender() override;
 

@@ -23,7 +23,7 @@ namespace LightManager
 
 		// 2. Calculate light matrices
 		glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
-		glm::mat4 lightView = glm::lookAt(light->getPosition(), glm::vec3(0.0f), glm::vec3(0, 1, 0));
+		glm::mat4 lightView = glm::lookAt(light->getWorldPosition(), glm::vec3(0.0f), glm::vec3(0, 1, 0));
 		lightSpaceMatrix = lightProjection * lightView;
 
 		// 3. Render all shadow casters
@@ -46,7 +46,7 @@ namespace LightManager
 	}
 
 	void shutdown() {
-		lights.clear();
+		clear();
 		//s_lights.clear();
 		std::cout << "LightManager shutdown complete." << std::endl;
 	}
@@ -77,17 +77,17 @@ namespace LightManager
 		// Set light position for shadow calculations
 		if (!lights.empty()) {
 			//shader->setVec3("lightPos", lights[0]->getPosition());
-			shader->setVec3("lightPos", lights[0]->getPosition());
+			shader->setVec3("lightPos", lights[0]->getWorldPosition());
 		}
 	}
 
-	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights) {
+	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<Camera> cam, int maxLights) { //TODO UPDATE FOR WEAK PTR USAGE
 
 		std::vector<std::shared_ptr<Light>> relevantLights;
 		for (const auto& light : lights) {
 			// Add logging to verify lights are present
 
-			float distance = glm::distance(light->getPosition(), cam->getPosition());
+			float distance = glm::distance(light->getWorldPosition(), cam->getPosition());
 			if (distance < cam->getMaxLightDistance()) {
 				relevantLights.push_back(light);
 			}

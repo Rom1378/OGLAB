@@ -59,7 +59,7 @@ void ModelRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 
 	for (size_t i = 0; i < relevantLights.size(); i++) {
 		std::string base = "lights[" + std::to_string(i) + "].";
-		m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
+		m_shader->setVec3(base + "position", relevantLights[i]->getWorldPosition());
 		m_shader->setVec3(base + "color", relevantLights[i]->getColor());
 		m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
 	}
