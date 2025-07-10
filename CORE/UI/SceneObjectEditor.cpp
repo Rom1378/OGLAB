@@ -1,5 +1,5 @@
 #include "SceneObjectEditor.hpp"
-
+#include <typeinfo>
 
 namespace UI {
 	GameObject* g_SelectedObject = nullptr;
@@ -62,7 +62,34 @@ namespace UI {
 
 		if (selectedObj) {
 			ImGui::BeginChild("Object editor", ImVec2(0, 0)); // Leave room for 1 line below us
+
 			ImGui::Text("selected object: %s", selectedObj->getName());
+			//gameobject transform
+
+			/*
+			{
+				glm::vec3 position = selectedObj->getPosition();
+				glm::vec3 rotation = selectedObj->getRotation();
+				glm::vec3 scale = selectedObj->getScale();
+
+				if (ImGui::TreeNode("Transform")) {
+					if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
+						selectedObj->setPosition(position);
+					}
+
+					if (ImGui::DragFloat3("Rotation", &rotation.x, 0.5f)) {
+						selectedObj->setRotation(rotation); // your setter updates quaternion too
+					}
+
+					if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
+						selectedObj->setScale(scale);
+					}
+
+					ImGui::TreePop();
+				}
+
+			}
+*/
 			//renderImGuiObjectEditor();
 			selectedObj->onImGuiRender();
 

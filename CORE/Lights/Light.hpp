@@ -1,9 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include "../Component.hpp"
-#include "../Transform.hpp"
+#include "../TransformableComponent.hpp"
 #include <memory>
 
 enum class LightType { POINT, DIRECTIONAL, SPOT };
@@ -28,14 +24,7 @@ public:
     float getIntensity() const { return intensity; }
     void setIntensity(float intensity) { this->intensity = intensity; }
 
-    //glm::vec3 getDirection() const { return getRotation(); }
-    //void setDirection(glm::vec3 direction) { this->m_rotation = direction; }
-
-    //glm::vec3 getPosition() const { return m_position; }
-    //void setPosition(glm::vec3 position) { m_position = position; }
-
     void onImGuiRender() override;
-
 
 private:
     LightType type;

@@ -1,5 +1,5 @@
-#include "LightManager.hpp"
 #include "Light.hpp"
+#include "LightManager.hpp"
 #include "CORE/Scene.hpp"
 
 #include <iostream>

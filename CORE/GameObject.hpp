@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include "Debug.hpp"
-#include "Component.hpp"
 #include "Transform.hpp"
 #include "RenderComponents/RenderComponent.hpp"
 #include "Lights/LightManager.hpp"
@@ -11,13 +10,13 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include <typeinfo>
+#include "Component.hpp"
 
 class PhysicsComponent;
 
 class GameObject : public Transform
 {
 public:
-
 	GameObject() : Transform() {}
 	GameObject(const char* name) : Transform(), m_name(name) {}
 	template<typename T>
@@ -120,6 +119,28 @@ public:
 	}
 
 	void onImGuiRender() {
+
+		//transform
+		glm::vec3 position = getPosition();
+		glm::vec3 rotation = getRotation(); // Euler degrees
+		glm::vec3 scale = getScale();
+
+		if (ImGui::TreeNode("Game Object Transform")) {
+			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
+				setPosition(position);
+			}
+
+			if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
+				setRotation(rotation);  // Will update quaternion
+			}
+
+			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
+				setScale(scale);
+			}
+
+			ImGui::TreePop();
+		}
+
 		static int selectedComponentIndex = 0;
 		static std::shared_ptr<Component> selectedComp = nullptr;
 		ImGui::Columns(2, nullptr, true);
@@ -129,7 +150,7 @@ public:
 		{
 			char label[128];
 			//snprintf(label, 128, getCompom_components[i].get()));
-			snprintf(label, 128, "Component: %d", i);
+			snprintf(label, 128, "Component: %s", typeid(*m_components[i].get()).name()+6);
 			if (ImGui::Selectable(label, selectedComponentIndex == i)) {
 				selectedComponentIndex = i;
 				selectedComp = m_components[i];
@@ -141,25 +162,25 @@ public:
 
 		if (selectedComp)
 		{
-			//transform
-			glm::vec3 position = getPosition();
-			glm::vec3 rotation = getRotation(); // Euler degrees
-			glm::vec3 scale = getScale();
+				//local component transform
+			if (auto tfComponent = std::dynamic_pointer_cast<TransformableComponent>(selectedComp))
+			{
+				glm::vec3 pos=tfComponent->getWorldPosition();
+				glm::vec3 rot=tfComponent->getWorldDirection();
 
-			if (ImGui::TreeNode("Transform")) {
-				if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
-					setPosition(position);
+				if (ImGui::TreeNode("Component Transform")) {
+					if (ImGui::DragFloat3("Position", &pos.x, 0.1f)) {
+						tfComponent->setPosition(pos);
+					}
+
+
+					if (ImGui::DragFloat3("Rotation", &rot.x, 1.0f)) {
+						tfComponent->setRotation(rot);
+					}
+
+					ImGui::TreePop();
 				}
 
-				if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
-					setRotation(rotation);  // Will update quaternion
-				}
-
-				if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
-					setScale(scale);
-				}
-
-				ImGui::TreePop();
 			}
 
 

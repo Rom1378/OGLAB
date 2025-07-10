@@ -1,6 +1,5 @@
 #include "ModelRenderer.hpp"
 #include "stb_image.h"
-#include "CORE/Lights/Light.hpp"
 #include "CORE/GameObject.hpp"
 
 

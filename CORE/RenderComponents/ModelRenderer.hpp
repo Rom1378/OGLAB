@@ -1,6 +1,6 @@
-
-#include "../RenderComponents/RenderComponent.hpp"
+#pragma once
 #include "../Lights/LightManager.hpp"
+#include "../RenderComponents/RenderComponent.hpp"
 #include <glm/glm.hpp>
 #include "../ModelLoader/Mesh.hpp" 
 #include <assimp/Importer.hpp>

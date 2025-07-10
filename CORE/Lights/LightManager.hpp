@@ -1,13 +1,13 @@
 #pragma once
 #include "../ShaderProgram.hpp"
-//#include "Light.hpp"
+#include "Light.hpp"
 #include <vector>
 #include <memory>
 #include <iostream>
 #include <memory>
 
 class Camera;
-class Light;
+//class Light;
 class Scene;
 
 namespace LightManager {

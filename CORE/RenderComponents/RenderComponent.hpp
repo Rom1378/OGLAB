@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 #include <string>
-#include "../Component.hpp"
+#include "../TransformableComponent.hpp"
 #include "../Transform.hpp"
 #include "InterfaceRenderer.hpp"
 #include "../Shader.hpp"
