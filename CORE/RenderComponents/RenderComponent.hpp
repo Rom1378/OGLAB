@@ -33,7 +33,8 @@ public:
 	void setIsShadowCaster(bool isShadowCaster) { m_isShadowCaster = isShadowCaster; }
 	void setIsShadowReceiver(bool isShadowReceiver) { m_isShadowReceiver = isShadowReceiver; }
 
-	void setRenderer(std::shared_ptr<InterfaceRenderer> renderer);
+	void setRenderer(std::shared_ptr<InterfaceRenderer> renderer); //todo to remove...
+
 	void setShader(const std::string& shaderName)	{		m_shader = ShaderManager::getShader(shaderName);	}
 	void setColor(const glm::vec3& color)	{		m_color = glm::vec4(color, 1.0f);	}
 	void setColor(const glm::vec4& color) {		m_color = color;	}

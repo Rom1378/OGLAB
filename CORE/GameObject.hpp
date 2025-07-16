@@ -118,6 +118,9 @@ public:
 		}
 	}
 
+
+
+
 	void onImGuiRender() {
 
 		//transform
@@ -141,8 +144,7 @@ public:
 			ImGui::TreePop();
 		}
 
-		static int selectedComponentIndex = 0;
-		static std::shared_ptr<Component> selectedComp = nullptr;
+		
 		ImGui::Columns(2, nullptr, true);
 
 		ImGui::BeginChild("GameObject Components");
@@ -190,6 +192,10 @@ public:
 	}
 
 	const char* getName() const { return m_name.c_str(); }
+
+
+	int selectedComponentIndex=0;
+	std::shared_ptr<Component> selectedComp = nullptr;
 
 private:
 	std::vector<std::shared_ptr<Component>> m_components;

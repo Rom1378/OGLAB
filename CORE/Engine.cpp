@@ -10,6 +10,8 @@
 #include "imgui_impl_opengl3.h"
 #include "UI/SceneObjectEditor.hpp"
 #include "Scene.hpp"
+#include "LineRenderer.hpp"
+
 
 #include <chrono>
 
@@ -44,6 +46,8 @@ namespace Engine {
 		Physics::init();
 		LightManager::init();
 
+		LineRenderer::init();
+
 	}
 
 	void shutdown() {
@@ -75,6 +79,9 @@ namespace Engine {
 		Window::update_viewport();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//3. physx debug pass
+
+
 		// Bind shadow map to shader
 		//auto mainShader = ShaderManager::getShader("standard");
 		//mainShader->use();
@@ -101,6 +108,9 @@ namespace Engine {
 
 		// Render scene normally
 		scene->renderMainPass();
+
+		// Physx debug pass
+		scene->renderPhysxDebugPass();
 
 		// Render UI pass 
 		scene->renderUIPass();

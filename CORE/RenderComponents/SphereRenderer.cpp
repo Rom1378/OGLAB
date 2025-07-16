@@ -9,7 +9,6 @@ SphereRenderer::~SphereRenderer() {
 }
 
 void SphereRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
-	// Implement raw geometry rendering if needed
 }
 void SphereRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	if (!m_shader) return;

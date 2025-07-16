@@ -1,5 +1,7 @@
 #include "devScene.hpp"
 
+#include <CORE/PhysicsScene.hpp>
+
 void DevScene::init() {
 	//auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
 	//addGameObject(prefCube);
@@ -82,6 +84,9 @@ void DevScene::init() {
 	auto cursor = std::make_shared<GameObject>("Cursor");
 	cursor->addComponent<UICursorComponent>();
 	addGameObject(cursor);
+
+
+	Physics::enable_debug_visualization(m_physicsScene->getScene(), true);
 }
 
 void DevScene::onUpdate() {
@@ -102,55 +107,62 @@ void DevScene::onUpdate() {
 		LOG("Switched to PLAY mode");
 	}
 	// Handle raycast selection
-		if (!m_camera) {
-			LOG_WARN("m_camera is null");
-		}
-		else {
+	if (!m_camera) {
+		LOG_WARN("m_camera is null");
+	}
+	else {
 
-			auto cameraPos = m_camera->getPosition();
+		auto cameraPos = m_camera->getPosition();
 
-			if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_camera->getForward()), 1000.0f, hitInfo)) {
-				hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
+		if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_camera->getForward()), 1000.0f, hitInfo)) {
+			hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
 
 
-				if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-					if (currentMode == EDIT) {
-						// If in EDIT mode, add a cube at the hit position
-					auto cube=	PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+			if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+				if (currentMode == EDIT) {
+					// If in EDIT mode, add a cube at the hit position
+					auto cube = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
 					cube->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 					addGameObject(cube);
-					}
-					else if (currentMode == PLAY) {
-						// If in PLAY mode, select the nearest object under the cursor
-						if (hitRaycastObject) {
-							selectedHitRaycastObject = hitRaycastObject;
-						}
+				}
+				else if (currentMode == PLAY) {
+					// If in PLAY mode, select the nearest object under the cursor
+					if (hitRaycastObject) {
+						selectedHitRaycastObject = hitRaycastObject;
 					}
 				}
 			}
 		}
+	}
 
 
 }
 
 void DevScene::onImGuiRender() {
 
-	ImGui::BeginGroup();
-	ImGui::BeginChild("Dev Scene", ImVec2(0, 0)); // Leave room for 1 line below us
+	ImGui::ShowDemoWindow();
+	ImGui::Begin("Scene");
+	//if (ImGui::Begin("Dev Scene Editor", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
+	
+
+		if (ImGui::BeginChild("Dev Scene", ImVec2(0, 0))) {
 
 			if (ImGui::BeginTabBar("##ScenesTabs", ImGuiTabBarFlags_None))
 			{
 				if (ImGui::BeginTabItem("Scene Hierarchy"))
 				{
 					UI::renderImGuiSceneHierarchy(this);
+					ImGui::Text("good");
 					ImGui::EndTabItem();
 				}
-				if (ImGui::BeginTabItem("camera"))
+				if (m_camera && ImGui::BeginTabItem("camera"))
 				{
+					m_camera->onImGuiRender();
 					//ObjectSelector(shadowCaster);
+					ImGui::Text("feeling good");
 					ImGui::EndTabItem();
 				}
-			ImGui::EndTabBar();
+				ImGui::EndTabBar();
 			}
 
 
@@ -162,50 +174,15 @@ void DevScene::onImGuiRender() {
 
 
 
-		// === Right Column: Lighting and Shadows ===
-		ImGui::BeginChild("RightPanel", ImVec2(0, 0), true);
 
-		/*
-		if (ImGui::CollapsingHeader("Sun Light", ImGuiTreeNodeFlags_DefaultOpen)) {
-			glm::vec3 lightPos = sunLight->getPosition();
-			if (ImGui::DragFloat3("Position", glm::value_ptr(lightPos), 0.1f)) {
-				sunLight->setPosition(lightPos);
-			}
+			// Reset columns
+			//ImGui::Columns(1);
 
-			glm::vec3 lightDir = sunLight->getDirection();
-			if (ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.1f)) {
-				sunLight->setDirection(lightDir);
-			}
-
-			glm::vec3 lightColor = sunLight->getColor();
-			if (ImGui::ColorEdit3("Color", glm::value_ptr(lightColor))) {
-				sunLight->setColor(lightColor);
-			}
-
-			float lightIntensity = sunLight->getIntensity();
-			if (ImGui::DragFloat("Intensity", &lightIntensity, 0.01f, 0.0f, 10.0f)) {
-				sunLight->setIntensity(lightIntensity);
-			}
+			ImGui::EndChild();
 		}
 
-		if (ImGui::CollapsingHeader("Shadow Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
-			float farPlane = LightManager::getShadowMapper()->getFarPlane();
-			if (ImGui::DragFloat("Far Plane", &farPlane, 0.1f, 0.0f, 10000.0f)) {
-				LightManager::getShadowMapper()->setFarPlane(farPlane);
-			}
+		//ImGui::End(); }
 
-			float orthoSize = LightManager::getShadowMapper()->getOrthoSize();
-			if (ImGui::DragFloat("Ortho Size", &orthoSize, 0.1f, 0.0f, 10000.0f)) {
-				LightManager::getShadowMapper()->setOrthoSize(orthoSize);
-			}
-		}
-		*/
-
-		ImGui::EndChild();
-
-		// Reset columns
-		ImGui::Columns(1);
-
-		ImGui::EndChild();
-		ImGui::EndGroup();
+	ImGui::Text("test");
+	ImGui::End();
 }

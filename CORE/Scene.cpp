@@ -1,7 +1,15 @@
 #include "Scene.hpp"
+#include "PhysicsScene.hpp"
 #include "PhysicsComponents/PhysicsComponent.hpp"
 #include "renderComponents/Cursor.hpp"
+#include "Cameras/Camera.hpp"
 
+
+
+Scene::Scene() : m_camera(nullptr), m_cubemap(nullptr) {
+    m_physicsScene = std::make_shared<PhysicsScene>();
+    m_physicsScene->init();
+}
 void Scene::update(float dt) { 
     if(m_camera)
         m_camera->update(dt);
@@ -93,6 +101,18 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
 	if (auto uiComponent = gameObject->getComponent<UIComponent>()) {
 		m_UIcomponents.push_back(gameObject);
 	}
+}
+
+
+void Scene::renderPhysxDebugPass() {
+	if (m_physicsScene) {
+        m_physicsScene->drawDebugVisualization();
+        m_physicsScene->renderDebugVisualization(m_camera);
+	}
+	else {
+		LOG_WARN("Physics scene is null, cannot render debug pass");
+	}
+
 }
 
 

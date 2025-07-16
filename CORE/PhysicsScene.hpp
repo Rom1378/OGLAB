@@ -2,6 +2,8 @@
 #include <memory>
 #include "Physics.hpp"
 
+class Camera;
+
 class PhysicsScene {
 public:
 	void init() { m_scene = Physics::createScene(); }
@@ -25,6 +27,11 @@ public:
 	glm::vec3 getGravity() { return m_gravity; }
 
 	PxScene* getScene() { return m_scene; }
+
+	void drawDebugVisualization();
+	void renderDebugVisualization(const std::shared_ptr<Camera> cam);
+
+
 private:
 	PxScene* m_scene;
 	glm::vec3 m_gravity;

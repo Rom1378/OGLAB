@@ -1,18 +1,15 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "Cameras/Camera.hpp"
 #include "RenderComponents/CubeMap.hpp"
-#include "PhysicsScene.hpp"
 #include "RenderComponents/Cursor.hpp"
 
+class PhysicsScene;
+class Camera;
 
 class Scene {
 public:
-	Scene() : m_camera(nullptr), m_cubemap(nullptr) {
-		m_physicsScene = std::make_shared<PhysicsScene>();
-		m_physicsScene->init();
-	}
+	Scene();
 
 
 	virtual ~Scene() = default;
@@ -30,6 +27,7 @@ public:
 	void renderShadowCasters(const glm::mat4& lightMatrix);
 	void renderMainPass();
 	void renderUIPass();
+	void renderPhysxDebugPass();
 
 	std::shared_ptr<GameObject> createGameObject();
 	void destroyGameObject(std::shared_ptr<GameObject> gameObject);

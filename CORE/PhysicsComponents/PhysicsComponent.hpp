@@ -52,6 +52,7 @@ public:
 	void setLinearVelocity(const glm::vec3& velocity);
 	void updateTransform();
 
+	// Update the physics body in the PhysX world
 	void updatePhysX();
 
     // Apply a scale to the physics body

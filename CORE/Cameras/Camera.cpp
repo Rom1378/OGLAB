@@ -96,7 +96,6 @@ void Camera::setFarPlane(float far) {
 
 
 void Camera::onImGuiRender() {
-	ImGui::Begin("Camera");
 	glm::vec3 pos = getPosition();
 	glm::vec3 rot = getRotation();
 	float fov = getFOV();
@@ -118,5 +117,4 @@ void Camera::onImGuiRender() {
 	ImGui::SliderFloat3("Rotation", glm::value_ptr(rot), -180.0f, 180.0f);
 	setPosition(pos);
 	setRotation(rot);
-	ImGui::End();
 }

@@ -113,9 +113,7 @@ ShaderProgram::ShaderProgram() : m_program(0) {
 
 ShaderProgram::~ShaderProgram() {
     if (m_program) {
-        GL_CLEAR_ERROR();
         glDeleteProgram(m_program);
-        GL_CHECK_ERROR();
     }
 }
 

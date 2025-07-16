@@ -30,5 +30,9 @@
   "assimpModel": {
     "vertex": "res\\shaders\\assimpmodel.vs",
     "fragment": "res\\shaders\\assimpmodel.fs"
+  },
+  "line": {
+    "vertex": "res\\shaders\\line.vs",
+    "fragment": "res\\shaders\\line.fs"
   }
 }

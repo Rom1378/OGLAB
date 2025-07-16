@@ -15,5 +15,8 @@ namespace Physics
 
 	PxPhysics* getPhysics();
 	bool raycast(PxScene*scene, const glm::vec3& origin, const glm::vec3& direction, float maxDistance, PxRaycastHit& hitInfo);
+
+
+	void enable_debug_visualization(PxScene*scene, bool enable);
 }
 

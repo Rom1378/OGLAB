@@ -12,132 +12,155 @@ namespace UI {
 		auto& gameObjects = scene->getGameObjects();
 		auto& shadowCaster = scene->getShadowCasters();
 		auto& uIComponents = scene->getUIComponents();
+		const std::vector<std::shared_ptr<GameObject>> objlist[] = { gameObjects,shadowCaster,uIComponents };
+
 
 
 		// Left
 		static int selectedObjectIndex = 0;
 		static std::shared_ptr<GameObject> selectedObj = nullptr;
+		static bool checkboxStateGameObjects = 0;
+		static bool checkboxStateShadowChaster = 0;
+		static bool checkboxStateuICompoments = 0;
+
+
+
+		//auto& selectedGameObjTypes=gameObjects;
 
 		auto ObjectSelector = [&](std::vector<std::shared_ptr<GameObject>> const& objs)
 			{
-				ImGui::BeginChild("left pane", ImVec2(0, 0), ImGuiChildFlags_ResizeX);
-				for (int i = 0; i < objs.size(); i++)
-				{
-					char label[128];
-					snprintf(label, 128, objs[i]->getName());
-					if (ImGui::Selectable(label, selectedObjectIndex == i)) {
-						selectedObjectIndex = i;
-						selectedObj = objs[i];
+				if (ImGui::BeginChild("left pane", ImVec2(0, 0))) {
+					for (int i = 0; i < objs.size(); i++)
+					{
+						char label[128];
+						snprintf(label, 128, objs[i]->getName());
+						if (ImGui::Selectable(label, selectedObjectIndex == i)) {
+							selectedObjectIndex = i;
+							selectedObj = objs[i];
+							//GameObject::selectedComp = nullptr;
+							//GameObject::selectedComponentIndex = 0;
+						}
 					}
+					ImGui::EndChild();
 				}
-				ImGui::EndChild();
 			};
 
-		ImGui::BeginGroup();
-		ImGui::Columns(2, nullptr, true);
-
-		ImGui::BeginChild("Game objects"); // Leave room for 1 line below us
-		//ImGui::Text("MyObject: %d", selected);
-		ImGui::Separator();
-		if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+		//ImGui::BeginGroup();
+		static int selected = 0;
 		{
-			if (ImGui::BeginTabItem("Games Objects"))
-			{
-				ObjectSelector(gameObjects);
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Shadow casters"))
-			{
-				ObjectSelector(shadowCaster);
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Ui Components")) {
-				ObjectSelector(uIComponents);
-				ImGui::EndTabItem();
-			}
-			ImGui::EndTabBar();
-		}
-		ImGui::EndChild();
-		ImGui::NextColumn();
-
-		if (selectedObj) {
-			ImGui::BeginChild("Object editor", ImVec2(0, 0)); // Leave room for 1 line below us
-
-			ImGui::Text("selected object: %s", selectedObj->getName());
-			//gameobject transform
-
-			/*
-			{
-				glm::vec3 position = selectedObj->getPosition();
-				glm::vec3 rotation = selectedObj->getRotation();
-				glm::vec3 scale = selectedObj->getScale();
-
-				if (ImGui::TreeNode("Transform")) {
-					if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
-						selectedObj->setPosition(position);
-					}
-
-					if (ImGui::DragFloat3("Rotation", &rotation.x, 0.5f)) {
-						selectedObj->setRotation(rotation); // your setter updates quaternion too
-					}
-
-					if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
-						selectedObj->setScale(scale);
-					}
-
-					ImGui::TreePop();
-				}
-
-			}
-*/
-			//renderImGuiObjectEditor();
-			selectedObj->onImGuiRender();
-
-
+			ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
+			ImGui::RadioButton("GameObject", &selected, 0);
+			ImGui::RadioButton("ShadowCaster", &selected, 1);
+			ImGui::RadioButton("UIComponents", &selected, 2);
 			ImGui::EndChild();
-
 		}
 
+
+		ImGui::SameLine();
+
+		ImGui::BeginGroup();
+		ImGui::BeginChild("item view", ImVec2(0, 0));
+
+		ObjectSelector(objlist[selected]);
+
+
+	
+		ImGui::SameLine();
+
+		//ImGui::BeginChild("Components", ImVec2(100, 100));
+		if (!selectedObj)
+			ImGui::Text("No object selected");
+		else {
+			ImGui::Text("selected object: %s", selectedObj->getName());
+			selectedObj->onImGuiRender();
+		}
+		//ImGui::EndChild();
+
+
+		ImGui::EndChild();
 		ImGui::EndGroup();
 
 
 
-		/*
 
-		if (ImGui::Begin("Scene Hierarchy")) {
-			// Search filter
-			static char searchFilter[256] = "";
-			ImGui::InputText("Search", searchFilter, IM_ARRAYSIZE(searchFilter));
 
-			// List all objects
-			ImGui::BeginChild("Object List", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
 
-			for (auto& obj : scene->getGameObjects()) {
-				if (!obj) continue;
+		if (0 && ImGui::BeginChild("GameDDobjects")) {
+			//ImGui::Text("MyObject: %d", selected);
+			//ImGui::Separator();
 
-				// Filter by name
-				if (searchFilter[0] != '\0' &&
-					std::string(obj->getName()).find(searchFilter) == std::string::npos) {
-					continue;
+
+			/*
+
+			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
+			{
+				if (ImGui::BeginTabItem("Games Objects"))
+				{
+					selectedGameObjTypes=gameObjects
+					ObjectSelector(gameObjects);
+					ImGui::EndTabItem();
 				}
-
-				// Display selectable object
-				bool isSelected = (g_SelectedObject == obj.get());
-				if (ImGui::Selectable(obj->getName(), isSelected)) {
-					g_SelectedObject = obj.get();
-					g_SelectedFromHierarchy = true;
-					g_JustSelectedFromHierarchy = true;
+				if (ImGui::BeginTabItem("Shadow casters"))
+				{
+					ObjectSelector(shadowCaster);
+					ImGui::EndTabItem();
 				}
-
-				if (isSelected && g_SelectedFromHierarchy && ImGui::GetScrollMaxY() > 0) {
-					ImGui::SetScrollHereY(0.5f);
+				if (ImGui::BeginTabItem("Ui Components")) {
+					ObjectSelector(uIComponents);
+					ImGui::EndTabItem();
 				}
+				ImGui::EndTabBar();
 			}
+			*/
 			ImGui::EndChild();
 		}
-		ImGui::End();
-		*/
+
+		//ImGui::SameLine();
+
+
+
+
+
+	//ImGui::EndGroup();
+
 	}
+
+
+	/*
+
+	if (ImGui::Begin("Scene Hierarchy")) {
+		// Search filter
+		static char searchFilter[256] = "";
+		ImGui::InputText("Search", searchFilter, IM_ARRAYSIZE(searchFilter));
+
+		// List all objects
+		ImGui::BeginChild("Object List", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
+
+		for (auto& obj : scene->getGameObjects()) {
+			if (!obj) continue;
+
+			// Filter by name
+			if (searchFilter[0] != '\0' &&
+				std::string(obj->getName()).find(searchFilter) == std::string::npos) {
+				continue;
+			}
+
+			// Display selectable object
+			bool isSelected = (g_SelectedObject == obj.get());
+			if (ImGui::Selectable(obj->getName(), isSelected)) {
+				g_SelectedObject = obj.get();
+				g_SelectedFromHierarchy = true;
+				g_JustSelectedFromHierarchy = true;
+			}
+
+			if (isSelected && g_SelectedFromHierarchy && ImGui::GetScrollMaxY() > 0) {
+				ImGui::SetScrollHereY(0.5f);
+			}
+		}
+		ImGui::EndChild();
+	}
+	ImGui::End();
+	*/
 
 	void renderImGuiObjectEditor() {
 		if (!g_SelectedObject) return;
