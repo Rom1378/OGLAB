@@ -34,7 +34,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 # this copies all resource files in the build directory
 # we need this, because we want to work with paths relative to the executable
-file(COPY res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${resources} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 #file(COPY Config DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 

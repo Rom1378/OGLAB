@@ -105,12 +105,12 @@ namespace Engine {
 	}
 	void render(Scene* scene) {
 		renderFrame(scene, LightManager::getShadowMapper()); // == renderShaderPass TODO
+		scene->renderPhysxDebugPass();
 
 		// Render scene normally
 		scene->renderMainPass();
 
 		// Physx debug pass
-		scene->renderPhysxDebugPass();
 
 		// Render UI pass 
 		scene->renderUIPass();

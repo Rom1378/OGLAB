@@ -48,7 +48,7 @@ namespace UI {
 		//ImGui::BeginGroup();
 		static int selected = 0;
 		{
-			ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_Borders | ImGuiChildFlags_ResizeX);
+			ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_ResizeX);
 			ImGui::RadioButton("GameObject", &selected, 0);
 			ImGui::RadioButton("ShadowCaster", &selected, 1);
 			ImGui::RadioButton("UIComponents", &selected, 2);
