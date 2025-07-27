@@ -72,6 +72,12 @@ namespace Physics {
 	void enable_debug_visualization(PxScene* scene,bool enable) {
 		scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
 		scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f);
+		scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_AXES, 1.0f);
+		scene->setVisualizationParameter(PxVisualizationParameter::eBODY_AXES, 1.0f);
+
+		scene->setVisualizationParameter(PxVisualizationParameter::eWORLD_AXES, 1.0f);
+		scene->setVisualizationParameter(PxVisualizationParameter::eBODY_ANG_VELOCITY, 1.0f);
+		scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
 	}
 
