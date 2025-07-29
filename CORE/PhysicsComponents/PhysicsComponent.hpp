@@ -25,8 +25,8 @@ using namespace physx;
 class PhysicsComponent : public Component {
 protected:
 
-	PxRigidActor* body = nullptr;
-	PxMaterial* material = nullptr;
+	PxRigidActor* body ;
+	PxMaterial* material ;
 
 	float mass = 1.0f;
 	bool isDynamic = false;

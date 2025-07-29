@@ -9,9 +9,10 @@ Light::Light(LightType type, glm::vec3 position, glm::vec3 direction, glm::vec3 
 	setPosition(position);
 }
 
-Light::~Light() {
-    LightManager::removeLight(shared_from_this());
-}
+//Light::~Light() {
+
+    //LightManager::removeLight(shared_from_this());
+//}
 
 void Light::init() {
     try {

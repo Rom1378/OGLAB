@@ -1,11 +1,15 @@
 #include "PhysicsComponent.hpp"
 #include "SpherePhysics.hpp"
 
-PhysicsComponent::PhysicsComponent(Type t) {
+PhysicsComponent::PhysicsComponent(Type t) : body(nullptr), material(nullptr) {
 	material = Physics::getPhysics()->createMaterial(0.5f, 0.5f, 0.2f); // Friction & restitution
 
-	if (body)
+	if (body) {
+
 		body->release();
+		body = nullptr;
+	}
+		
 	if (t == Type::DYNAMIC) {
 		body = Physics::getPhysics()->createRigidDynamic(PxTransform(PxIdentity));
 	}
@@ -163,9 +167,9 @@ void PhysicsComponent::setRotation(const glm::vec3& eulerDegrees) {
 }
 
 PhysicsComponent::~PhysicsComponent() {
-	if (body) {
-		body->release();
-	}
+	if (body )
+		if (body->isReleasable())
+			body->release();
 	if (material) {
 		material->release();
 	}

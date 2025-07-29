@@ -8,7 +8,7 @@ class Light : public TransformableComponent, public std::enable_shared_from_this
 public:
 
     Light(LightType type, glm::vec3 position, glm::vec3 direction, glm::vec3 color, float intensity);
-    ~Light();
+    //~Light();
 
     
     void init() override;
