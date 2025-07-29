@@ -18,5 +18,8 @@ namespace Physics
 
 
 	void enable_debug_visualization(PxScene*scene, bool enable);
+	
+	void imgui_debug_menu(PxScene*scene);
+
 }
 

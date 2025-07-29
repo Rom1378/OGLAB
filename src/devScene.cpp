@@ -140,18 +140,19 @@ void DevScene::onUpdate() {
 
 void DevScene::onImGuiRender() {
 
-	ImGui::ShowDemoWindow();
+	//ImGui::ShowDemoWindow();
 	ImGui::Begin("Scene");
 	//if (ImGui::Begin("Dev Scene Editor", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
 	
 
-		if (ImGui::BeginChild("Dev Scene", ImVec2(0, 0))) {
+		if (ImGui::BeginChild("Dev Scene",ImVec2(0,0), ImGuiChildFlags_Border)) {
 
 			if (ImGui::BeginTabBar("##ScenesTabs", ImGuiTabBarFlags_None))
 			{
 				if (ImGui::BeginTabItem("Scene Hierarchy"))
 				{
-					UI::renderImGuiSceneHierarchy(this);
+					//UI::renderImGuiSceneHierarchy(this);
+
 					ImGui::Text("good");
 					ImGui::EndTabItem();
 				}
@@ -167,8 +168,10 @@ void DevScene::onImGuiRender() {
 
 
 
+			ImGui::Separator();
 
 			UI::UICameraController(getCamera());
+			ImGui::Separator();
 
 			UI::handleRaycastSelection(selectedHitRaycastObject);
 
@@ -177,12 +180,14 @@ void DevScene::onImGuiRender() {
 
 			// Reset columns
 			//ImGui::Columns(1);
+			ImGui::Separator();
 
+			Physics::imgui_debug_menu(m_physicsScene.get()->getScene());
 			ImGui::EndChild();
+
 		}
 
 		//ImGui::End(); }
 
-	ImGui::Text("test");
 	ImGui::End();
 }

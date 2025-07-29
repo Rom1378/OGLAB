@@ -1,4 +1,5 @@
 #include "Physics.hpp"
+#include "imgui.h"
 
 
 namespace Physics {
@@ -10,7 +11,16 @@ namespace Physics {
 		PxFoundation* gFoundation = nullptr;
 		PxPhysics* gPhysics = nullptr;
 		PxPvd* gPvd = nullptr;
+
 	}
+
+	struct visualisationParametersStates {
+		bool eCOLLISION_SHAPES = 0;
+		bool eSCALE = 0;
+		bool  eACTOR_AXES = 0;
+
+	} visParamStates;
+	
 
 
 	void init() {
@@ -70,15 +80,24 @@ namespace Physics {
 	}
 
 	void enable_debug_visualization(PxScene* scene,bool enable) {
-		scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f);
-		scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f);
-		scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_AXES, 1.0f);
-		scene->setVisualizationParameter(PxVisualizationParameter::eBODY_AXES, 1.0f);
+		scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * enable);
+		scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * enable);
+	}
 
-		scene->setVisualizationParameter(PxVisualizationParameter::eWORLD_AXES, 1.0f);
-		scene->setVisualizationParameter(PxVisualizationParameter::eBODY_ANG_VELOCITY, 1.0f);
-		scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+	void imgui_debug_menu(PxScene* scene) {
+
+		visParamStates.eSCALE= scene->getVisualizationParameter(PxVisualizationParameter::eSCALE);
+		visParamStates.eACTOR_AXES =scene->getVisualizationParameter(PxVisualizationParameter::eACTOR_AXES);
+		visParamStates.eCOLLISION_SHAPES =scene->getVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES	);
+
+		if (ImGui::Checkbox("eCOLLISION_SHAPES", & visParamStates.eCOLLISION_SHAPES))
+			scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f * visParamStates.eCOLLISION_SHAPES );
+		if (ImGui::Checkbox("eACTOR_AXES", &visParamStates.eACTOR_AXES))
+			scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * visParamStates.eACTOR_AXES);
+		if (ImGui::Checkbox("eSCALE",  & visParamStates.eSCALE))
+			scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * visParamStates.eSCALE);
 
 	}
+
 
 }

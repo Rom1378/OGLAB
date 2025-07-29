@@ -53,6 +53,7 @@ void Scene::renderUIPass() {
         uiComponent->renderWithMaterials(m_camera);
 		//uiComponent->render(m_camera);
 	}
+
 }
 
 /*

@@ -94,8 +94,8 @@ namespace Engine {
 
 	void renderUI(Scene* scene) {
 
-		scene->onImGuiRender();
 		// Render UI
+		scene->onImGuiRender();
 		
 
 		// Render ImGui
