@@ -26,9 +26,6 @@ void Light::init() {
 
 void Light::update(float dt) {
 	if (auto gameObject = this->getGameObject()) {
-		//setPosition()
-		//:w
-		// m_position = gameObject->getPosition();
 
 	}
 }

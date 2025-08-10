@@ -13,5 +13,7 @@ public:
 	void draw(const std::shared_ptr<Camera> cam) override;
     ~CubeRenderer();
 
+    const char* getName() override { return "CubeRenderer"; }
+
 };
 

@@ -12,6 +12,7 @@ public:
 	//virtual void render(std::shared_ptr<Camera> cam) {}
 	virtual void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {	}
 
+	const char* getName() override { return "UIComponent"; }
 };
 
 class UICursorComponent : public UIComponent {
@@ -75,5 +76,6 @@ public:
 		glEnable(GL_DEPTH_TEST);
 	}
 
+	const char* getName() override { return "UICursorComponent"; }
 
 };

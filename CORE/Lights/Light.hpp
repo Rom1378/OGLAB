@@ -26,6 +26,9 @@ public:
 
     void onImGuiRender() override;
 
+    const char* getName() override { return "Light"; }
+
+
 private:
     LightType type;
     glm::vec3 color;

@@ -19,6 +19,8 @@ public:
 	GameObject* getGameObject() { return m_gameObject; }
 	void setGameObject(GameObject* gameObject) { m_gameObject = gameObject; }
 
+	virtual const char* getName() { return "Unamed"; }
+
 
 protected:
 

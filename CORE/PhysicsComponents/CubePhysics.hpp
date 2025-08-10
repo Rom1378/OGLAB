@@ -11,6 +11,9 @@ public:
 	void init();
 
 	void applyScale(const glm::vec3& scale);
+
+    const char* getName() override { return "CubePhysics"; }
+
 };
 
 

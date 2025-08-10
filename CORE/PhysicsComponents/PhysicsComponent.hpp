@@ -77,6 +77,9 @@ public:
 
 	~PhysicsComponent();
 
+    const char* getName() override { return "PhysicsComponent"; }
+
+
 
 };
 

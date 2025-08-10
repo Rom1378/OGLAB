@@ -6,23 +6,83 @@ namespace UI {
 	bool g_SelectedFromHierarchy = false;
 	bool g_JustSelectedFromHierarchy = false;
 
+
+
+
+
+	void drawGameObjectTree(const std::vector<std::shared_ptr<GameObject>>& gameObjects) {
+
+		static std::shared_ptr<GameObject> selected_gameobject = nullptr;
+		static std::shared_ptr<Component> selected_component = nullptr;
+
+		//ImGui::Begin("Scene Hierarchy");
+		ImGui::BeginChild("Scene hi");
+		ImGui::Columns(2);
+
+		for (auto& obj : gameObjects) {
+			// GameObject node
+			bool nodeOpen = ImGui::TreeNode(obj->getName());
+			if (ImGui::IsItemClicked()) {
+				selected_gameobject = obj;
+				selected_component = nullptr;
+			}
+
+			if (nodeOpen) {
+				for (auto& comp : obj->getAllComponents()) {
+					// Component as a leaf node
+					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+					ImGui::TreeNodeEx(comp->getName(), flags | ImGuiTreeNodeFlags_Selected * (comp == selected_component));
+
+					if (ImGui::IsItemClicked()) {
+						selected_gameobject = obj;
+						selected_component = comp;
+					}
+				}
+				ImGui::TreePop();
+			}
+		}
+
+		//ImGui::End();
+		ImGui::NextColumn();
+		// Right panel: settings
+
+		//ImGui::Begin("Inspector");
+		if (selected_gameobject) {
+			ImGui::Text("GameObject: %s", selected_gameobject->getName());
+			// Draw game object settings here
+		}
+		if (selected_component) {
+			ImGui::Text("Component: %s", selected_component->getName());
+			// Draw component settings here
+		}
+
+		if (selected_gameobject) {
+			selected_gameobject->onImGuiRender();
+			// Draw game object settings here
+		}
+		if (selected_component) {
+			selected_component->onImGuiRender();
+			// Draw component settings here
+		}
+		//ImGui::End();
+		ImGui::EndChild();
+
+	}
+
+
 	void renderImGuiSceneHierarchy(Scene* scene) {
 		if (!scene) return;
 
-		auto& gameObjects = scene->getGameObjects();
-		auto& shadowCaster = scene->getShadowCasters();
-		auto& uIComponents = scene->getUIComponents();
-		const std::vector<std::shared_ptr<GameObject>> objlist[] = { gameObjects,shadowCaster,uIComponents };
 
+
+		std::vector<std::shared_ptr<GameObject>>const* componentsArray[] = 
+			{ &scene->getGameObjects(), &scene->getShadowCasters() ,&scene->getUIComponents()};
 
 
 		// Left
 		static int selectedObjectIndex = 0;
 		static std::shared_ptr<GameObject> selectedObj = nullptr;
-		static bool checkboxStateGameObjects = 0;
-		static bool checkboxStateShadowChaster = 0;
-		static bool checkboxStateuICompoments = 0;
-
+	
 
 
 		//auto& selectedGameObjTypes=gameObjects;
@@ -48,13 +108,21 @@ namespace UI {
 		//ImGui::BeginGroup();
 		static int selected = 0;
 		{
-			ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_ResizeX);
+			//ImGui::BeginChild("left pane", ImVec2(150, 0), ImGuiChildFlags_ResizeX);
 			ImGui::RadioButton("GameObject", &selected, 0);
 			ImGui::RadioButton("ShadowCaster", &selected, 1);
 			ImGui::RadioButton("UIComponents", &selected, 2);
-			ImGui::EndChild();
+			//ImGui::EndChild();
 		}
 
+		ImGui::Text("selected objects list index %d", selected);
+
+		drawGameObjectTree(*componentsArray[selected]);
+
+
+	}
+
+		/*
 
 		ImGui::SameLine();
 
@@ -111,7 +179,6 @@ namespace UI {
 				}
 				ImGui::EndTabBar();
 			}
-			*/
 			ImGui::EndChild();
 		}
 
@@ -236,6 +303,7 @@ namespace UI {
 			if (hitObject && Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
 				g_SelectedObject = hitObject;
 				g_SelectedFromHierarchy = false;
+				LOG("raycast selection called!");
 			}
 		}
 		g_JustSelectedFromHierarchy = false;

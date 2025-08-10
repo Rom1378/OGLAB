@@ -119,13 +119,13 @@ void DevScene::onUpdate() {
 
 
 			if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
-				if (currentMode == EDIT) {
+				if (currentMode == PLAY) {
 					// If in EDIT mode, add a cube at the hit position
 					auto cube = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
 					cube->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 					addGameObject(cube);
 				}
-				else if (currentMode == PLAY) {
+				else if (currentMode == EDIT) {
 					// If in PLAY mode, select the nearest object under the cursor
 					if (hitRaycastObject) {
 						selectedHitRaycastObject = hitRaycastObject;
@@ -144,6 +144,12 @@ void DevScene::onImGuiRender() {
 	ImGui::Begin("Scene");
 	//if (ImGui::Begin("Dev Scene Editor", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
 	
+	if (currentMode==PLAY)
+		ImGui::Text("MODE: PLAY");
+	else
+		ImGui::Text("MODE: EDIT");
+
+
 
 		if (ImGui::BeginChild("Dev Scene",ImVec2(0,0), ImGuiChildFlags_Border)) {
 
@@ -151,16 +157,19 @@ void DevScene::onImGuiRender() {
 			{
 				if (ImGui::BeginTabItem("Scene Hierarchy"))
 				{
-					//UI::renderImGuiSceneHierarchy(this);
+					UI::renderImGuiSceneHierarchy(this);
 
 					ImGui::Text("good");
 					ImGui::EndTabItem();
 				}
-				if (m_camera && ImGui::BeginTabItem("camera"))
+				if (m_camera && ImGui::BeginTabItem("Camera"))
 				{
 					m_camera->onImGuiRender();
-					//ObjectSelector(shadowCaster);
-					ImGui::Text("feeling good");
+						
+					ImGui::EndTabItem();
+				}
+				if (ImGui::BeginTabItem("Visual Debug")) {
+					Physics::imgui_debug_menu(m_physicsScene.get()->getScene());
 					ImGui::EndTabItem();
 				}
 				ImGui::EndTabBar();
@@ -168,21 +177,12 @@ void DevScene::onImGuiRender() {
 
 
 
-			ImGui::Separator();
-
-			UI::UICameraController(getCamera());
-			ImGui::Separator();
-
-			UI::handleRaycastSelection(selectedHitRaycastObject);
+			//ImGui::Separator();
+			
+			//dont remember what this is about
+			//UI::handleRaycastSelection(selectedHitRaycastObject);
 
 
-
-
-			// Reset columns
-			//ImGui::Columns(1);
-			ImGui::Separator();
-
-			Physics::imgui_debug_menu(m_physicsScene.get()->getScene());
 			ImGui::EndChild();
 
 		}

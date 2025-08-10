@@ -16,6 +16,9 @@ public:
 	void setPosition(glm::vec3 const& pos) { m_localPosition = pos; }
 	void setRotation(glm::vec3 const& rot) { m_localRotation = rot; }
 	void setScale(glm::vec3 const& scale) { m_localScale = scale; }
+
+    const char* getName() override { return "TransformableComponent"; }
+
 private:
 
 	glm::vec3 m_localPosition = { 0, 0, 0 };

@@ -8,4 +8,10 @@ Implement scene save, load, saving all object states
 Add batch rendering for cubes
 Add mutli threading for loading models
 Add spinning cat music for sound : )
-releasing objects, not working
+X releasing objects, not working
+
+
+need a way to select individual objects.
+	via UI and next via clicking from the camera with shift or smthg
+
+there is a delay on the input in the window for cusor sure keys idk.

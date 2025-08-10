@@ -12,6 +12,8 @@
 #include <CORE/Debug.hpp>
 
 
+
+//F2 F1
 class DevScene : public Scene {
 public:
 
@@ -20,17 +22,19 @@ public:
 	void onUpdate() override;
 	void onImGuiRender() override;
 
-	private:
-	
-		std::shared_ptr<Light> sunLight;
+private:
 
-		PxRaycastHit hitInfo;
-		GameObject* hitRaycastObject = nullptr;// = static_cast<GameObject*>(hitInfo.actor->userData);
-		GameObject* selectedHitRaycastObject = nullptr;
+	std::shared_ptr<Light> sunLight;
 
-		enum mode {
-			EDIT, //right click will add a cube
-			PLAY  //right click will select the nearest object under the cursor
-		} currentMode = EDIT;
+	PxRaycastHit hitInfo;
+	GameObject* hitRaycastObject = nullptr;// = static_cast<GameObject*>(hitInfo.actor->userData);
+	GameObject* selectedHitRaycastObject = nullptr;
+
+
+
+	enum mode {
+		EDIT, //right click will add a cube
+		PLAY  //right click will select the nearest object under the cursor
+	} currentMode = EDIT;
 
 };
