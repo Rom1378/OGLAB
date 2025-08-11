@@ -14,4 +14,4 @@ X releasing objects, not working
 need a way to select individual objects.
 	via UI and next via clicking from the camera with shift or smthg
 
-there is a delay on the input in the window for cusor sure keys idk.
+X there is a delay on the input in the window for cusor sure keys idk.

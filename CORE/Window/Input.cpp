@@ -33,8 +33,7 @@ namespace Input
 	}
 
 
-	void update() {
-
+	void resetFrameKeys() {
 		// Reset per-frame values
 		Internal::scrollDelta = 0.0f;
 
@@ -44,15 +43,17 @@ namespace Input
 			Internal::keysJustPressed[i] = false;
 			Internal::keysJustReleased[i] = false;
 		}
+	}
 
+
+
+	void update() {
 		// Check if ImGui captures the inputs
 		ImGuiIO& io = ImGui::GetIO();
 		bool imguiWantsMouse = io.WantCaptureMouse;
 		bool imguiWantsKeyboard = io.WantCaptureKeyboard;
 
 		// Reset per-frame values
-
-
 		if (Internal::mouseLocked) {
 			// If mouse is locked, center it in the window
 			int width, height;
@@ -82,7 +83,6 @@ namespace Input
 			// If not locked, delta is calculated in mouse_callback, but reset it here after one frame
 			Internal::prevMousePosition = Internal::mousePosition;
 		}
-		glfwPollEvents();
 
 	}
 

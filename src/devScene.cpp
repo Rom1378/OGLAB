@@ -98,11 +98,11 @@ void DevScene::onUpdate() {
 		auto c = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(0.0f, 140.0f, 0.0f));
 		c->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 	}
-	if (Input::isKeyJustPressed(GLFW_KEY_F1)) {
+	if (Input::isKeyPressed(GLFW_KEY_F1)) {
 		currentMode = EDIT;
 		LOG("Switched to EDIT mode");
 	}
-	else if (Input::isKeyJustPressed(GLFW_KEY_F2)) {
+	else if (Input::isKeyPressed(GLFW_KEY_F2)) {
 		currentMode = PLAY;
 		LOG("Switched to PLAY mode");
 	}

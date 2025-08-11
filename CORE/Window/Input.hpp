@@ -35,5 +35,7 @@ namespace Input
     void setMouseLocked(bool locked);
     bool isMouseLocked();
 
+
+    void resetFrameKeys();
     // Window focus handling
 }

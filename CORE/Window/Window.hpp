@@ -10,7 +10,7 @@ namespace Window
 		std::string title = "Engine";
 		uint32_t width = 1280;
 		uint32_t height = 720;
-		bool vsync = true;
+		bool vsync = false;
 	};
 
 	void init(const WindowProps& props = WindowProps{});

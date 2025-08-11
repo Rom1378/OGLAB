@@ -62,11 +62,15 @@ namespace Engine {
 	}
 
 	void update(Scene* scene) {
-		Window::update();
-		Input::update();
-		Window::clear();
 		m_dt = getDeltaTime();
 		scene->update(m_dt);
+
+
+
+
+		//Window::update(); //swapbuffer
+		//Input::update(); //shit + pollenvent
+		//Window::clear();
 
 	}
 
