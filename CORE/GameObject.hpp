@@ -121,9 +121,6 @@ public:
 		}
 	}
 
-
-
-
 	void onImGuiRender() {
 
 		//transform
@@ -146,60 +143,9 @@ public:
 
 			ImGui::TreePop();
 		}
-
-		/*
-		ImGui::Columns(2, nullptr, true);
-
-		ImGui::BeginChild("GameObject Components");
-		for (int i = 0; i < m_components.size(); i++)
-		{
-			char label[128];
-			//snprintf(label, 128, getCompom_components[i].get()));
-			snprintf(label, 128, "Component: %s", typeid(*m_components[i].get()).name()+6);
-			if (ImGui::Selectable(label, selectedComponentIndex == i)) {
-				selectedComponentIndex = i;
-				selectedComp = m_components[i];
-			}
-		}
-		ImGui::EndChild();
-
-		ImGui::NextColumn();
-
-		if (selectedComp)
-		{
-				//local component transform
-			if (auto tfComponent = std::dynamic_pointer_cast<TransformableComponent>(selectedComp))
-			{
-				glm::vec3 pos=tfComponent->getWorldPosition();
-				glm::vec3 rot=tfComponent->getWorldDirection();
-
-				if (ImGui::TreeNode("Component Transform")) {
-					if (ImGui::DragFloat3("Position", &pos.x, 0.1f)) {
-						tfComponent->setPosition(pos);
-					}
-
-
-					if (ImGui::DragFloat3("Rotation", &rot.x, 1.0f)) {
-						tfComponent->setRotation(rot);
-					}
-
-					ImGui::TreePop();
-				}
-
-			}
-
-
-			//component specifications
-			selectedComp->onImGuiRender();
-		}
-		*/
 	}
 
 	const char* getName() const { return m_name.c_str(); }
-
-
-	//int selectedComponentIndex=0;
-	//std::shared_ptr<Component> selectedComp = nullptr;
 
 private:
 	std::vector<std::shared_ptr<Component>> m_components;

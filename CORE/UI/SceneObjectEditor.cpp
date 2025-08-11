@@ -7,9 +7,6 @@ namespace UI {
 	bool g_JustSelectedFromHierarchy = false;
 
 
-
-
-
 	void drawGameObjectTree(const std::vector<std::shared_ptr<GameObject>>& gameObjects) {
 
 		static std::shared_ptr<GameObject> selected_gameobject = nullptr;
@@ -121,113 +118,6 @@ namespace UI {
 
 
 	}
-
-		/*
-
-		ImGui::SameLine();
-
-		ImGui::BeginGroup();
-		ImGui::BeginChild("item view", ImVec2(0, 0));
-
-		ObjectSelector(objlist[selected]);
-
-
-	
-		ImGui::SameLine();
-
-		//ImGui::BeginChild("Components", ImVec2(100, 100));
-		if (!selectedObj)
-			ImGui::Text("No object selected");
-		else {
-			ImGui::Text("selected object: %s", selectedObj->getName());
-			selectedObj->onImGuiRender();
-		}
-		//ImGui::EndChild();
-
-
-		ImGui::EndChild();
-		ImGui::EndGroup();
-
-
-
-
-
-
-		if (0 && ImGui::BeginChild("GameDDobjects")) {
-			//ImGui::Text("MyObject: %d", selected);
-			//ImGui::Separator();
-
-
-			/*
-
-			if (ImGui::BeginTabBar("##Tabs", ImGuiTabBarFlags_None))
-			{
-				if (ImGui::BeginTabItem("Games Objects"))
-				{
-					selectedGameObjTypes=gameObjects
-					ObjectSelector(gameObjects);
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Shadow casters"))
-				{
-					ObjectSelector(shadowCaster);
-					ImGui::EndTabItem();
-				}
-				if (ImGui::BeginTabItem("Ui Components")) {
-					ObjectSelector(uIComponents);
-					ImGui::EndTabItem();
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::EndChild();
-		}
-
-		//ImGui::SameLine();
-
-
-
-
-
-	//ImGui::EndGroup();
-
-	}
-
-
-	/*
-
-	if (ImGui::Begin("Scene Hierarchy")) {
-		// Search filter
-		static char searchFilter[256] = "";
-		ImGui::InputText("Search", searchFilter, IM_ARRAYSIZE(searchFilter));
-
-		// List all objects
-		ImGui::BeginChild("Object List", ImVec2(0, -ImGui::GetFrameHeightWithSpacing()), true);
-
-		for (auto& obj : scene->getGameObjects()) {
-			if (!obj) continue;
-
-			// Filter by name
-			if (searchFilter[0] != '\0' &&
-				std::string(obj->getName()).find(searchFilter) == std::string::npos) {
-				continue;
-			}
-
-			// Display selectable object
-			bool isSelected = (g_SelectedObject == obj.get());
-			if (ImGui::Selectable(obj->getName(), isSelected)) {
-				g_SelectedObject = obj.get();
-				g_SelectedFromHierarchy = true;
-				g_JustSelectedFromHierarchy = true;
-			}
-
-			if (isSelected && g_SelectedFromHierarchy && ImGui::GetScrollMaxY() > 0) {
-				ImGui::SetScrollHereY(0.5f);
-			}
-		}
-		ImGui::EndChild();
-	}
-	ImGui::End();
-	*/
 
 	void renderImGuiObjectEditor() {
 		if (!g_SelectedObject) return;
