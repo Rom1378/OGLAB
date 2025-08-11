@@ -1,5 +1,6 @@
 #include "SceneObjectEditor.hpp"
 #include <typeinfo>
+#include <format>
 
 namespace UI {
 	GameObject* g_SelectedObject = nullptr;
@@ -16,23 +17,30 @@ namespace UI {
 		ImGui::BeginChild("Scene hi");
 		ImGui::Columns(2);
 
-		for (auto& obj : gameObjects) {
+
+		for (uint32_t y = 0; y < gameObjects.size(); y++) {
 			// GameObject node
-			bool nodeOpen = ImGui::TreeNode(obj->getName());
+			bool nodeOpen = ImGui::TreeNode(std::format("{}_{}", y, gameObjects[y]->getName()).c_str());
 			if (ImGui::IsItemClicked()) {
-				selected_gameobject = obj;
+				selected_gameobject = gameObjects[y];
 				selected_component = nullptr;
 			}
 
 			if (nodeOpen) {
-				for (auto& comp : obj->getAllComponents()) {
+				const auto& objComponents = gameObjects[y]->getAllComponents();
+
+
+
+				for (uint32_t i = 0; i < objComponents.size();i++) {
 					// Component as a leaf node
 					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-					ImGui::TreeNodeEx(comp->getName(), flags | ImGuiTreeNodeFlags_Selected * (comp == selected_component));
+					//std::string id=std::to_string(i) + std::string
+
+					ImGui::TreeNodeEx(std::format("{}_{}", i,objComponents[i]->getName()).c_str(), flags | ImGuiTreeNodeFlags_Selected * (objComponents[i] == selected_component));
 
 					if (ImGui::IsItemClicked()) {
-						selected_gameobject = obj;
-						selected_component = comp;
+						selected_gameobject = gameObjects[y];
+						selected_component = objComponents[i];
 					}
 				}
 				ImGui::TreePop();
