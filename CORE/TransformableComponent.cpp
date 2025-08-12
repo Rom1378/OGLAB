@@ -33,3 +33,11 @@ glm::vec3 TransformableComponent::getWorldDirection() const {
     glm::vec3 forward = { 0, 0, -1 }; // OpenGL forward
     return glm::normalize(glm::mat3(getWorldMatrix()) * forward);
 }
+
+glm::vec3 TransformableComponent::getLocalRotation() const {
+    return m_localRotation;
+}
+
+glm::vec3 TransformableComponent::getLocalPosition() const {
+    return m_localPosition;
+}

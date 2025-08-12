@@ -70,6 +70,8 @@ public:
 	// Update all components
 	void update(float dt);
 
+	virtual void onUpdate(float dt) {}
+
 	// Render if has RenderComponent
 	void render(const glm::mat4& view, const glm::mat4& projection);
 

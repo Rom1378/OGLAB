@@ -5,12 +5,12 @@
 #include "../Component.hpp"
 #include "../Window/Input.hpp"
 #include <iostream>
-#include "../Transform.hpp"
 #include "../Window/Window.hpp"
+#include "CORE/TransformableComponent.hpp"
 
 
 
-class Camera : public Transform, public Component {
+class Camera : public TransformableComponent {
 public:
 	Camera(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f);
 
@@ -42,6 +42,8 @@ public:
 	float getMaxLightDistance() const { return maxLightDistance; }
 	void setMaxLightDistance(float distance) { maxLightDistance = distance; }
 
+
+	void setYawPitch(float newYaw, float newPitch);
 	void onImGuiRender() override;
 
 protected:
@@ -57,6 +59,9 @@ protected:
 	float nearPlane;
 	float farPlane;
 	float maxLightDistance;
+
+	float yaw = 0.0f;
+	float pitch = 0.0f;
 
 	void updateProjection() {
 		projection = glm::perspective(glm::radians(fov), aspectRatio,

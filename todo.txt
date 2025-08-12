@@ -1,4 +1,3 @@
-Add cool fps camera
 Improve textures binding for model renderer
 Add more lights to shaders computation
 Improve light manager
@@ -11,7 +10,16 @@ Add spinning cat music for sound : )
 X releasing objects, not working
 
 
-need a way to select individual objects.
+X need a way to select individual objects.
 	via UI and next via clicking from the camera with shift or smthg
 
 X there is a delay on the input in the window for cusor sure keys idk.
+
+
+fixing res folder. there is a copi when running cmake. choose what I want to do.
+
+height map generation
+
+add water at level -378
+
+Add cool fps camera

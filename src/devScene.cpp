@@ -1,6 +1,17 @@
 #include "devScene.hpp"
 
 #include <CORE/PhysicsScene.hpp>
+#include "Player.hpp"
+
+
+
+
+
+
+
+
+
+
 
 void DevScene::init() {
 	//auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
@@ -67,10 +78,15 @@ void DevScene::init() {
 	//add velocity
 	sphere->getComponent<PhysicsComponent>()->setLinearVelocity(glm::vec3(10.0f, 30.0f, 0.0f));
 
-	auto camera = std::make_shared<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
+
+	//Player GAMEOBJ
+	auto player = std::make_shared<Player>("Player");
+
+	auto camera = player->addComponent<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
 	camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
 	camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-	setCamera(camera);
+//	setCamera(camera);
+	addGameObject(player);
 
 	auto sunLightObj = std::make_shared<GameObject>("SunLight");
 	sunLightObj->addComponent<Light>(LightType::DIRECTIONAL,
@@ -107,14 +123,14 @@ void DevScene::onUpdate() {
 		LOG("Switched to PLAY mode");
 	}
 	// Handle raycast selection
-	if (!m_camera) {
+	if (!m_current_camera) {
 		LOG_WARN("m_camera is null");
 	}
 	else {
 
-		auto cameraPos = m_camera->getPosition();
+		auto cameraPos = m_current_camera->getWorldPosition();
 
-		if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_camera->getForward()), 1000.0f, hitInfo)) {
+		if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_current_camera->getForward()), 1000.0f, hitInfo)) {
 			hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
 
 
@@ -162,9 +178,9 @@ void DevScene::onImGuiRender() {
 					ImGui::Text("good");
 					ImGui::EndTabItem();
 				}
-				if (m_camera && ImGui::BeginTabItem("Camera"))
+				if (m_current_camera && ImGui::BeginTabItem("Camera"))
 				{
-					m_camera->onImGuiRender();
+					m_current_camera->onImGuiRender();
 						
 					ImGui::EndTabItem();
 				}

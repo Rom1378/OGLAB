@@ -6,13 +6,13 @@
 
 
 
-Scene::Scene() : m_camera(nullptr), m_cubemap(nullptr) {
+Scene::Scene() : m_current_camera(nullptr), m_cubemap(nullptr) {
     m_physicsScene = std::make_shared<PhysicsScene>();
     m_physicsScene->init();
 }
 void Scene::update(float dt) { 
-    if(m_camera)
-        m_camera->update(dt);
+    if(m_current_camera)
+    //    m_current_camera->update(dt);
 
 
     m_physicsScene->update(dt);
@@ -39,18 +39,18 @@ void Scene::renderShadowCasters(const glm::mat4& lightMatrix) {
 void Scene::renderMainPass() {
     //cubemaps
     if (m_cubemap)
-		m_cubemap->draw(m_camera->getViewMatrix(), m_camera->getProjectionMatrix());
+		m_cubemap->draw(m_current_camera->getViewMatrix(), m_current_camera->getProjectionMatrix());
     
     // Normal rendering with materials
     for (auto obj : m_gameObjects) {
-        obj->renderWithMaterials(m_camera);
+        obj->renderWithMaterials(m_current_camera);
     }
 
 }
 void Scene::renderUIPass() {
 	// Render UI components
 	for (auto& uiComponent : m_UIcomponents) {
-        uiComponent->renderWithMaterials(m_camera);
+        uiComponent->renderWithMaterials(m_current_camera);
 		//uiComponent->render(m_camera);
 	}
 
@@ -102,13 +102,18 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
 	if (auto uiComponent = gameObject->getComponent<UIComponent>()) {
 		m_UIcomponents.push_back(gameObject);
 	}
+
+    if (auto camera = gameObject->getComponent<Camera>()) {
+        m_cameras.push_back(camera);
+        m_current_camera = m_cameras[0];
+    }
 }
 
 
 void Scene::renderPhysxDebugPass() {
 	if (m_physicsScene) {
         m_physicsScene->drawDebugVisualization();
-        m_physicsScene->renderDebugVisualization(m_camera);
+        m_physicsScene->renderDebugVisualization(m_current_camera);
 	}
 	else {
 		LOG_WARN("Physics scene is null, cannot render debug pass");

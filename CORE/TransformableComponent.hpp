@@ -13,6 +13,9 @@ public:
 	glm::vec3 getWorldPosition() const;
 	glm::vec3 getWorldDirection() const;
 
+	glm::vec3 getLocalRotation() const;
+	glm::vec3 getLocalPosition() const;
+
 	void setPosition(glm::vec3 const& pos) { m_localPosition = pos; }
 	void setRotation(glm::vec3 const& rot) { m_localRotation = rot; }
 	void setScale(glm::vec3 const& scale) { m_localScale = scale; }

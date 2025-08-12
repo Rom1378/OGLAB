@@ -12,6 +12,6 @@ public:
 
 
 private:
-	float m_speed = 5.0f;
+	//float m_speed = 5.0f;
 	float m_sensitivity = 0.1f;
 };

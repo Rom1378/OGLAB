@@ -74,7 +74,7 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	// Material properties
 	m_shader->setBool("useTexture", !m_textures.empty());
 	m_shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
-	m_shader->setVec3("viewPos", cam->getPosition());
+	m_shader->setVec3("viewPos", cam->getWorldPosition());
 
 	// Bind textures if available
 	if (!m_textures.empty()) {
@@ -121,7 +121,8 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
 	m_shader->setInt("shadowMap", 1);
-	m_shader->setVec3("lightPos", relevantLights[0]->getWorldPosition());
+	if (relevantLights.size())
+		m_shader->setVec3("lightPos", relevantLights[0]->getWorldPosition());
 	//LightManager::bindShadowMap(m_shader);
 
 	// Draw

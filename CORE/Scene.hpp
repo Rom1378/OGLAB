@@ -37,8 +37,8 @@ public:
 	inline std::vector<std::shared_ptr<GameObject>> const& getShadowCasters() { return m_shadowCasters; }
 	inline std::vector<std::shared_ptr<GameObject>> const& getUIComponents() { return m_UIcomponents; }
 
-	inline void setCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
-	inline std::shared_ptr<Camera> getCamera() { return m_camera; }
+	//inline void setCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
+	inline std::shared_ptr<Camera> getCamera() { return m_current_camera; }
 	inline void setCubemap(std::shared_ptr<CubeMap> cubemap) { m_cubemap = cubemap; }
 	inline std::shared_ptr<CubeMap> getCubemap() { return m_cubemap; }
 	inline std::shared_ptr<PhysicsScene> getPhysicsScene() { return m_physicsScene; }
@@ -55,7 +55,9 @@ protected:
 
 	std::vector<std::shared_ptr<GameObject>> m_UIcomponents;
 
-	std::shared_ptr<Camera> m_camera;
+	std::vector<std::shared_ptr<Camera>> m_cameras;
+
+	std::shared_ptr<Camera> m_current_camera;
 	std::shared_ptr<CubeMap> m_cubemap;
 	std::shared_ptr<PhysicsScene> m_physicsScene;
 

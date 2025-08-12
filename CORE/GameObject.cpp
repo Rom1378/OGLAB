@@ -7,6 +7,8 @@ void GameObject::update(float dt) {
 	for (auto& component : m_components) {
 		component->update(dt);
 	}
+
+	onUpdate(dt);
 }
 
 // Render if has RenderComponent
