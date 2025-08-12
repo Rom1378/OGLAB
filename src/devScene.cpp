@@ -85,6 +85,9 @@ void DevScene::init() {
 	auto camera = player->addComponent<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
 	camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
 	camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
+
+	auto body = player->addComponent<CubePhysics>(CubePhysics::Type::DYNAMIC);
+
 //	setCamera(camera);
 	addGameObject(player);
 
