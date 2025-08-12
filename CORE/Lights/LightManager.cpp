@@ -87,7 +87,7 @@ namespace LightManager
 		for (const auto& light : lights) {
 			// Add logging to verify lights are present
 
-			float distance = glm::distance(light->getWorldPosition(), cam->getPosition());
+			float distance = glm::distance(light->getWorldPosition(), cam->getWorldPosition());
 			if (distance < cam->getMaxLightDistance()) {
 				relevantLights.push_back(light);
 			}
