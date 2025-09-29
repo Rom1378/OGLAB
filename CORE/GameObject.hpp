@@ -51,7 +51,7 @@ public:
 
 
 	template<typename T>
-	std::shared_ptr<T> getComponent()
+	std::shared_ptr<T> getComponent() const
 	{
 		for (auto& component : m_components)
 		{
@@ -65,7 +65,7 @@ public:
 	}
 
 	//return all components
-	inline std::vector<std::shared_ptr<Component>>const& getAllComponents() { return this->m_components; }
+	inline std::vector<std::shared_ptr<Component>>const& getAllComponents() const { return this->m_components; }
 
 	// Update all components
 	void update(float dt);
@@ -73,9 +73,9 @@ public:
 	virtual void onUpdate(float dt) {}
 
 	// Render if has RenderComponent
-	void render(const glm::mat4& view, const glm::mat4& projection);
+	void render(const glm::mat4& view, const glm::mat4& projection) const;
 
-	void render(std::shared_ptr<Camera> cam);
+	void render(std::shared_ptr<Camera> cam) const;
 
 	// Set position and update physics component if exists
 	void setPosition(const glm::vec3& position, bool update_physx = true);

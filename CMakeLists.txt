@@ -32,6 +32,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${VCPKG_INSTALLED_DIR}/x64-windows/include)
+
+
+
 # this copies all resource files in the build directory
 # we need this, because we want to work with paths relative to the executable
 file(COPY ${resources} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -48,6 +52,13 @@ target_link_libraries(${PROJECT_NAME}
     assimp::assimp
     nlohmann_json::nlohmann_json
 )
+
+# After target_link_libraries
+get_target_property(PHYSX_INCLUDES unofficial::omniverse-physx-sdk::sdk INTERFACE_INCLUDE_DIRECTORIES)
+if (PHYSX_INCLUDES)
+    target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${PHYSX_INCLUDES})
+endif()
+
 
 if(TARGET unofficial::omniverse-physx-sdk::gpu-library)
         if(UNIX)
@@ -82,7 +93,7 @@ if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
 
     # option 2: apply the option on a per-target basis
     target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
-    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/ZI>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/Zi>)
 
 endif()
 

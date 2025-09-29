@@ -2,6 +2,7 @@
 
 #include <CORE/PhysicsScene.hpp>
 #include "Player.hpp"
+#include <CORE/RenderComponents/SphereRenderer.hpp>
 
 
 
@@ -74,10 +75,12 @@ void DevScene::init() {
 	auto cattxtr = TextureManager::loadTexture("res/textures/CAT.png", "CAT.png");
 	world->getComponent<RenderComponent>()->addTexture(doogtxtr);
 
-	auto sphere = PrefabManager::instantiate("SpherePrefab", glm::vec3(0.0f, 10.0f, 0.0f));
+	auto sphere = PrefabManager::instantiate("SpherePrefab", glm::vec3(0.0f, 100.0f, 0.0f));
+	
 	//add velocity
-	sphere->getComponent<PhysicsComponent>()->setLinearVelocity(glm::vec3(10.0f, 30.0f, 0.0f));
-
+	sphere->getComponent<PhysicsComponent>()->setLinearVelocity(glm::vec3(0.0f, 0.0f, 0.0f));
+	sphere->getComponent<SphereRenderer>()->setColor(glm::vec4(1.0f, 255.0f, 0.0f, 255.0f));
+	//addGameObject(sphere);
 
 	//Player GAMEOBJ
 	auto player = std::make_shared<Player>("Player");

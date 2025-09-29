@@ -17,6 +17,7 @@
 
 #define ENGINE_ASSERT(x, msg) ((void)0)
 
+#define LOG(msg)       ((void)0)
 #define LOG_OK(msg)    ((void)0)
 #define LOG_WARN(msg)  ((void)0)
 #define LOG_ERROR(msg) ((void)0)

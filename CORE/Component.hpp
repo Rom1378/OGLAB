@@ -16,7 +16,7 @@ public:
 	virtual void update(float dt) {}
 	virtual void onImGuiRender();
 
-	GameObject* getGameObject() { return m_gameObject; }
+	GameObject* getGameObject() const { return m_gameObject; }
 	void setGameObject(GameObject* gameObject) { m_gameObject = gameObject; }
 
 	virtual const char* getName() { return "Unamed"; }

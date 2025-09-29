@@ -21,7 +21,7 @@ namespace Engine{
 
     void renderUI(Scene* scene = nullptr);
     void render(Scene* scene = nullptr);
-    bool isRunning();
+    bool isRunning() ;
 
     float get_dt();
 }

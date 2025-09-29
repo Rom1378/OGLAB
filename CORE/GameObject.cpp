@@ -12,13 +12,13 @@ void GameObject::update(float dt) {
 }
 
 // Render if has RenderComponent
-void GameObject::render(const glm::mat4& view, const glm::mat4& projection) {
+void GameObject::render(const glm::mat4& view, const glm::mat4& projection) const {
 	if (auto renderComponent = getComponent<RenderComponent>()) {
 		renderComponent->draw(view, projection);
 	}
 }
 
-void GameObject::render(std::shared_ptr<Camera> cam) {
+void GameObject::render(std::shared_ptr<Camera> cam) const {
 	if (auto renderComponent = getComponent<RenderComponent>()) {
 		renderComponent->draw(cam);
 	}
