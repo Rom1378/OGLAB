@@ -35,6 +35,10 @@ void GameObject::setPosition(const glm::vec3& position, bool update_physx){
 	}
 }
 
+void GameObject::setPosition(float x, float y, float z, bool update_physx) { setPosition(glm::vec3{ x,y,z }, update_physx); }
+void GameObject::setPosition(const PxVec3d& p, bool update_physx ) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+void GameObject::setPosition(const PxVec3& p, bool update_physx ) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+
 // Set rotation and update physics component if exists
 void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
 

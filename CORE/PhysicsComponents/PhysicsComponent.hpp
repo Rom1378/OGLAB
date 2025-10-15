@@ -22,7 +22,7 @@
 
 using namespace physx;
 
-class PhysicsComponent : public Component {
+class PhysicsComponent : public TransformableComponent {
 protected:
 
 	PxRigidActor* body ;
@@ -80,7 +80,14 @@ public:
     const char* getName() override { return "PhysicsComponent"; }
 
 
+	void LockRotationX(bool v);
+	void LockRotationY(bool v);
+	void LockRotationZ(bool v);
 
 };
+
+
+
+// class PlayerController : public PhysicsComponent
 
 

@@ -6,7 +6,10 @@ class Camera;
 
 class PhysicsScene {
 public:
-	void init() { m_scene = Physics::createScene(); }
+	void init() { 
+		m_scene = Physics::createScene();
+		Physics::setControllerManagerScene(m_scene);
+	}
 
 	void update(float dt) {
 		m_scene->simulate(dt);

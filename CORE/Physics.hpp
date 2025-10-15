@@ -21,5 +21,9 @@ namespace Physics
 	
 	void imgui_debug_menu(PxScene*scene);
 
+	void setControllerManagerScene(PxScene* scene);
+
+	PxControllerManager& getControllerManger() ;
+
 }
 

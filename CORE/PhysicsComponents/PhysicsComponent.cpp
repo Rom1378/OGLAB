@@ -81,7 +81,7 @@ void PhysicsComponent::updatePhysX() {
 
 
 void PhysicsComponent::updateTransform() {
-	if (body) {
+	if (body and this->m_attachedToGameObject) {
 		PxTransform pxTransform = body->getGlobalPose();
 
 		// Update position
@@ -173,4 +173,20 @@ PhysicsComponent::~PhysicsComponent() {
 	if (material) {
 		material->release();
 	}
+}
+
+
+void PhysicsComponent::LockRotationX(bool v) {
+	PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
+	if (dynamic) {		dynamic->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_X, v);	}
+}
+
+void PhysicsComponent::LockRotationY(bool v) {
+	PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
+	if (dynamic) { dynamic->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Y, v); }
+}
+
+void PhysicsComponent::LockRotationZ(bool v) {
+	PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
+	if (dynamic) { dynamic->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, v); }
 }

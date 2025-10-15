@@ -22,9 +22,12 @@ public:
 
     const char* getName() override { return "TransformableComponent"; }
 
-private:
+protected:
 
 	glm::vec3 m_localPosition = { 0, 0, 0 };
 	glm::vec3 m_localRotation = { 0, 0, 0 }; // Euler
 	glm::vec3 m_localScale = { 1, 1, 1 };
+
+	bool m_attachedToGameObject{ 1 };
+
 };

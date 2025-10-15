@@ -85,11 +85,7 @@ void DevScene::init() {
 	//Player GAMEOBJ
 	auto player = std::make_shared<Player>("Player");
 
-	auto camera = player->addComponent<CameraMC>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
-	camera->setPosition(glm::vec3(5.0f, 0.0f, 0.0f));
-	camera->setRotation(glm::vec3(0.0f, 90.0f, 0.0f));
-
-	auto body = player->addComponent<CubePhysics>(CubePhysics::Type::DYNAMIC);
+	
 
 //	setCamera(camera);
 	addGameObject(player);
@@ -163,17 +159,16 @@ void DevScene::onUpdate() {
 void DevScene::onImGuiRender() {
 
 	//ImGui::ShowDemoWindow();
-	ImGui::Begin("Scene");
-	//if (ImGui::Begin("Dev Scene Editor", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
-	
-	if (currentMode==PLAY)
-		ImGui::Text("MODE: PLAY");
-	else
-		ImGui::Text("MODE: EDIT");
+	if (
+		ImGui::Begin("Scene")) {
+		//if (ImGui::Begin("Dev Scene Editor", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize)) {
 
+		if (currentMode == PLAY)
+			ImGui::Text("MODE: PLAY");
+		else
+			ImGui::Text("MODE: EDIT");
 
-
-		if (ImGui::BeginChild("Dev Scene",ImVec2(0,0), ImGuiChildFlags_Border)) {
+		if (ImGui::BeginChild("Dev Scene", ImVec2(0, 0), ImGuiChildFlags_Border)) {
 
 			if (ImGui::BeginTabBar("##ScenesTabs", ImGuiTabBarFlags_None))
 			{
@@ -187,7 +182,7 @@ void DevScene::onImGuiRender() {
 				if (m_current_camera && ImGui::BeginTabItem("Camera"))
 				{
 					m_current_camera->onImGuiRender();
-						
+
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Visual Debug")) {
@@ -200,16 +195,15 @@ void DevScene::onImGuiRender() {
 
 
 			//ImGui::Separator();
-			
+
 			//dont remember what this is about
 			//UI::handleRaycastSelection(selectedHitRaycastObject);
 
-
+		}
 			ImGui::EndChild();
 
-		}
-
 		//ImGui::End(); }
-
-	ImGui::End();
+	}
+		ImGui::End(); // must call END even when Begin returns false
+	
 }

@@ -4,6 +4,7 @@ project(CLC)
 
 set(PROJECT_NAME CLC)
 
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -38,7 +39,12 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${VCPKG_INSTALLED_DIR}
 
 # this copies all resource files in the build directory
 # we need this, because we want to work with paths relative to the executable
-file(COPY ${resources} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# file(COPY ${resources} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+#copy shaders too 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/CORE/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+
 #file(COPY Config DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 
@@ -93,7 +99,11 @@ if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
 
     # option 2: apply the option on a per-target basis
     target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
-    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/Zi>)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/ZI>)
+
+
+    # Disable warnings from PhysX headers (MSVC 2019+)
+
 
 endif()
 

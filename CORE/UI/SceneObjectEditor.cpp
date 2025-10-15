@@ -62,7 +62,7 @@ namespace UI {
 		}
 
 		if (selected_gameobject) {
-			selected_gameobject->onImGuiRender();
+			selected_gameobject->ImGuiRender();
 			// Draw game object settings here
 		}
 		if (selected_component) {

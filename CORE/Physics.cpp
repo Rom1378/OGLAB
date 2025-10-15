@@ -12,6 +12,8 @@ namespace Physics {
 		PxPhysics* gPhysics = nullptr;
 		PxPvd* gPvd = nullptr;
 
+
+		PxControllerManager* controllerManager = nullptr;
 	}
 
 	struct visualisationParametersStates {
@@ -51,6 +53,11 @@ namespace Physics {
 		Internal::gPvd->release();
 		Internal::gFoundation->release();
 	}
+
+	void setControllerManagerScene(PxScene* scene) {
+		Internal::controllerManager = PxCreateControllerManager(*scene);
+	}
+
 	PxScene* createScene()
 	{
 		PxSceneDesc sceneDesc(Internal::gPhysics->getTolerancesScale());
@@ -100,4 +107,7 @@ namespace Physics {
 	}
 
 
+	 PxControllerManager& getControllerManger() {
+		return *Internal::controllerManager;
+	}
 }

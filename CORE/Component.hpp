@@ -26,5 +26,6 @@ protected:
 
 	GameObject* m_gameObject;
 
+
 }; // class Component
 

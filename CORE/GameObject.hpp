@@ -12,6 +12,8 @@
 #include <typeinfo>
 #include "Component.hpp"
 
+#include "CORE/Physics.hpp"
+
 class PhysicsComponent;
 
 class GameObject : public Transform
@@ -69,8 +71,34 @@ public:
 
 	// Update all components
 	void update(float dt);
-
+	virtual void onImGuiRender() {};
 	virtual void onUpdate(float dt) {}
+
+	void ImGuiRender() {
+
+		//transform
+		glm::vec3 position = getPosition();
+		glm::vec3 rotation = getRotation(); // Euler degrees
+		glm::vec3 scale = getScale();
+
+		if (ImGui::TreeNode("Game Object Transform")) {
+			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
+				setPosition(position);
+			}
+
+			if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
+				setRotation(rotation);  // Will update quaternion
+			}
+
+			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
+				setScale(scale);
+			}
+
+			ImGui::TreePop();
+		}
+
+		onImGuiRender();
+	}
 
 	// Render if has RenderComponent
 	void render(const glm::mat4& view, const glm::mat4& projection) const;
@@ -79,6 +107,9 @@ public:
 
 	// Set position and update physics component if exists
 	void setPosition(const glm::vec3& position, bool update_physx = true);
+	void setPosition(float x, float y, float z, bool update_physx = true); 
+	void setPosition(const PxVec3d& p, bool update_physx = true);
+	void setPosition(const PxVec3& p, bool update_physx = true); 
 
 	//set rotation and update physics component if exists
 	void setRotation(const glm::vec3& rotation, bool update_physx = true);
@@ -123,29 +154,7 @@ public:
 		}
 	}
 
-	void onImGuiRender() {
-
-		//transform
-		glm::vec3 position = getPosition();
-		glm::vec3 rotation = getRotation(); // Euler degrees
-		glm::vec3 scale = getScale();
-
-		if (ImGui::TreeNode("Game Object Transform")) {
-			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
-				setPosition(position);
-			}
-
-			if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
-				setRotation(rotation);  // Will update quaternion
-			}
-
-			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
-				setScale(scale);
-			}
-
-			ImGui::TreePop();
-		}
-	}
+	
 
 	const char* getName() const { return m_name.c_str(); }
 
