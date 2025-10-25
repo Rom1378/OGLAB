@@ -11,7 +11,7 @@ public:
 	void init() override;
 	void draw(const glm::mat4& view, const glm::mat4& projection) override;
 
-	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override;
+	void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) override;
 	void setTexture(const std::vector<std::string>& faces) { addTexture(TextureManager::loadCubemap(faces)); }
 
 	void bindTextures();

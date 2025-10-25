@@ -10,7 +10,7 @@ SphereRenderer::~SphereRenderer() {
 
 void SphereRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
 }
-void SphereRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
+void SphereRenderer::renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) {
 	if (!m_shader) return;
 
 	m_shader->use();
@@ -38,7 +38,7 @@ void SphereRenderer::init() {
 	initBuffers();
 }
 
-void SphereRenderer::draw(const std::shared_ptr<Camera> cam) {
+void SphereRenderer::draw(const std::shared_ptr<CameraComponent> cam) {
 	if (!m_shader) return;
 
 	m_shader->use();

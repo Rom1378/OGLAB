@@ -53,7 +53,7 @@ public:
 
 
 	template<typename T>
-	std::shared_ptr<T> getComponent() const
+	const std::shared_ptr<T>& getComponent() const
 	{
 		for (auto& component : m_components)
 		{
@@ -74,36 +74,12 @@ public:
 	virtual void onImGuiRender() {};
 	virtual void onUpdate(float dt) {}
 
-	void ImGuiRender() {
-
-		//transform
-		glm::vec3 position = getPosition();
-		glm::vec3 rotation = getRotation(); // Euler degrees
-		glm::vec3 scale = getScale();
-
-		if (ImGui::TreeNode("Game Object Transform")) {
-			if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
-				setPosition(position);
-			}
-
-			if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
-				setRotation(rotation);  // Will update quaternion
-			}
-
-			if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
-				setScale(scale);
-			}
-
-			ImGui::TreePop();
-		}
-
-		onImGuiRender();
-	}
+	void ImGuiRender();
 
 	// Render if has RenderComponent
 	void render(const glm::mat4& view, const glm::mat4& projection) const;
 
-	void render(std::shared_ptr<Camera> cam) const;
+	void render(std::shared_ptr<CameraComponent> cam) const;
 
 	// Set position and update physics component if exists
 	void setPosition(const glm::vec3& position, bool update_physx = true);
@@ -143,7 +119,7 @@ public:
 		}
 	}
 	//render with materials for all render components
-	void renderWithMaterials(const std::shared_ptr<Camera>& cam)
+	void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam)
 	{
 		for (auto& component : m_components)
 		{

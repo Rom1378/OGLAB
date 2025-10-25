@@ -20,6 +20,6 @@ void PhysicsScene::drawDebugVisualization() {
 	}
 }
 
-void PhysicsScene::renderDebugVisualization(const std::shared_ptr<Camera> cam) {
+void PhysicsScene::renderDebugVisualization(const std::shared_ptr<CameraComponent> cam) {
 	LineRenderer::render(cam);
 }

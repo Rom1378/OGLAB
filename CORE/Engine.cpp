@@ -31,6 +31,7 @@ namespace Engine {
 		lastTime = currentTime;
 		return deltaTime.count(); // Returns time in seconds
 	}
+	void reset_dt() { getDeltaTime(); }
 
 	void init() {
 		registerPrefabs();

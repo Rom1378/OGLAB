@@ -10,9 +10,9 @@
 
 
 
-class Camera : public TransformableComponent {
+class CameraComponent : public TransformableComponent {
 public:
-	Camera(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f);
+	CameraComponent(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f);
 
 
 	void update(float dt) override;
@@ -45,6 +45,10 @@ public:
 
 	void setYawPitch(float newYaw, float newPitch);
 	void onImGuiRender() override;
+	
+	
+	const char* getName() override { return "Camera"; }
+
 
 protected:
 	glm::vec3 m_forward{ 0.0f, 0.0f, -1.0f }; // Forward direction

@@ -13,10 +13,10 @@ public:
 	ModelRenderer(const std::string& path) : RenderComponent(), m_path(path) {	}
 	void setPath(const std::string& path) { m_path = path; }
 	void renderRawGeometry(const glm::mat4& lightSpaceMatrix) override;
-	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override;
+	void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) override;
 	void init() override;
 	~ModelRenderer();
-	void draw(const std::shared_ptr<Camera> cam) override { renderWithMaterials(cam); }
+	void draw(const std::shared_ptr<CameraComponent> cam) override { renderWithMaterials(cam); }
 
 private:
 

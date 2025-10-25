@@ -2,7 +2,7 @@
 #include <memory>
 #include "Physics.hpp"
 
-class Camera;
+class CameraComponent;
 
 class PhysicsScene {
 public:
@@ -32,7 +32,7 @@ public:
 	PxScene* getScene() { return m_scene; }
 
 	void drawDebugVisualization();
-	void renderDebugVisualization(const std::shared_ptr<Camera> cam);
+	void renderDebugVisualization(const std::shared_ptr<CameraComponent> cam);
 
 
 private:

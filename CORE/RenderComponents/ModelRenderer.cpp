@@ -15,7 +15,7 @@ void ModelRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
 	}
 }
 
-void ModelRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
+void ModelRenderer::renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) {
 
 	if (!m_shader) return;
 

@@ -7,10 +7,10 @@ class CubeRenderer : public RenderComponent {
 public:
 
     void renderRawGeometry(const glm::mat4& lightSpaceMatrix) override;
-    void renderWithMaterials(const std::shared_ptr<Camera>& cam) override;
+    void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) override;
 
     void init() override;
-	void draw(const std::shared_ptr<Camera> cam) override;
+	void draw(const std::shared_ptr<CameraComponent> cam) override;
     ~CubeRenderer();
 
     const char* getName() override { return "CubeRenderer"; }

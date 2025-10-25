@@ -6,6 +6,7 @@
 class TransformableComponent : public Component {
 public:
 
+	TransformableComponent() = default;
 	//void update() override;
 
 	glm::mat4 getLocalMatrix() const;
@@ -22,12 +23,15 @@ public:
 
     const char* getName() override { return "TransformableComponent"; }
 
+	inline bool isAttachedToGameObject() const { return m_attachedToGameObject; }
+	inline void setAttachedToGameObject(bool attach) { m_attachedToGameObject = attach; }
+
 protected:
 
 	glm::vec3 m_localPosition = { 0, 0, 0 };
 	glm::vec3 m_localRotation = { 0, 0, 0 }; // Euler
 	glm::vec3 m_localScale = { 1, 1, 1 };
 
-	bool m_attachedToGameObject{ 1 };
+	bool m_attachedToGameObject{ true };
 
 };

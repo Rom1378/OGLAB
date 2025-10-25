@@ -1,5 +1,5 @@
 #include "LineRenderer.hpp"
-#include "Cameras/Camera.hpp"
+#include "CameraComponents/Camera.hpp"
 #include "Shader.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -62,7 +62,7 @@ namespace LineRenderer {
 		count += 1;
 	}
 
-	void LineRenderer::render(const std::shared_ptr<Camera> cam) {
+	void LineRenderer::render(const std::shared_ptr<CameraComponent> cam) {
 
 		glBindVertexArray(VAO);
 

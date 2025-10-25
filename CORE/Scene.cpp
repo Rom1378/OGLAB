@@ -2,26 +2,56 @@
 #include "PhysicsScene.hpp"
 #include "PhysicsComponents/PhysicsComponent.hpp"
 #include "renderComponents/Cursor.hpp"
-#include "Cameras/Camera.hpp"
+#include "CameraComponents/CameraMC.hpp"
+#include "Engine.hpp"
 
 
-
-Scene::Scene() : m_current_camera(nullptr), m_cubemap(nullptr) {
+Scene::Scene() : m_current_camera(nullptr), m_current_camera_component{nullptr}, m_cubemap(nullptr),
+m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{EDIT}
+{
     m_physicsScene = std::make_shared<PhysicsScene>();
     m_physicsScene->init();
+    
+    m_devCamera = std::make_shared<GameObject>("Dev Camera");
+    m_current_camera_component=m_devCamera->addComponent<CameraMCComponent>();
+
 }
 void Scene::update(float dt) { 
     if(m_current_camera)
-    //    m_current_camera->update(dt);
+        m_current_camera->update(dt);
 
-
-    m_physicsScene->update(dt);
-
-    for (auto& gameObject : m_gameObjects) {
-        gameObject->update(dt);
+    // EDIT MODE
+    if (Input::isKeyJustPressed(GLFW_KEY_F1)) {
+        currentMode = EDIT;
+        m_current_camera = m_devCamera;
+        m_current_camera_component = m_devCamera->getComponent<CameraComponent>();
+        LOG("Switched to EDIT mode");
     }
+    else if (Input::isKeyJustPressed(GLFW_KEY_F2)) {
+        Engine::reset_dt();
+        currentMode = PLAY;
+        if (m_gameCamera) {
+            m_current_camera = m_gameCamera;
+            m_current_camera_component = m_current_camera->getComponent<CameraComponent>();
+        }
 
-    onUpdate();
+        LOG("Switched to PLAY mode");
+    }
+  
+    switch (currentMode) {
+    case PLAY:
+        m_physicsScene->update(dt);
+        for (auto& gameObject : m_gameObjects) {
+            gameObject->update(dt);
+        }
+
+        onUpdate();
+        break;
+    case EDIT:
+
+        break;
+    }
+   
 
 }
 
@@ -39,38 +69,22 @@ void Scene::renderShadowCasters(const glm::mat4& lightMatrix) {
 void Scene::renderMainPass() {
     //cubemaps
     if (m_cubemap)
-		m_cubemap->draw(m_current_camera->getViewMatrix(), m_current_camera->getProjectionMatrix());
+		m_cubemap->draw(m_current_camera_component->getViewMatrix(), m_current_camera_component->getProjectionMatrix());
     
     // Normal rendering with materials
     for (auto obj : m_gameObjects) {
-        obj->renderWithMaterials(m_current_camera);
+        obj->renderWithMaterials(m_current_camera_component);
     }
 
 }
 void Scene::renderUIPass() {
 	// Render UI components
 	for (auto& uiComponent : m_UIcomponents) {
-        uiComponent->renderWithMaterials(m_current_camera);
+        uiComponent->renderWithMaterials(m_current_camera_component);
 		//uiComponent->render(m_camera);
 	}
 
 }
-
-/*
-void Scene::render() {
-    glm::mat4 view = m_camera->getViewMatrix();
-    glm::mat4 projection = m_camera->getProjectionMatrix();
-
-    //drawcubemap
-    if (m_cubemap)
-        m_cubemap->draw(view,projection);
-    for (auto& gameObject : m_gameObjects) {
-        //gameObject->render(view, projection);
-        gameObject->render(m_camera);
-    }
-
-    onRender();
-}*/
 
 std::shared_ptr<GameObject> Scene::createGameObject() {
     auto gameObject = std::make_shared<GameObject>();
@@ -103,9 +117,9 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
 		m_UIcomponents.push_back(gameObject);
 	}
 
-    if (auto camera = gameObject->getComponent<Camera>()) {
+    if (auto camera = gameObject->getComponent<CameraComponent>()) {
         m_cameras.push_back(camera);
-        m_current_camera = m_cameras[0];
+        //m_current_camera = m_cameras[0];
     }
 }
 
@@ -113,7 +127,7 @@ void Scene::addGameObject(std::shared_ptr<GameObject> gameObject) {
 void Scene::renderPhysxDebugPass() {
 	if (m_physicsScene) {
         m_physicsScene->drawDebugVisualization();
-        m_physicsScene->renderDebugVisualization(m_current_camera);
+        m_physicsScene->renderDebugVisualization(m_current_camera_component);
 	}
 	else {
 		LOG_WARN("Physics scene is null, cannot render debug pass");

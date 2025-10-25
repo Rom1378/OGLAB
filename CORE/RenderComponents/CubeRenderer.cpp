@@ -39,7 +39,7 @@ void CubeRenderer::init() {
 
 }
 
-void CubeRenderer::draw(const std::shared_ptr<Camera> cam) {
+void CubeRenderer::draw(const std::shared_ptr<CameraComponent> cam) {
 	renderWithMaterials(cam);
 	}
 
@@ -60,7 +60,7 @@ void CubeRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
 }
 
 
-void CubeRenderer::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
+void CubeRenderer::renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) {
 	if (!m_shader) return;
 
 	m_shader->use();

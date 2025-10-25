@@ -6,7 +6,7 @@
 #include <array>
 #include <memory>
 
-class Camera;
+class CameraComponent;
 
 namespace LineRenderer {
 
@@ -14,6 +14,6 @@ namespace LineRenderer {
 
 	void draw(glm::vec3 const& start, glm::vec3 const& end, glm::vec4 const& color);
 
-	void render(const std::shared_ptr<Camera> cam);
+	void render(const std::shared_ptr<CameraComponent> cam);
 
 };

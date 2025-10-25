@@ -11,6 +11,33 @@ void GameObject::update(float dt) {
 	onUpdate(dt);
 }
 
+
+void GameObject::ImGuiRender() {
+
+	//transform
+	glm::vec3 position = getPosition();
+	glm::vec3 rotation = getRotation(); // Euler degrees
+	glm::vec3 scale = getScale();
+
+	if (ImGui::TreeNode("Game Object Transform")) {
+		if (ImGui::DragFloat3("Position", &position.x, 0.1f)) {
+			setPosition(position);
+		}
+
+		if (ImGui::DragFloat3("Rotation", &rotation.x, 1.0f)) {
+			setRotation(rotation);  // Will update quaternion
+		}
+
+		if (ImGui::DragFloat3("Scale", &scale.x, 0.1f)) {
+			setScale(scale);
+		}
+
+		ImGui::TreePop();
+	}
+
+	onImGuiRender();
+}
+
 // Render if has RenderComponent
 void GameObject::render(const glm::mat4& view, const glm::mat4& projection) const {
 	if (auto renderComponent = getComponent<RenderComponent>()) {
@@ -18,7 +45,7 @@ void GameObject::render(const glm::mat4& view, const glm::mat4& projection) cons
 	}
 }
 
-void GameObject::render(std::shared_ptr<Camera> cam) const {
+void GameObject::render(std::shared_ptr<CameraComponent> cam) const {
 	if (auto renderComponent = getComponent<RenderComponent>()) {
 		renderComponent->draw(cam);
 	}

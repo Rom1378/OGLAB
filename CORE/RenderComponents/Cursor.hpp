@@ -10,7 +10,7 @@ public:
 	}
 	virtual void init() override {	}
 	//virtual void render(std::shared_ptr<Camera> cam) {}
-	virtual void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {	}
+	virtual void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) override {	}
 
 	const char* getName() override { return "UIComponent"; }
 };
@@ -47,7 +47,7 @@ public:
 		setShader("cursor");
 	}
 
-	void renderWithMaterials(const std::shared_ptr<Camera>& cam) override {
+	void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) override {
 
 		auto shader = ShaderManager::getShader("cursor");
 		if (!shader) return;

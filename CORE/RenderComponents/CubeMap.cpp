@@ -16,7 +16,7 @@ void CubeMap::init() {
 
 }
 
-void CubeMap::renderWithMaterials(const std::shared_ptr<Camera>& cam) {
+void CubeMap::renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) {
 
 	draw(cam->getViewMatrix(), cam->getProjectionMatrix());
 

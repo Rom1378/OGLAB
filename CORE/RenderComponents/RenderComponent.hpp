@@ -9,7 +9,7 @@
 #include "../Shader.hpp"
 #include "../TextureManager.hpp"
 #include <iostream>
-#include "../Cameras/Camera.hpp"
+#include "../CameraComponents/Camera.hpp"
 
 class RenderComponent : public Component {
 public:
@@ -23,10 +23,10 @@ public:
 		VAO(0), VBO(0), EBO(0), m_isShadowCaster(isShadowCaster), m_isShadowReceiver(isShadowReceiver) {	}
 
 	virtual void draw(const glm::mat4& view, const glm::mat4& projection) {};
-	virtual void draw(const std::shared_ptr<Camera> cam) {};
+	virtual void draw(const std::shared_ptr<CameraComponent> cam) {};
 	virtual void draw() {};
 	virtual void renderRawGeometry(const glm::mat4& lightSpaceMatrix) {};// Shadow pass
-	virtual void renderWithMaterials(const std::shared_ptr<Camera>& cam) {}; // Main pass
+	virtual void renderWithMaterials(const std::shared_ptr<CameraComponent>& cam) {}; // Main pass
 
 	bool getIsShadowCaster() const { return m_isShadowCaster; }
 	bool getIsShadowReceiver() const { return m_isShadowReceiver; }

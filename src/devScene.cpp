@@ -5,15 +5,6 @@
 #include <CORE/RenderComponents/SphereRenderer.hpp>
 
 
-
-
-
-
-
-
-
-
-
 void DevScene::init() {
 	//auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
 	//addGameObject(prefCube);
@@ -84,11 +75,12 @@ void DevScene::init() {
 
 	//Player GAMEOBJ
 	auto player = std::make_shared<Player>("Player");
+	setGameCameraHost(player);
 
-	
-
-//	setCamera(camera);
 	addGameObject(player);
+
+
+
 
 	auto sunLightObj = std::make_shared<GameObject>("SunLight");
 	sunLightObj->addComponent<Light>(LightType::DIRECTIONAL,
@@ -103,11 +95,11 @@ void DevScene::init() {
 	cursor->addComponent<UICursorComponent>();
 	addGameObject(cursor);
 
-
 	Physics::enable_debug_visualization(m_physicsScene->getScene(), true);
 }
 
 void DevScene::onUpdate() {
+
 	// Cube spawning logic
 	static float timer = 0.0f;
 	timer += Engine::get_dt();
@@ -116,23 +108,12 @@ void DevScene::onUpdate() {
 		auto c = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(0.0f, 140.0f, 0.0f));
 		c->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 	}
-	if (Input::isKeyPressed(GLFW_KEY_F1)) {
-		currentMode = EDIT;
-		LOG("Switched to EDIT mode");
-	}
-	else if (Input::isKeyPressed(GLFW_KEY_F2)) {
-		currentMode = PLAY;
-		LOG("Switched to PLAY mode");
-	}
-	// Handle raycast selection
-	if (!m_current_camera) {
-		LOG_WARN("m_camera is null");
-	}
+	
 	else {
 
-		auto cameraPos = m_current_camera->getWorldPosition();
+		auto cameraPos = m_current_camera_component->getWorldPosition();
 
-		if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_current_camera->getForward()), 1000.0f, hitInfo)) {
+		if (Physics::raycast(getPhysicsScene()->getScene(), cameraPos, glm::normalize(m_current_camera_component->getForward()), 1000.0f, hitInfo)) {
 			hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
 
 

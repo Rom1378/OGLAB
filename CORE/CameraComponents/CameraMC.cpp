@@ -2,7 +2,7 @@
 #include "CameraMC.hpp"
 #include "CORE/GameObject.hpp"
 
-void CameraMC::update(float dt) {
+void CameraMCComponent::update(float dt) {
 
 
 	// Only process mouse input when mouse is locked
@@ -64,5 +64,5 @@ void CameraMC::update(float dt) {
 		*/
 
 	// Always update the view matrix
-	Camera::update(dt);
+	CameraComponent::update(dt);
 }

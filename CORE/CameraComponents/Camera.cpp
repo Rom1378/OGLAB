@@ -4,33 +4,37 @@
 #include "imgui_impl_opengl3.h"
 
 
-Camera::Camera(float fov, float aspectRatio, float nearPlane, float farPlane) :
+CameraComponent::CameraComponent(float fov, float aspectRatio, float nearPlane, float farPlane) :
 	fov(fov), aspectRatio(aspectRatio), maxLightDistance(1000000.0f),
 	nearPlane(nearPlane), farPlane(farPlane), TransformableComponent() {
 	updateProjection();
 }
 
 
-void Camera::update(float dt) {
+void CameraComponent::update(float dt) {
 	if (Window::getViewPortChanged())
 	{
 		setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
 	}
+
+	//if  attached to gameObject freecam. need to check where we should enable it.
+	//if ();
+
 	updateView();
 }
 
 // Camera control methods
-void Camera::setPosition(const glm::vec3& pos) {
+void CameraComponent::setPosition(const glm::vec3& pos) {
 	TransformableComponent::setPosition(pos);
 	updateView();
 }
 
-void Camera::setRotation(const glm::vec3& rot) {
+void CameraComponent::setRotation(const glm::vec3& rot) {
 	TransformableComponent::setRotation(rot);
 	updateView();
 }
 
-void Camera::lookAt(const glm::vec3& target) {
+void CameraComponent::lookAt(const glm::vec3& target) {
 	glm::vec3 pos = getWorldPosition();
 	view = glm::lookAt(pos , target, up);
 	m_forward = glm::normalize(target - pos);// Update forward vector
@@ -40,14 +44,14 @@ void Camera::lookAt(const glm::vec3& target) {
 	view = glm::lookAt(pos, target, up);
 }
 
-void Camera::setRotation(float pitch, float yaw, float roll) {
+void CameraComponent::setRotation(float pitch, float yaw, float roll) {
 	this->setRotation(pitch, yaw, roll);
 	//m_rotation = glm::vec3(pitch, yaw, roll);
 	updateView();
 }
 
 
-void Camera::updateView() {
+void CameraComponent::updateView() {
 	// Calculate the camera's orientation vectors based on its rotation
 	//glm::mat4 rotationMatrix = glm::mat4(1.0f);
 	/*
@@ -122,7 +126,7 @@ void Camera::updateView() {
 }
 
 
-void   Camera::setAspectRatio(float ratio) {
+void   CameraComponent::setAspectRatio(float ratio) {
 	if (aspectRatio != ratio) {
 		aspectRatio = ratio;
 		updateProjection();
@@ -130,7 +134,7 @@ void   Camera::setAspectRatio(float ratio) {
 }
 
 
-void  Camera::setFOV(float f) {
+void  CameraComponent::setFOV(float f) {
 	if (fov != f) {
 		fov = f;
 		updateProjection();
@@ -138,7 +142,7 @@ void  Camera::setFOV(float f) {
 }
 
 
-void Camera::setNearPlane(float near) {
+void CameraComponent::setNearPlane(float near) {
 	if (nearPlane != near) {
 		nearPlane = near;
 		updateProjection();
@@ -146,7 +150,7 @@ void Camera::setNearPlane(float near) {
 }
 
 
-void Camera::setFarPlane(float far) {
+void CameraComponent::setFarPlane(float far) {
 	if (farPlane != far) {
 		farPlane = far;
 		updateProjection();
@@ -154,7 +158,7 @@ void Camera::setFarPlane(float far) {
 }
 
 
-void Camera::onImGuiRender() {
+void CameraComponent::onImGuiRender() {
 	glm::vec3 pos = getLocalPosition();
 	glm::vec3 rot = getLocalRotation();
 	float fov = getFOV();
@@ -175,15 +179,18 @@ void Camera::onImGuiRender() {
 	ImGui::SliderFloat3("Local Component Position", glm::value_ptr(pos), -100.0f, 100.0f);
 	ImGui::SliderFloat3("Local Component Rotation", glm::value_ptr(rot), -180.0f, 180.0f);
 
+	ImGui::SliderFloat3("Forward Vector", glm::value_ptr(m_forward), -180.0f, 180.0f);
+
 	ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f);
 	ImGui::SliderFloat("Pitch", &pitch, -180.0f, 180.0f);
+
 	setPosition(pos);
 	setRotation(rot);
 	setYawPitch(yaw, pitch);
 
 }
 
-void Camera::setYawPitch(float newYaw, float newPitch) {
+void CameraComponent::setYawPitch(float newYaw, float newPitch) {
 
 	yaw = newYaw;
 	pitch = newPitch;

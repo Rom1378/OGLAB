@@ -1,10 +1,10 @@
-
+/*
 #pragma once
 
 #include "Camera.hpp"
 #include "TransformableComponent.hpp"
 
-class CameraFPS : trans public Camera {
+class CameraFPS : trans public CameraComponent {
 
 public:
 	CameraMC(float fov = 80.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f)
@@ -17,3 +17,4 @@ private:
 	float m_speed = 5.0f;
 	float m_sensitivity = 0.1f;
 };
+*/

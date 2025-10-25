@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../Cameras/Camera.hpp"
+#include "../CameraComponents/Camera.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
 namespace UI {
-	inline void UICameraController(std::shared_ptr<Camera> cam) {
+	inline void UICameraController(std::shared_ptr<CameraComponent> cam) {
 		if (!cam) {
 			LOG_WARN("camera is null");
 			return;

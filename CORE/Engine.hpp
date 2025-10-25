@@ -24,4 +24,6 @@ namespace Engine{
     bool isRunning() ;
 
     float get_dt();
+    void reset_dt();
+
 }

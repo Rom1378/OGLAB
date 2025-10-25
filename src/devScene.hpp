@@ -8,7 +8,7 @@
 #include "../CORE/RenderComponents/Cursor.hpp"
 #include "../CORE/UI/SceneObjectEditor.hpp"
 #include "../CORE/RenderComponents/ModelRenderer.hpp"
-#include "../CORE/Cameras/CameraMC.hpp"
+#include "../CORE/CameraComponents/CameraMC.hpp"
 #include <CORE/Debug.hpp>
 
 
@@ -32,9 +32,5 @@ private:
 
 
 
-	enum mode {
-		EDIT, //right click will add a cube
-		PLAY  //right click will select the nearest object under the cursor
-	} currentMode = EDIT;
-
+	
 };
