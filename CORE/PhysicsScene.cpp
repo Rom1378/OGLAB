@@ -15,7 +15,6 @@ void PhysicsScene::drawDebugVisualization() {
 			glm::vec4 color(0, 1, 0, 1);
 			// Render the line using your rendering engine
 			LineRenderer::draw(start, end, color);
-
 		}
 	}
 }

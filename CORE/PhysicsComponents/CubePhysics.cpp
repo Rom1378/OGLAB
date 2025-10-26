@@ -36,7 +36,12 @@ void CubePhysics::init() {
 }
 
 void CubePhysics::applyScale(const glm::vec3& scale) {
+
 	if (!body) return;
+	if (!scale.x or !scale.y or !scale.z){
+		LOG_ERROR("scale cant be 0");
+		throw std::exception("scale cant be 0");
+	}
 
 	// Release existing shapes
 	releaseAllShapes();

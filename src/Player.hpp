@@ -9,10 +9,9 @@ public:
 	Player(const char* name) : GameObject(name) {
 
 		m_playerController = addComponent<PlayerControllerComponent>();
-		
 	
-		m_camera = addComponent<CameraMCComponent>(45, 1280.0f / 720.0f, 0.1f, 100000.0f);
-		m_camera->setPosition(glm::vec3(5.0f, 110.0f, 0.0f));
+		m_camera = addComponent<CameraMCComponent>(65, 1280.0f / 720.0f, 0.1f, 100000.0f);
+		m_camera->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 		m_camera->setRotation(glm::vec3(0.0f, 1.0f, 0.0f));
 	}
 

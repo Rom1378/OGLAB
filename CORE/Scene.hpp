@@ -27,7 +27,7 @@ public:
 	void renderUIPass();
 	void renderPhysxDebugPass();
 
-	std::shared_ptr<GameObject> createGameObject();
+	std::shared_ptr<GameObject> createGameObject(const std::string& name);
 	void destroyGameObject(std::shared_ptr<GameObject> gameObject);
 
 	void addGameObject(std::shared_ptr<GameObject> gameObject);

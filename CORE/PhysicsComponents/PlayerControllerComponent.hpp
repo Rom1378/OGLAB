@@ -44,6 +44,7 @@ public:
 
 			glm::vec3 forward = camera->getForward();
 			forward.y = 0;
+			forward = glm::normalize(forward);
 			glm::vec3 right = camera->getRight();
 
 			if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
@@ -55,7 +56,7 @@ public:
 				m_velocity += forward * m_actualSpeed * dt;
 			}
 			if (Input::isKeyPressed(GLFW_KEY_S)) {
-				m_velocity -= forward * m_actualSpeed * dt;
+				m_velocity -= forward* m_actualSpeed* dt;
 			}
 			if (Input::isKeyPressed(GLFW_KEY_A)) {
 				m_velocity -= right * m_actualSpeed * dt;
@@ -105,9 +106,9 @@ public:
 	const char* getName() { return "PlayerControllerComponent"; }
 
 private:
-	const float m_walkSpeed = 20.0f;
-	const float m_sprintSpeed = 40.0f;
-	const float m_jump_force{ 10.0f };
+	const float m_walkSpeed = 3.0f;
+	const float m_sprintSpeed = 6.0f;
+	const float m_jump_force{ 3.0f };
 	float m_actualSpeed = m_walkSpeed;
 	glm::vec3 m_velocity{ 0.0f,0.0f,0.0f };
 	glm::vec3 speed{ 0.0f,0.0f,0.0f };

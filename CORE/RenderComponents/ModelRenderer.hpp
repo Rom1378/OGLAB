@@ -17,6 +17,7 @@ public:
 	void init() override;
 	~ModelRenderer();
 	void draw(const std::shared_ptr<CameraComponent> cam) override { renderWithMaterials(cam); }
+	const char* getName() override { return "ModelRendererComponent"; }
 
 private:
 

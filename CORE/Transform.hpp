@@ -32,7 +32,7 @@ public:
 
 	void setScale(const glm::vec3& scale) { m_scale = scale; }
 
-	void move(const glm::vec3& offset) { m_position += offset; }
+	virtual void move(const glm::vec3& offset) { m_position += offset; }
 	//void rotate(const glm::vec3& offset) { m_rotation += offset; }
 
 	void rotate(const glm::vec3& offset) {

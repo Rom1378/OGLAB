@@ -6,6 +6,11 @@
 #include "Debug.hpp"
 
 
+void TransformableComponent::onImGuiRender() {
+
+    ImGui::SliderFloat3("Local Component Position", glm::value_ptr(m_localPosition), -100.0f, 100.0f);
+    ImGui::SliderFloat3("Local Component Rotation", glm::value_ptr(m_localRotation), -180.0f, 180.0f);
+}
 
 
 glm::mat4 TransformableComponent::getLocalMatrix() const {

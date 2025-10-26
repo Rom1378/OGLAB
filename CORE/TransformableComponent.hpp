@@ -9,6 +9,9 @@ public:
 	TransformableComponent() = default;
 	//void update() override;
 
+	void onImGuiRender() override;
+
+
 	glm::mat4 getLocalMatrix() const;
 	glm::mat4 getWorldMatrix() const;
 	glm::vec3 getWorldPosition() const;

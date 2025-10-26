@@ -40,31 +40,35 @@ void GameObject::ImGuiRender() {
 
 // Render if has RenderComponent
 void GameObject::render(const glm::mat4& view, const glm::mat4& projection) const {
-	if (auto renderComponent = getComponent<RenderComponent>()) {
+	if (auto& renderComponent = getComponent<RenderComponent>()) {
 		renderComponent->draw(view, projection);
 	}
 }
 
 void GameObject::render(std::shared_ptr<CameraComponent> cam) const {
-	if (auto renderComponent = getComponent<RenderComponent>()) {
+	if (auto& renderComponent = getComponent<RenderComponent>()) {
 		renderComponent->draw(cam);
 	}
 }
 
 // Set position and update physics component if exists
-void GameObject::setPosition(const glm::vec3& position, bool update_physx){
+void GameObject::setPosition(const glm::vec3& position, bool update_physx) {
 
 	Transform::setPosition(position);
 	if (update_physx) {
-		if (auto physicsComponent = getComponent<PhysicsComponent>()) {
+		if (auto& physicsComponent = getComponent<PhysicsComponent>()) {
 			physicsComponent->setPosition(position);
 		}
 	}
 }
 
 void GameObject::setPosition(float x, float y, float z, bool update_physx) { setPosition(glm::vec3{ x,y,z }, update_physx); }
-void GameObject::setPosition(const PxVec3d& p, bool update_physx ) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
-void GameObject::setPosition(const PxVec3& p, bool update_physx ) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+void GameObject::setPosition(const PxVec3d& p, bool update_physx) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+void GameObject::setPosition(const PxVec3& p, bool update_physx) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+
+void GameObject::move(const glm::vec3& offset, bool update_physx ) {
+	setPosition(getPosition() + offset, update_physx);
+}//m_position += offset; }
 
 // Set rotation and update physics component if exists
 void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
@@ -72,7 +76,7 @@ void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
 	Transform::setRotation(rotation);
 
 	if (update_physx) {
-		if (auto physicsComponent = getComponent<PhysicsComponent>())
+		if (auto& physicsComponent = getComponent<PhysicsComponent>())
 			physicsComponent->setRotation(rotation);
 	}
 }
@@ -83,7 +87,7 @@ void GameObject::setRotationQuaternion(const glm::quat& rotation, bool update_ph
 
 	if (update_physx) {
 		// Update physics component if it exists
-		auto physicsComponent = getComponent<PhysicsComponent>();
+		auto& physicsComponent = getComponent<PhysicsComponent>();
 		if (physicsComponent) {
 			physicsComponent->updatePhysX();
 		}
@@ -95,7 +99,7 @@ void GameObject::setScale(const glm::vec3& scale) {
 
 	Transform::setScale(scale);
 
-	if (auto physicsComponent = getComponent<PhysicsComponent>()) {
+	if (auto& physicsComponent = getComponent<PhysicsComponent>()) {
 		physicsComponent->setScale(scale);
 	}
 }

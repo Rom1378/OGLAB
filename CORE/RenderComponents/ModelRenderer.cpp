@@ -86,21 +86,30 @@ ModelRenderer::~ModelRenderer() {
 
 void ModelRenderer::loadModel() {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(m_path,
-		aiProcess_Triangulate |
-		aiProcess_GenSmoothNormals |
-		aiProcess_FlipUVs |
-		aiProcess_CalcTangentSpace);
 
-	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-		throw std::runtime_error("Assimp error: " + std::string(importer.GetErrorString()));
+	try
+	{
+		const aiScene* scene = importer.ReadFile(m_path,
+			aiProcess_Triangulate |
+			aiProcess_GenSmoothNormals |
+			aiProcess_FlipUVs |
+			aiProcess_CalcTangentSpace);
+
+		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+			throw std::runtime_error("Assimp error: " + std::string(importer.GetErrorString()));
+		}
+
+		directory = m_path.substr(0, m_path.find_last_of('/'));
+		processNode(scene->mRootNode, scene);
+
+		// Print model information
+		printModelInfo();
+	}
+	catch (const std::exception& e)
+	{
+		LOG_ERROR(e.what());
 	}
 
-	directory = m_path.substr(0, m_path.find_last_of('/'));
-	processNode(scene->mRootNode, scene);
-
-	// Print model information
-	printModelInfo();
 }
 
 void ModelRenderer::processNode(aiNode* node, const aiScene* scene) {

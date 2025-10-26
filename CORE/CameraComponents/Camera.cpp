@@ -159,6 +159,8 @@ void CameraComponent::setFarPlane(float far) {
 
 
 void CameraComponent::onImGuiRender() {
+
+	TransformableComponent::onImGuiRender();
 	glm::vec3 pos = getLocalPosition();
 	glm::vec3 rot = getLocalRotation();
 	float fov = getFOV();
@@ -176,10 +178,12 @@ void CameraComponent::onImGuiRender() {
 	setFarPlane(farPlane);
 
 
-	ImGui::SliderFloat3("Local Component Position", glm::value_ptr(pos), -100.0f, 100.0f);
-	ImGui::SliderFloat3("Local Component Rotation", glm::value_ptr(rot), -180.0f, 180.0f);
+	//ImGui::SliderFloat3("Local Component Position", glm::value_ptr(pos), -100.0f, 100.0f);
+	//ImGui::SliderFloat3("Local Component Rotation", glm::value_ptr(rot), -180.0f, 180.0f);
 
 	ImGui::SliderFloat3("Forward Vector", glm::value_ptr(m_forward), -180.0f, 180.0f);
+	ImGui::SliderFloat3("Right Vector", glm::value_ptr(m_right), -180.0f, 180.0f);
+	ImGui::SliderFloat3("Up Vector", glm::value_ptr(m_up), -180.0f, 180.0f);
 
 	ImGui::SliderFloat("Yaw", &yaw, -180.0f, 180.0f);
 	ImGui::SliderFloat("Pitch", &pitch, -180.0f, 180.0f);

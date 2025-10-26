@@ -20,6 +20,7 @@ namespace Physics {
 		bool eCOLLISION_SHAPES = 0;
 		bool eSCALE = 0;
 		bool  eACTOR_AXES = 0;
+		bool eCULL_BOX = 0;
 
 	} visParamStates;
 	
@@ -96,6 +97,7 @@ namespace Physics {
 		visParamStates.eSCALE= scene->getVisualizationParameter(PxVisualizationParameter::eSCALE);
 		visParamStates.eACTOR_AXES =scene->getVisualizationParameter(PxVisualizationParameter::eACTOR_AXES);
 		visParamStates.eCOLLISION_SHAPES =scene->getVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES	);
+		visParamStates.eCULL_BOX = scene->getVisualizationParameter(PxVisualizationParameter::eCULL_BOX);
 
 		if (ImGui::Checkbox("eCOLLISION_SHAPES", & visParamStates.eCOLLISION_SHAPES))
 			scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f * visParamStates.eCOLLISION_SHAPES );
@@ -103,6 +105,8 @@ namespace Physics {
 			scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * visParamStates.eACTOR_AXES);
 		if (ImGui::Checkbox("eSCALE",  & visParamStates.eSCALE))
 			scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * visParamStates.eSCALE);
+		if (ImGui::Checkbox("eCULL_BOX", &visParamStates.eCULL_BOX))
+			scene->setVisualizationParameter(PxVisualizationParameter::eCULL_BOX, 1.0f * visParamStates.eCULL_BOX);
 
 	}
 

@@ -50,7 +50,7 @@ namespace LightManager {
 			return lightSpaceMatrix;
 		}
 
-		ShadowMapper() : depthMapFBO(0), depthMapTexture(0), resolution(2048) {}
+		ShadowMapper() : depthMapFBO(0), depthMapTexture(0), resolution(2048), lightSpaceMatrix{ glm::mat4{} } {}
 
 		~ShadowMapper() {
 			if (depthMapFBO) {

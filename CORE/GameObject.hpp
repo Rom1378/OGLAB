@@ -21,6 +21,7 @@ class GameObject : public Transform
 public:
 	GameObject() : Transform() {}
 	GameObject(const char* name) : Transform(), m_name(name) {}
+	GameObject(const std::string& name) : Transform(), m_name(name) {}
 	template<typename T>
 	std::shared_ptr<T> addComponent()
 	{
@@ -87,6 +88,9 @@ public:
 	void setPosition(const PxVec3d& p, bool update_physx = true);
 	void setPosition(const PxVec3& p, bool update_physx = true); 
 
+	
+	void move(const glm::vec3& offset, bool update_physx = true);
+
 	//set rotation and update physics component if exists
 	void setRotation(const glm::vec3& rotation, bool update_physx = true);
 
@@ -129,8 +133,6 @@ public:
 			}
 		}
 	}
-
-	
 
 	const char* getName() const { return m_name.c_str(); }
 

@@ -3,6 +3,7 @@
 #include "PhysicsComponents/PhysicsComponent.hpp"
 #include "renderComponents/Cursor.hpp"
 #include "CameraComponents/CameraMC.hpp"
+#include "CameraComponents/CameraControllerComponent.hpp"
 #include "Engine.hpp"
 
 
@@ -14,6 +15,7 @@ m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{EDIT}
     
     m_devCamera = std::make_shared<GameObject>("Dev Camera");
     m_current_camera_component=m_devCamera->addComponent<CameraMCComponent>();
+    m_devCamera->addComponent<CameraControllerComponent>();
 
 }
 void Scene::update(float dt) { 
@@ -72,7 +74,7 @@ void Scene::renderMainPass() {
 		m_cubemap->draw(m_current_camera_component->getViewMatrix(), m_current_camera_component->getProjectionMatrix());
     
     // Normal rendering with materials
-    for (auto obj : m_gameObjects) {
+    for (const auto& obj : m_gameObjects) {
         obj->renderWithMaterials(m_current_camera_component);
     }
 
@@ -86,8 +88,8 @@ void Scene::renderUIPass() {
 
 }
 
-std::shared_ptr<GameObject> Scene::createGameObject() {
-    auto gameObject = std::make_shared<GameObject>();
+std::shared_ptr<GameObject> Scene::createGameObject(const std::string& name) {
+    const auto& gameObject = std::make_shared<GameObject>(name);
     m_gameObjects.push_back(gameObject);
     return gameObject;
 }

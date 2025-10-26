@@ -30,7 +30,5 @@ private:
 	GameObject* hitRaycastObject = nullptr;// = static_cast<GameObject*>(hitInfo.actor->userData);
 	GameObject* selectedHitRaycastObject = nullptr;
 
-
-
 	
 };

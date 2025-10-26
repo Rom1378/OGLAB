@@ -80,6 +80,18 @@ void DevScene::init() {
 	addGameObject(player);
 
 
+	try {
+
+		auto paleVisitor = std::make_shared<GameObject>("PaleVisitor");//createGameObject("PaleVisitor");//
+		paleVisitor->addComponent<ModelRenderer>("res/3DModels/paleVisitor/source/PaleVisitor.fbx");
+		addGameObject(paleVisitor);
+	}
+	catch (std::exception& e) {
+		LOG_ERROR(e.what());
+
+	}
+
+
 
 
 	auto sunLightObj = std::make_shared<GameObject>("SunLight");

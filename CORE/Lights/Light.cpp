@@ -35,7 +35,7 @@ void Light::onImGuiRender() {
 	//if (ImGui::DragFloat3("Direction", glm::value_ptr(lightDir), 0.1f)) {
 	//	getGameObject()->setRotation(lightDir);
 	//}
-
+	TransformableComponent::onImGuiRender();
 	glm::vec3 lightColor = getColor();
 	if (ImGui::ColorEdit3("Color", glm::value_ptr(lightColor))) {
 		setColor(lightColor);
