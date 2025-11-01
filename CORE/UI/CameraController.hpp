@@ -8,7 +8,7 @@
 namespace UI {
 	inline void UICameraController(std::shared_ptr<CameraComponent> cam) {
 		if (!cam) {
-			LOG_WARN("camera is null");
+		///	LOG_WARN("camera is null");
 			return;
 		}
 		

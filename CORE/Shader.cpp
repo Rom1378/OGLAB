@@ -5,8 +5,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
-
-
+#include "CORE/Debug.hpp"
 
 namespace ShaderManager
 {
@@ -32,6 +31,7 @@ namespace ShaderManager
             std::ifstream file(configPath);
             if (!file.is_open())
             {
+                LOG_ERROR("Failed to open shader config file: " + configPath);
                 throw std::runtime_error("Failed to open shader config file: " + configPath);
             }
 
@@ -54,6 +54,7 @@ namespace ShaderManager
                 // Validate required fields
                 if (!shaderData.contains("vertex") || !shaderData.contains("fragment"))
                 {
+                    LOG_ERROR("Shader '" + shaderName + "' missing vertex or fragment path");
                     throw std::runtime_error("Shader '" + shaderName + "' missing vertex or fragment path");
                 }
 
@@ -75,24 +76,28 @@ namespace ShaderManager
                 std::ifstream fragFile(config.fragmentPath);
                 if (!vertFile.good())
                 {
+                    LOG_ERROR("Vertex shader not found: " + config.vertexPath);
                     throw std::runtime_error("Vertex shader not found: " + config.vertexPath);
                 }
                 if (!fragFile.good())
                 {
+                    LOG_ERROR("Fragment shader not found: " + config.fragmentPath);
                     throw std::runtime_error("Fragment shader not found: " + config.fragmentPath);
                 }
 
                 shaderConfigs[shaderName] = config;
-                std::cout << "Loaded config for shader: " << shaderName << std::endl;
+                LOG("Loaded config for shader: ", shaderName);
             }
         }
         catch (const nlohmann::json::parse_error& e)
         {
+            LOG_ERROR("JSON parse error in " + configPath + ": " + e.what());
             throw std::runtime_error("JSON parse error in " + configPath + ": " + e.what());
         }
         catch (const std::exception& e)
         {
             system("cd");
+            LOG_ERROR("Error loading shader configs: " + std::string(e.what()));
             throw std::runtime_error("Error loading shader configs: " + std::string(e.what()));
         }
     }

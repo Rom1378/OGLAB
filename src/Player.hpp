@@ -7,16 +7,24 @@ class Player : public GameObject {
 
 public:
 	Player(const char* name) : GameObject(name) {
-
-		m_playerController = addComponent<PlayerControllerComponent>();
 	
 		m_camera = addComponent<CameraMCComponent>(65, 1280.0f / 720.0f, 0.1f, 100000.0f);
-		m_camera->setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
+		m_camera->setPosition(glm::vec3(0.0f, 0.5f, 0.0f));
 		m_camera->setRotation(glm::vec3(0.0f, 1.0f, 0.0f));
+
+		m_playerController = addComponent<PlayerControllerComponent>();
+
+
+		const auto& paleVisitoModel = addComponent<ModelRenderer>("res/3DModels/paleVisitor/source/PaleVisitor.fbx");
+		paleVisitoModel->setRotation(-90, 0, 0);
+		const auto& DAMICROWAVE= addComponent<ModelRenderer>("res/3DModels/DAMICROWAVE.fbx");
+		DAMICROWAVE->setRotation(0, 0, 0);
 	}
 
+
 	void onImGuiRender() override {
-		}
+		
+	}
 
 	void onUpdate(float dt) override {
 		// Process keyboard input for movement (only when mouse is locked)

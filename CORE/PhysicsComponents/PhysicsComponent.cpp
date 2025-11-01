@@ -1,5 +1,6 @@
 #include "PhysicsComponent.hpp"
 #include "SpherePhysics.hpp"
+#include <glm/gtx/matrix_decompose.hpp>
 
 PhysicsComponent::PhysicsComponent(Type t) : body(nullptr), material(nullptr) {
 	material = Physics::getPhysics()->createMaterial(0.5f, 0.5f, 0.2f); // Friction & restitution
@@ -62,11 +63,11 @@ void PhysicsComponent::setLinearVelocity(const glm::vec3& velocity) {
 	}
 }
 
-void PhysicsComponent::updatePhysX() {
+void PhysicsComponent::updatePhysX() { //need to ADD LOCAL transform
 	if (body) {
 		// Get the current transform from the game object
-		glm::vec3 position = getGameObject()->getPosition();
-		glm::quat rotation = getGameObject()->getRotationQuaternion();
+		glm::vec3 position = getWorldPosition();
+		glm::quat rotation = getLocalRotation();
 
 		// Convert to PhysX format
 		PxTransform transform(
@@ -79,23 +80,43 @@ void PhysicsComponent::updatePhysX() {
 	}
 }
 
-
 void PhysicsComponent::updateTransform() {
 	if (body and this->m_attachedToGameObject) {
 		PxTransform pxTransform = body->getGlobalPose();
-
 		// Update position
-		glm::vec3 position(pxTransform.p.x, pxTransform.p.y, pxTransform.p.z);
+		glm::vec3 physxPosition(pxTransform.p.x, pxTransform.p.y, pxTransform.p.z);
 
 		// Convert PhysX quaternion to glm quaternion and normalize
 		PxQuat pxQuat = pxTransform.q;
 		pxQuat.normalize();
-		glm::quat rotation(pxQuat.w, pxQuat.x, pxQuat.y, pxQuat.z);
+		glm::quat physxRotation(pxQuat.w, pxQuat.x, pxQuat.y, pxQuat.z);
+
+		//transform matrix from physx data
+		glm::mat4 physxMatrix = glm::translate(glm::mat4(1.0f), physxPosition) *
+			glm::mat4_cast(physxRotation);
+
+		glm::mat4 worldMatrix = physxMatrix * getLocalMatrix();
+
+		glm::vec3 scale;
+		glm::quat rotation;
+		glm::vec3 position;
+		glm::vec3 skew;
+		glm::vec4 perspective;
+		glm::decompose(worldMatrix, scale, rotation, position, skew, perspective);
 
 		// Update GameObject with quaternion directly
+		
 		getGameObject()->setPosition(position, false);
 		getGameObject()->setRotationQuaternion(rotation, false);
 	}
+}
+
+void PhysicsComponent::updateRotation() {
+	this->setRotationQuaternion(getWorldDirection());//TODO not exactly working
+}
+
+void PhysicsComponent::updatePosition() {
+	setPosition(getWorldPosition());
 }
 
 void PhysicsComponent::releaseAllShapes() {
@@ -118,10 +139,41 @@ void PhysicsComponent::releaseAllShapes() {
 	this->shapes.clear();
 }
 
-
-void PhysicsComponent::setPosition(const glm::vec3& position) {
+void PhysicsComponent::setPosition(const glm::vec3& worldPosition) {
 	if (body) {
-		body->setGlobalPose(PxTransform(position.x, position.y, position.z));
+	
+		glm::mat4 inverseLocal = glm::inverse(getLocalMatrix());
+		glm::vec3 physxPosition = inverseLocal * glm::vec4(worldPosition, 1.0f);
+
+		PxTransform transform = body->getGlobalPose();
+		transform.p = PxVec3(physxPosition.x, physxPosition.y, physxPosition.z);
+		if (body->is<PxRigidDynamic>()) {
+			PxRigidDynamic* dynamic = static_cast<PxRigidDynamic*>(body);
+
+			if (dynamic->getRigidBodyFlags() & PxRigidBodyFlag::eKINEMATIC) {
+				// Kinematic body - use kinematic target
+				dynamic->setKinematicTarget(transform);
+
+			}
+			else {
+				// Dynamic body - set pose and wake up
+				dynamic->setGlobalPose(transform);
+				dynamic->wakeUp();
+				dynamic->setLinearVelocity(PxVec3(0, 0, 0));
+				dynamic->setAngularVelocity(PxVec3(0, 0, 0));
+			}
+		}
+		else {
+			// Static body
+			body->setGlobalPose(transform);
+		}
+		
+		updateTransform();
+		
+
+		//body->setGlobalPose(transform);
+		//body->setKi
+
 	}
 }
 
@@ -144,25 +196,34 @@ glm::vec3 PhysicsComponent::getScale() {
 }
 
 void PhysicsComponent::setRotation(const glm::vec3& eulerDegrees) {
+	LOG_WARN("should use quaternion instead of euler");
 	if (body) {
-		// Convert to quaternion (world-space)
-		glm::quat worldRot = glm::quat(glm::radians(eulerDegrees));
+		// Convert world rotation to PhysX rotation considering local transform
+		glm::quat worldRotation = glm::quat(glm::radians(eulerDegrees));
 
-		// Get current PhysX rotation
-		PxQuat currentPxRot = body->getGlobalPose().q;
-		glm::quat currentRot(currentPxRot.w, currentPxRot.x, currentPxRot.y, currentPxRot.z);
+		// Account for component's local rotation
+		glm::quat localRotation = glm::quat(glm::radians(getLocalRotation()));
+		glm::quat physxRotation = worldRotation * glm::inverse(localRotation);
 
-		// Convert to local-space rotation
-		glm::quat localRot = glm::inverse(currentRot) * worldRot;
+		PxTransform transform = body->getGlobalPose();
+		transform.q = PxQuat(physxRotation.x, physxRotation.y, physxRotation.z, physxRotation.w);
+		transform.q.normalize();
 
-		// Apply to PhysX (as delta rotation)
-		PxQuat pxLocalRot(localRot.x, localRot.y, localRot.z, localRot.w);
-		pxLocalRot.normalize();
+		rotatePhysxBody(transform);
+	}
+}
 
-		body->setGlobalPose(PxTransform(
-			body->getGlobalPose().p,
-			pxLocalRot * body->getGlobalPose().q
-		));
+void PhysicsComponent::setRotationQuaternion(const glm::quat& worldRotation) {
+	if (body) {
+		// Account for component's local rotation
+		glm::quat localRotation = glm::quat(glm::radians(getLocalRotation()));
+		glm::quat physxRotation = worldRotation * glm::inverse(localRotation);
+
+		PxTransform transform = body->getGlobalPose();
+		transform.q = PxQuat(physxRotation.x, physxRotation.y, physxRotation.z, physxRotation.w);
+		transform.q.normalize();
+
+		rotatePhysxBody(transform);
 	}
 }
 
@@ -174,7 +235,6 @@ PhysicsComponent::~PhysicsComponent() {
 		material->release();
 	}
 }
-
 
 void PhysicsComponent::LockRotationX(bool v) {
 	PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
@@ -190,3 +250,24 @@ void PhysicsComponent::LockRotationZ(bool v) {
 	PxRigidDynamic* dynamic = body->is<PxRigidDynamic>();
 	if (dynamic) { dynamic->setRigidDynamicLockFlag(PxRigidDynamicLockFlag::eLOCK_ANGULAR_Z, v); }
 }
+
+
+void PhysicsComponent::rotatePhysxBody(const PxTransform& transform) {
+	if (body->is<PxRigidDynamic>()) {
+		PxRigidDynamic* dynamic = static_cast<PxRigidDynamic*>(body);
+
+		if (dynamic->getRigidBodyFlags() & PxRigidBodyFlag::eKINEMATIC) {
+			dynamic->setKinematicTarget(transform);
+		}
+		else {
+			dynamic->setGlobalPose(transform);
+			dynamic->wakeUp();
+			dynamic->setLinearVelocity(PxVec3(0, 0, 0));
+			dynamic->setAngularVelocity(PxVec3(0, 0, 0));
+		}
+	}
+	else {
+		body->setGlobalPose(transform);
+	}
+}
+

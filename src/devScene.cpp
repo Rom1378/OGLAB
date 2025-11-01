@@ -6,9 +6,13 @@
 
 
 void DevScene::init() {
+	
+
+	
 	//auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
 	//addGameObject(prefCube);
 
+	currentMode = EDIT;
 	//prefCube->setPosition(glm::vec3(0.0f, 10.0f, 0.0f));
 
 	//remove gravaity
@@ -75,23 +79,10 @@ void DevScene::init() {
 
 	//Player GAMEOBJ
 	auto player = std::make_shared<Player>("Player");
+	player->setPosition(glm::vec3 (10, 120, 10));
 	setGameCameraHost(player);
 
 	addGameObject(player);
-
-
-	try {
-
-		auto paleVisitor = std::make_shared<GameObject>("PaleVisitor");//createGameObject("PaleVisitor");//
-		paleVisitor->addComponent<ModelRenderer>("res/3DModels/paleVisitor/source/PaleVisitor.fbx");
-		addGameObject(paleVisitor);
-	}
-	catch (std::exception& e) {
-		LOG_ERROR(e.what());
-
-	}
-
-
 
 
 	auto sunLightObj = std::make_shared<GameObject>("SunLight");
@@ -108,6 +99,8 @@ void DevScene::init() {
 	addGameObject(cursor);
 
 	Physics::enable_debug_visualization(m_physicsScene->getScene(), true);
+	
+
 }
 
 void DevScene::onUpdate() {
@@ -135,6 +128,13 @@ void DevScene::onUpdate() {
 					auto cube = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
 					cube->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 					addGameObject(cube);
+					//const auto& tree = std::make_shared<GameObject>("Trees");
+					//tree->addComponent<ModelRenderer>("res/3DModels/various-forest-assets-pack/source/ForestAssetsLibrary.glb");
+					//tree->setPosition(glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+					//addGameObject(tree);
+
+
+
 				}
 				else if (currentMode == EDIT) {
 					// If in PLAY mode, select the nearest object under the cursor

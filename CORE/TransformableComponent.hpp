@@ -18,13 +18,17 @@ public:
 	glm::vec3 getWorldDirection() const;
 
 	glm::vec3 getLocalRotation() const;
+	glm::quat getLocalRotationQuat() const;
 	glm::vec3 getLocalPosition() const;
 
-	void setPosition(glm::vec3 const& pos) { m_localPosition = pos; }
-	void setRotation(glm::vec3 const& rot) { m_localRotation = rot; }
+	inline void setPosition(glm::vec3 const& pos) { m_localPosition = pos; }
+	inline void setPosition(float x, float y, float z) { m_localPosition = glm::vec3(x, y, z); }
+	inline void setRotation(glm::vec3 const& rot) { m_localRotation = rot; }
+	inline void setRotation(float x, float y, float z) { m_localRotation = glm::vec3(x, y, z); }
 	void setScale(glm::vec3 const& scale) { m_localScale = scale; }
+	void setScale(float x, float y, float z) { m_localScale = glm::vec3(x, y, z); }
 
-    const char* getName() override { return "TransformableComponent"; }
+	const char* getName() override { return "TransformableComponent"; }
 
 	inline bool isAttachedToGameObject() const { return m_attachedToGameObject; }
 	inline void setAttachedToGameObject(bool attach) { m_attachedToGameObject = attach; }

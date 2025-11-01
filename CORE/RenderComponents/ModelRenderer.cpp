@@ -1,14 +1,14 @@
 #include "ModelRenderer.hpp"
 #include "stb_image.h"
 #include "CORE/GameObject.hpp"
-
+#include "CORE/Debug.hpp"
 
 
 void ModelRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
 	auto shader = ShaderManager::getShader("simpleDepthShader");
 	shader->use();
 	shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-	shader->setMat4("model", glm::value_ptr(getGameObject()->getModelMatrix()));
+	shader->setMat4("model", glm::value_ptr(getWorldMatrix()));
 
 	for (auto& mesh : meshes) {
 		mesh.drawRawGeometry();
@@ -22,7 +22,7 @@ void ModelRenderer::renderWithMaterials(const std::shared_ptr<CameraComponent>& 
 	m_shader->use();
 
 	// Standard matrix uniforms
-	m_shader->setMat4("model", glm::value_ptr(getGameObject()->getModelMatrix()));
+	m_shader->setMat4("model", glm::value_ptr(this->getWorldMatrix()));
 	m_shader->setMat4("view", glm::value_ptr(cam->getViewMatrix()));
 	m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
 	m_shader->setMat4("lightSpaceMatrix", LightManager::getShadowMapper()->getLightSpaceMatrix());
@@ -132,7 +132,7 @@ Mesh ModelRenderer::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 	// Process vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
-		Vertex vertex;
+		Vertex vertex{};
 
 		// Position
 		vertex.Position = glm::vec3(
@@ -238,7 +238,8 @@ unsigned int ModelRenderer::TextureFromFile(const char* path, const std::string&
 		stbi_image_free(data);
 	}
 	else {
-		std::cerr << "Texture failed to load at path: " << path << std::endl;
+		LOG_WARN("Texture failed to load at path : ", path);
+		//std::cerr << "Texture failed to load at path: " << path << std::endl;
 		stbi_image_free(data);
 	}
 
@@ -246,7 +247,8 @@ unsigned int ModelRenderer::TextureFromFile(const char* path, const std::string&
 }
 
 void ModelRenderer::printModelInfo() const {
-	std::cout << "Model Information:\n";
+	LOG("Model Information:");
+
 	std::cout << "  Meshes: " << meshes.size() << "\n";
 
 	for (size_t i = 0; i < meshes.size(); i++) {

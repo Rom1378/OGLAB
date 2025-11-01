@@ -2,9 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
-#include <iostream>
 #include <mutex>
 #include <glm/gtc/type_ptr.hpp>
+#include "CORE/Debug.hpp"
 
 // Static variable initialization
 bool GLDebug::debugCallbackInitialized = false;
@@ -69,10 +69,10 @@ void GLDebug::init() {
         glDebugMessageControl(GL_DONT_CARE, GL_DEBUG_TYPE_ERROR,
             GL_DONT_CARE, 0, nullptr, GL_TRUE);
         debugCallbackInitialized = true;
-        std::cout << "OpenGL debug output enabled" << std::endl;
+        LOG("OpenGL debug output enabled");
     }
     else {
-        std::cout << "OpenGL debug output not available (requires OpenGL 4.3+)" << std::endl;
+        LOG_WARN("OpenGL debug output not available (requires OpenGL 4.3+)");
     }
 }
 
@@ -90,8 +90,7 @@ void GLDebug::checkError(const char* file, int line) {
         case GL_INVALID_FRAMEBUFFER_OPERATION:  error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         default:                                error = "UNKNOWN_ERROR"; break;
         }
-        std::cerr << "[OpenGL Error] (" << error << " | " << errorCode << "): "
-            << file << ":" << line << std::endl;
+        LOG_ERROR("[OpenGL Error] (", error, " | ", errorCode, "): ", file, ":", line);
     }
 }
 
@@ -123,7 +122,7 @@ GLint ShaderProgram::getUniformLocation(const std::string& name) const {
     GL_CHECK_ERROR();
 
     if (loc == -1) {
-        std::cerr << "Warning: Uniform '" << name << "' not found or optimized out" << std::endl;
+        LOG_WARN("Uniform '", name, "' not found or optimized out");
     }
     return loc;
 }
@@ -141,8 +140,8 @@ GLuint ShaderProgram::compileShaderInternal(const std::string& source, GLenum ty
     if (!success) {
         GLchar infoLog[1024];
         glGetShaderInfoLog(shader, sizeof(infoLog), nullptr, infoLog);
-        std::cerr << "ERROR::SHADER::" << typeName << "::COMPILATION_FAILED\n" << infoLog << "\n";
-        std::cerr << "Shader source:\n" << source << "\n";
+        LOG_ERROR("ERROR::SHADER::" , typeName , "::COMPILATION_FAILED\n" ,infoLog);
+        LOG_ERROR("Shader source:\n", source);
         glDeleteShader(shader);
         throw std::runtime_error("Shader compilation failed");
     }

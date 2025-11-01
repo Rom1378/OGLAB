@@ -10,7 +10,7 @@ namespace PrefabManager {
 
 	void registerPrefab(const PrefabDefinition& prefabDef) {
 		prefabs[prefabDef.name] = prefabDef;
-		std::cout << "Registered prefab: " << prefabDef.name << std::endl;
+		LOG("Registered prefab : ", prefabDef.name);
 	}
 
 
@@ -20,7 +20,7 @@ namespace PrefabManager {
 
 	std::shared_ptr<GameObject> instantiate(const std::string& prefabName, const glm::vec3& position) {
 		if (!hasPrefab(prefabName)) {
-			std::cerr << "Error: Prefab '" << prefabName << "' not found!" << std::endl;
+			LOG_ERROR("Error: Prefab '" , prefabName , "' not found!");
 			return nullptr;
 		}
 

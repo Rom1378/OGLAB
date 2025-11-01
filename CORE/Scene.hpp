@@ -10,6 +10,7 @@ class CameraComponent;
 class Scene {
 public:
 	Scene();
+	//Scene(const std::string & save);
 
 
 	virtual ~Scene() = default;
@@ -19,8 +20,10 @@ public:
 	virtual void onRender() {}
 	virtual void onImGuiRender() {}
 
-	void update(float dt);
+	void saveScene(const std::string& file);
+	
 
+	void update(float dt);
 
 	void renderShadowCasters(const glm::mat4& lightMatrix);
 	void renderMainPass();
@@ -56,12 +59,16 @@ public:
 	inline void setDevCamera(const std::shared_ptr<GameObject>& cam) { m_devCamera = cam; }
 
 
+	inline void setPlaySimulation(bool v) { play_simulation = v; }
+	inline bool getIsSimlationPlaying() const { return play_simulation; }
 protected:
 
 	enum mode {
 		EDIT,
 		PLAY
 	} currentMode;
+
+	bool play_simulation{ 1 };
 
 
 

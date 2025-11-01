@@ -23,7 +23,7 @@ file(GLOB_RECURSE engine CORE/*.c CORE/*.cpp CORE/*.h CORE/*.hpp)
 file(GLOB_RECURSE sources_src src/*.c src/*.cpp src/*.h src/*.hpp)
 file(GLOB_RECURSE resources res/*)
 
-set(sources ${sources_src} ${engine} ${resources})
+set(sources ${sources_src} ${engine} )
 add_executable(${PROJECT_NAME} ${sources})
 
 

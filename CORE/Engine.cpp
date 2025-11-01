@@ -49,6 +49,8 @@ namespace Engine {
 
 		LineRenderer::init();
 
+		Window::setVSync(1);
+
 	}
 
 	void shutdown() {
@@ -114,8 +116,8 @@ namespace Engine {
 		// Render scene normally
 		scene->renderMainPass();
 
-		// Physx debug pass
 		scene->renderPhysxDebugPass();
+		// Physx debug pass
 
 		// Render UI pass 
 		scene->renderUIPass();

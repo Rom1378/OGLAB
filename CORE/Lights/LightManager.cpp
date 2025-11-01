@@ -53,7 +53,7 @@ namespace LightManager
 
 	void bindShadowMap(std::shared_ptr<ShaderProgram> shader) {
 		if (!shader) {
-			std::cerr << "Error: Invalid shader program in bindShadowMap" << std::endl;
+			LOG_ERROR("Error: Invalid shader program in bindShadowMap");
 			return;
 		}
 
@@ -62,7 +62,7 @@ namespace LightManager
 		// Set the shadow map uniform
 		GLint shadowMapLoc = glGetUniformLocation(shader->getProgram(), "shadowMap");
 		if (shadowMapLoc == -1) {
-			std::cerr << "Warning: shadowMap uniform not found in shader" << std::endl;
+			LOG_ERROR("Warning: shadowMap uniform not found in shader");
 			return;
 		}
 

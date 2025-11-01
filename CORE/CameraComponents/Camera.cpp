@@ -160,6 +160,7 @@ void CameraComponent::setFarPlane(float far) {
 
 void CameraComponent::onImGuiRender() {
 
+
 	TransformableComponent::onImGuiRender();
 	glm::vec3 pos = getLocalPosition();
 	glm::vec3 rot = getLocalRotation();

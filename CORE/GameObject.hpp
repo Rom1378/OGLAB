@@ -83,16 +83,20 @@ public:
 	void render(std::shared_ptr<CameraComponent> cam) const;
 
 	// Set position and update physics component if exists
-	void setPosition(const glm::vec3& position, bool update_physx = true);
-	void setPosition(float x, float y, float z, bool update_physx = true); 
-	void setPosition(const PxVec3d& p, bool update_physx = true);
-	void setPosition(const PxVec3& p, bool update_physx = true); 
+	virtual void setPosition(const glm::vec3& position, bool update_physx = true);
+	virtual void setPosition(float x, float y, float z, bool update_physx = true);
+	virtual virtual void setPosition(const PxVec3d& p, bool update_physx = true);
+	virtual void setPosition(const PxVec3& p, bool update_physx = true);
 
 	
 	void move(const glm::vec3& offset, bool update_physx = true);
+	void move(const PxVec3d& offset, bool update_physx = true);
+	void move(float x, float y, float z, bool update_physx = true);
 
 	//set rotation and update physics component if exists
 	void setRotation(const glm::vec3& rotation, bool update_physx = true);
+
+	void rotate(const glm::vec3& offset, bool update_physx = true);
 
 	// Add this to your GameObject class
 	void setRotationQuaternion(const glm::quat& rotation, bool update_physx = true);
@@ -137,6 +141,8 @@ public:
 	const char* getName() const { return m_name.c_str(); }
 
 private:
+	void update_physx_component() const ;
+
 	std::vector<std::shared_ptr<Component>> m_components;
 	//gameobject name
 	std::string m_name;

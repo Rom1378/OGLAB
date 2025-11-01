@@ -3,13 +3,13 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "Debug.hpp"
+#include "CORE/Debug.hpp"
 
 
 void TransformableComponent::onImGuiRender() {
 
-    ImGui::SliderFloat3("Local Component Position", glm::value_ptr(m_localPosition), -100.0f, 100.0f);
-    ImGui::SliderFloat3("Local Component Rotation", glm::value_ptr(m_localRotation), -180.0f, 180.0f);
+    ImGui::DragFloat3("Local Component Position", glm::value_ptr(m_localPosition), 0.2f, -100.0f, 100.0f);
+    ImGui::DragFloat3("Local Component Rotation", glm::value_ptr(m_localRotation), 0.2f, -180.0f, 180.0f);
 }
 
 
@@ -41,6 +41,10 @@ glm::vec3 TransformableComponent::getWorldDirection() const {
 
 glm::vec3 TransformableComponent::getLocalRotation() const {
     return m_localRotation;
+}
+
+glm::quat TransformableComponent::getLocalRotationQuat() const {
+    return glm::quat(m_localRotation);
 }
 
 glm::vec3 TransformableComponent::getLocalPosition() const {

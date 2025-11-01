@@ -108,7 +108,7 @@ void Mesh::Draw(std::shared_ptr<ShaderProgram> shader,
 }
 
 void Mesh::printInfo() const {
-	std::cout << "Mesh Info:\n";
+	LOG("Mesh Info : \n");
 	std::cout << "  Vertices: " << vertices.size() << "\n";
 	std::cout << "  Indices: " << indices.size() << "\n";
 	std::cout << "  Textures: " << textures.size() << "\n";

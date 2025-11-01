@@ -42,8 +42,8 @@ int main() {
 
 			Engine::update(&scene); //scene update
 
-			Engine::render(&scene);
 
+			Engine::render(&scene);
 
 			//IMGUI rendering
 			Window::drawImGuiInterface(); // ImGUI NEWFRAME + FRAME BUFFER

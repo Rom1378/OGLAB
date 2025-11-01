@@ -13,6 +13,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "CORE/Debug.hpp"
+
 
 
 namespace TextureManager
@@ -24,7 +26,7 @@ namespace TextureManager
 
 	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name)
 	{
-		std::cout << "Loading texture: " << path << std::endl;
+		LOG("Loading texture: ", path);
 
 		//first check if the texture hasnt already been loaded :
 		auto it = Internal::textures.find(name);
@@ -61,7 +63,7 @@ namespace TextureManager
 			}
 			else
 			{
-				std::cerr << "TextureManager: Unsupported number of channels: " << nrChannels << std::endl;
+				LOG_ERROR("TextureManager: Unsupported number of channels: " ,nrChannels);
 			}
 			glGenerateMipmap(GL_TEXTURE_2D);
 			texture->width = width;
@@ -69,7 +71,7 @@ namespace TextureManager
 		}
 		else
 		{
-			std::cerr << "TextureManager: Failed to load texture: " << path << std::endl;
+			LOG_ERROR("TextureManager: Failed to load texture: " , path);
 		}
 		stbi_image_free(data);
 
@@ -235,8 +237,7 @@ namespace TextureManager
 
 		// Calculate resolution based on source
 		const int cubemapSize = calculateOptimalCubemapSize(hdrInfo.width, hdrInfo.height);
-		std::cout << "Converting HDR (" << hdrInfo.width << "x" << hdrInfo.height
-			<< ") to cubemap " << cubemapSize << "x" << cubemapSize << std::endl;
+		LOG("Converting HDR (" ,hdrInfo.width , "x" , hdrInfo.height , ") to cubemap " ,cubemapSize , "x" , cubemapSize);
 
 		// Create cubemap texture with calculated size
 		auto cubemap = std::make_shared<Texture>();

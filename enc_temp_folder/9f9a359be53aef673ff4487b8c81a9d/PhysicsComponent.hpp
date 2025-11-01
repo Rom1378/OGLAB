@@ -53,7 +53,7 @@ public:
 	void setAngularVelocity(const glm::vec3& velocity);
 	void setLinearVelocity(const glm::vec3& velocity);
 
-	virtual void updateTransform(); // that fetch PHYSX transform and update gameobject.
+	virtual void updateTransform(); // function that fetch PHYSX transform and update gameobject.
 
 	virtual void updateRotation();
 	virtual void updatePosition();

@@ -86,7 +86,6 @@ public:
 			if (collisionFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 				m_velocity.y = 0.0f;
 
-			// update GameObject 
 			updateTransform();
 
 			//m_gameObject->move(m_playerController->get);
@@ -106,8 +105,6 @@ public:
 
 	void setRotation(const glm::vec3& rotation) override {	} //no need for rotation
 	void setRotationQuaternion(const glm::quat& worldRotation) override {} //no need for rotation
-
-	// update GameObject position based on the physx fetched results
 	void updateTransform() override {
 		if (body and this->m_attachedToGameObject) {
 			PxTransform pxTransform = body->getGlobalPose();

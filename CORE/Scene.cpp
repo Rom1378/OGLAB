@@ -6,9 +6,8 @@
 #include "CameraComponents/CameraControllerComponent.hpp"
 #include "Engine.hpp"
 
-
-Scene::Scene() : m_current_camera(nullptr), m_current_camera_component{nullptr}, m_cubemap(nullptr),
-m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{EDIT}
+Scene::Scene() : m_current_camera(nullptr), m_current_camera_component{ nullptr }, m_cubemap(nullptr),
+m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{ EDIT }, play_simulation{ 1 }
 {
     m_physicsScene = std::make_shared<PhysicsScene>();
     m_physicsScene->init();
@@ -16,19 +15,17 @@ m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{EDIT}
     m_devCamera = std::make_shared<GameObject>("Dev Camera");
     m_current_camera_component=m_devCamera->addComponent<CameraMCComponent>();
     m_devCamera->addComponent<CameraControllerComponent>();
-
 }
 void Scene::update(float dt) { 
-    if(m_current_camera)
-        m_current_camera->update(dt);
 
-    // EDIT MODE
+    // EDIT MODE // the SCENE should be paused
     if (Input::isKeyJustPressed(GLFW_KEY_F1)) {
         currentMode = EDIT;
         m_current_camera = m_devCamera;
         m_current_camera_component = m_devCamera->getComponent<CameraComponent>();
         LOG("Switched to EDIT mode");
     }
+    // PLAY MORE THE scenes GameObj should be updated
     else if (Input::isKeyJustPressed(GLFW_KEY_F2)) {
         Engine::reset_dt();
         currentMode = PLAY;
@@ -42,18 +39,22 @@ void Scene::update(float dt) {
   
     switch (currentMode) {
     case PLAY:
-        m_physicsScene->update(dt);
-        for (auto& gameObject : m_gameObjects) {
-            gameObject->update(dt);
+        if (Input::isMouseLocked()) {
+            if (play_simulation)
+                m_physicsScene->update(dt);
+            for (auto& gameObject : m_gameObjects) {
+                gameObject->update(dt);
+            }
         }
+   
 
-        onUpdate();
         break;
     case EDIT:
-
+        if (m_current_camera && Input::isMouseLocked())
+            m_current_camera->update(dt);
         break;
     }
-   
+        onUpdate();
 
 }
 
@@ -132,12 +133,14 @@ void Scene::renderPhysxDebugPass() {
         m_physicsScene->renderDebugVisualization(m_current_camera_component);
 	}
 	else {
-		LOG_WARN("Physics scene is null, cannot render debug pass");
+        LOG_WARN("Physics scene is null, cannot render debug pass");
 	}
 
 }
 
+void saveScene(const std::string& file) {
 
 
+}
 
 

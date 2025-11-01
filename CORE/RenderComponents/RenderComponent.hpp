@@ -11,15 +11,15 @@
 #include <iostream>
 #include "../CameraComponents/Camera.hpp"
 
-class RenderComponent : public Component {
+class RenderComponent : public TransformableComponent {
 public:
-	RenderComponent() : Component(), m_color(glm::vec4(1, 1, 1, 1)), m_renderer(nullptr), m_shader(nullptr),
+	RenderComponent() : TransformableComponent(), m_color(glm::vec4(1, 1, 1, 1)), m_renderer(nullptr), m_shader(nullptr),
 		VAO(0), VBO(0), EBO(0), m_isShadowCaster(false), m_isShadowReceiver(false) {	}
-	RenderComponent(bool isShadowCaster, bool isShadowReceiver) : Component(), m_color(glm::vec4(1, 1, 1, 1)), m_renderer(nullptr), m_shader(nullptr),
+	RenderComponent(bool isShadowCaster, bool isShadowReceiver) : TransformableComponent(), m_color(glm::vec4(1, 1, 1, 1)), m_renderer(nullptr), m_shader(nullptr),
 		VAO(0), VBO(0), EBO(0), m_isShadowCaster(isShadowCaster), m_isShadowReceiver(isShadowReceiver) {	}
-	RenderComponent(const glm::vec4& color) : Component(), m_color(color), m_renderer(nullptr), m_shader(nullptr),
+	RenderComponent(const glm::vec4& color) : TransformableComponent(), m_color(color), m_renderer(nullptr), m_shader(nullptr),
 		VAO(0), VBO(0), EBO(0), m_isShadowCaster(false), m_isShadowReceiver(false) {	}
-	RenderComponent(const glm::vec4& color, bool isShadowCaster, bool isShadowReceiver) : Component(), m_color(color), m_renderer(nullptr), m_shader(nullptr),
+	RenderComponent(const glm::vec4& color, bool isShadowCaster, bool isShadowReceiver) : TransformableComponent(), m_color(color), m_renderer(nullptr), m_shader(nullptr),
 		VAO(0), VBO(0), EBO(0), m_isShadowCaster(isShadowCaster), m_isShadowReceiver(isShadowReceiver) {	}
 
 	virtual void draw(const glm::mat4& view, const glm::mat4& projection) {};
