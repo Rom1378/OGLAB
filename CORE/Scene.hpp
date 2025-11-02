@@ -25,6 +25,7 @@ public:
 
 	void update(float dt);
 
+
 	void renderShadowCasters(const glm::mat4& lightMatrix);
 	void renderMainPass();
 	void renderUIPass();
@@ -61,6 +62,9 @@ public:
 
 	inline void setPlaySimulation(bool v) { play_simulation = v; }
 	inline bool getIsSimlationPlaying() const { return play_simulation; }
+
+private: 
+	void update_components(float dt);
 protected:
 
 	enum mode {

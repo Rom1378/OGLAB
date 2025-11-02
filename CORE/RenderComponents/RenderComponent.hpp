@@ -48,6 +48,9 @@ public:
 
     const char* getName() override { return "RenderComponent"; }
 
+	void onImGuiRender() override;
+
+
 protected:
 
 	std::shared_ptr<InterfaceRenderer> m_renderer;

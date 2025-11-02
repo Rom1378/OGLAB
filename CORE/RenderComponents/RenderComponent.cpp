@@ -1,5 +1,5 @@
 #include "RenderComponent.hpp"
-
+#include "imgui.h"
 
 void RenderComponent::setRenderer(std::shared_ptr<InterfaceRenderer> renderer)
 {
@@ -38,4 +38,12 @@ void RenderComponent::unBindTextures() {
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+}
+
+
+void RenderComponent::onImGuiRender() {
+	TransformableComponent::onImGuiRender();
+	ImGui::BeginChild("RenderComponent");
+	ImGui::ColorEdit4("Color", glm::value_ptr(m_color));
+	ImGui::EndChild();
 }

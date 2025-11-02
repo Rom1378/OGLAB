@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <list>
 #include <string>
 #include "Debug.hpp"
 #include "Transform.hpp"
@@ -28,8 +29,18 @@ public:
 		static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
 		std::shared_ptr<T> component = std::make_shared<T>();
 		component->setGameObject(this);
-		m_components.push_back(component);
+
+		//cameras are stored at the end because they must be updated last.
+		if (auto camera_component = std::dynamic_pointer_cast<CameraComponent>(component))
+			m_components.push_back(camera_component);
+		else //not a camera component
+			m_components.push_front(component);
+
+
 		component->init();
+		if (auto physicsComponent = std::dynamic_pointer_cast<PhysicsComponent>(component))
+			physicsComponent->setUserData(this);
+
 		return component;
 	}
 
@@ -41,13 +52,21 @@ public:
 
 		std::shared_ptr<T> component = std::make_shared<T>(std::forward<Args>(args)...);
 		component->setGameObject(this);
-		m_components.push_back(component);
+		
+		
+		
+
+		//cameras are stored at the end because they must be updated last.
+		if (auto camera_component = std::dynamic_pointer_cast<CameraComponent>(component))
+			m_components.push_back(camera_component);
+		else //not a camera component
+			m_components.push_front(component);
+
 		component->init();
-		//if physx component put gameobject ptr as userdata
 		if (auto physicsComponent = std::dynamic_pointer_cast<PhysicsComponent>(component))
-		{
 			physicsComponent->setUserData(this);
-		}
+		
+		component->init();
 
 		return component;
 	}
@@ -68,7 +87,7 @@ public:
 	}
 
 	//return all components
-	inline std::vector<std::shared_ptr<Component>>const& getAllComponents() const { return this->m_components; }
+	inline std::list<std::shared_ptr<Component>>const& getAllComponents() const { return m_components; }
 
 	// Update all components
 	void update(float dt);
@@ -143,7 +162,7 @@ public:
 private:
 	void update_physx_component() const ;
 
-	std::vector<std::shared_ptr<Component>> m_components;
+	std::list<std::shared_ptr<Component>> m_components;
 	//gameobject name
 	std::string m_name;
 

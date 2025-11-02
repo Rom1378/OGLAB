@@ -36,26 +36,37 @@ void Scene::update(float dt) {
 
         LOG("Switched to PLAY mode");
     }
-  
-    switch (currentMode) {
-    case PLAY:
-        if (Input::isMouseLocked()) {
-            if (play_simulation)
-                m_physicsScene->update(dt);
-            for (auto& gameObject : m_gameObjects) {
-                gameObject->update(dt);
-            }
-        }
-   
+    else if (Input::isKeyJustPressed(GLFW_KEY_F3)) {
+        LOG_OK("change play_simulation state:", play_simulation);
+        play_simulation = !play_simulation;
+        if (play_simulation)
+            Engine::reset_dt();
 
-        break;
-    case EDIT:
-        if (m_current_camera && Input::isMouseLocked())
-            m_current_camera->update(dt);
-        break;
     }
-        onUpdate();
 
+    if (currentMode == PLAY) {
+        if (Input::isMouseLocked()) {
+            m_physicsScene->update(dt);
+            update_components(dt);// m_current_camera will be updated by the gameobject
+        }
+    }
+    // EDIT MODE =>
+    else if (currentMode == EDIT) {
+        if (play_simulation) {
+            m_physicsScene->update(dt);
+            update_components(dt);
+            if (Input::isMouseLocked())
+                m_devCamera->update(dt);
+            //m_current_camera->update(dt);
+
+        }
+        else {
+            if (m_current_camera && Input::isMouseLocked())
+                m_current_camera->update(dt);
+        }
+    }
+
+    onUpdate();
 }
 
 
@@ -143,4 +154,8 @@ void saveScene(const std::string& file) {
 
 }
 
-
+void Scene::update_components(float dt) {
+    for (auto& gameObject : m_gameObjects) {
+        gameObject->update(dt);
+    }
+}

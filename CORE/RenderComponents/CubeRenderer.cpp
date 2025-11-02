@@ -50,7 +50,9 @@ void CubeRenderer::renderRawGeometry(const glm::mat4& lightSpaceMatrix) {
 	depthShader->use();
 
 	// Only need model and light space matrix
-	depthShader->setMat4("model", glm::value_ptr(getGameObject()->getModelMatrix()));
+	depthShader->setMat4("model", glm::value_ptr(
+		getWorldMatrix()));
+		//getGameObject()->getModelMatrix()));
 	depthShader->setMat4("lightSpaceMatrix", glm::value_ptr(lightSpaceMatrix));
 
 	// Draw bare geometry
@@ -66,7 +68,9 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<CameraComponent>& c
 	m_shader->use();
 
 	// Standard matrix uniforms
-	m_shader->setMat4("model", glm::value_ptr(getGameObject()->getModelMatrix()));
+	m_shader->setMat4("model", glm::value_ptr(
+		
+		getGameObject()->getModelMatrix()));
 	m_shader->setMat4("view", glm::value_ptr(cam->getViewMatrix()));
 	m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
 	m_shader->setMat4("lightSpaceMatrix", LightManager::getShadowMapper()->getLightSpaceMatrix());

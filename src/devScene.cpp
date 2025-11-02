@@ -122,12 +122,13 @@ void DevScene::onUpdate() {
 			hitRaycastObject = static_cast<GameObject*>(hitInfo.actor->userData);
 
 
-			if (Input::isMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT)) {
+			if (Input::isKeyJustPressed(GLFW_KEY_E)) {
 				if (currentMode == PLAY) {
 					// If in EDIT mode, add a cube at the hit position
-					auto cube = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
-					cube->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
-					addGameObject(cube);
+					auto sphere = PrefabManager::instantiate("SpherePrefab", glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));
+					//sphere->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
+					addGameObject(sphere);
+
 					//const auto& tree = std::make_shared<GameObject>("Trees");
 					//tree->addComponent<ModelRenderer>("res/3DModels/various-forest-assets-pack/source/ForestAssetsLibrary.glb");
 					//tree->setPosition(glm::vec3(hitInfo.position.x, hitInfo.position.y, hitInfo.position.z));

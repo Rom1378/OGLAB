@@ -9,7 +9,7 @@ public:
 	Player(const char* name) : GameObject(name) {
 	
 		m_camera = addComponent<CameraMCComponent>(65, 1280.0f / 720.0f, 0.1f, 100000.0f);
-		m_camera->setPosition(glm::vec3(0.0f, 0.5f, 0.0f));
+		m_camera->setPosition(glm::vec3(0.0f, 1.5f, 0.0f));
 		m_camera->setRotation(glm::vec3(0.0f, 1.0f, 0.0f));
 
 		m_playerController = addComponent<PlayerControllerComponent>();
@@ -17,8 +17,12 @@ public:
 
 		const auto& paleVisitoModel = addComponent<ModelRenderer>("res/3DModels/paleVisitor/source/PaleVisitor.fbx");
 		paleVisitoModel->setRotation(-90, 0, 0);
+		paleVisitoModel->setPosition(0, -2, 0);
+
 		const auto& DAMICROWAVE= addComponent<ModelRenderer>("res/3DModels/DAMICROWAVE.fbx");
 		DAMICROWAVE->setRotation(0, 0, 0);
+		DAMICROWAVE->setPosition(0, 0.6, 0);
+
 	}
 
 

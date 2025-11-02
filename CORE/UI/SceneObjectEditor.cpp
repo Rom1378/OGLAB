@@ -31,16 +31,14 @@ namespace UI {
 
 
 
-				for (uint32_t i = 0; i < objComponents.size();i++) {
-					// Component as a leaf node
+				uint32_t i{ 0 };
+				for (auto it{ objComponents.begin() }; it != objComponents.end(); it++,i++) {
 					ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-					//std::string id=std::to_string(i) + std::string
-
-					ImGui::TreeNodeEx(std::format("{}_{}", i,objComponents[i]->getName()).c_str(), flags | ImGuiTreeNodeFlags_Selected * (objComponents[i] == selected_component));
+					ImGui::TreeNodeEx(std::format("{}_{}", i, it->get()->getName()).c_str(), flags | ImGuiTreeNodeFlags_Selected * (*it == selected_component));
 
 					if (ImGui::IsItemClicked()) {
 						selected_gameobject = gameObjects[y];
-						selected_component = objComponents[i];
+						selected_component = *it;
 					}
 				}
 				ImGui::TreePop();
