@@ -13,20 +13,22 @@ class GameObject;
 class Component
 {
 public:
+	Component() = delete;
 	virtual ~Component() = default;
 	virtual void init() {}
 	virtual void update(float dt) {}
 	virtual void onImGuiRender();
 	virtual const char* getName() = 0;//{ return "Unamed"; }
 
-	GameObject* getGameObject() const { return m_gameObject; }
-	void setGameObject(GameObject* gameObject) { m_gameObject = gameObject; }
+	GameObject* getGameObjectPtr() const { return &m_gameObject; }
+	GameObject& getGameObject() const { return m_gameObject; }
+	void setGameObject(GameObject& gameObject) { m_gameObject = gameObject; }
 
 
 
 protected:
 
-	GameObject* m_gameObject;
+	GameObject& m_gameObject;
 
 
 }; // class Component

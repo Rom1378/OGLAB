@@ -4,14 +4,17 @@
 #include "CORE/Physics.hpp"
 #include <glm/gtx/matrix_decompose.hpp>
 
-class PlayerControllerComponent : public PhysicsComponent {
+class CapsuleMotorComponent: public PhysicsComponent {
 
 public:
 
-	PlayerControllerComponent(const PxCapsuleControllerDesc& desc) : m_desc{ desc }, m_playerController{ nullptr } {
+	CapsuleMotorComponent(const PxCapsuleControllerDesc& desc) : m_desc{ desc }, m_playerController{ nullptr } {
 		m_playerController = Physics::getControllerManger().createController(desc);
 	}
-	PlayerControllerComponent() : m_playerController{ nullptr } {}
+	
+	CapsuleMotorComponent() : m_playerController{ nullptr }, m_velocity{ 0 } {
+		std::cout << " CONTRUCTOR CALLED " << std::endl;
+	}
 	void init() override {
 
 		m_desc.height = 2.0f;
@@ -34,67 +37,31 @@ public:
 		body = m_playerController->getActor();
 		this->material = material;
 
-
 	}
 
-	~PlayerControllerComponent() {
+	~CapsuleMotorComponent() {
 		m_playerController->release();
 	}
+
+	void setVelocity(glm::vec3 vel) { 
+		this->m_velocity = vel;
+
+	}
+
+	glm::vec3 getVelocity() const { return m_velocity; }
+	
 	void update(float dt) override {
+
+		//return;
 
 		if (!m_gameObject)
 			return;
-		const auto& camera = m_gameObject->getComponent<CameraComponent>();
-		//const auto& transform = 
-		if (camera and camera->isAttachedToGameObject()) {
-
-			glm::vec3 forward = camera->getForward();
-			forward.y = 0;
-			forward = glm::normalize(forward);
-			glm::vec3 right = camera->getRight();
-
-			if (Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT))
-				m_actualSpeed = m_sprintSpeed;
-			else
-				m_actualSpeed = m_walkSpeed;
-
-			if (Input::isKeyPressed(GLFW_KEY_W)) {
-				m_velocity += forward * m_actualSpeed * dt;
-			}
-			if (Input::isKeyPressed(GLFW_KEY_S)) {
-				m_velocity -= forward * m_actualSpeed * dt;
-			}
-			if (Input::isKeyPressed(GLFW_KEY_A)) {
-				m_velocity -= right * m_actualSpeed * dt;
-			}
-			if (Input::isKeyPressed(GLFW_KEY_D)) {
-				m_velocity += right * m_actualSpeed * dt;
-			}
-
-			if (Input::isKeyJustPressed(GLFW_KEY_SPACE)) {
-				m_velocity.y = m_jump_force;// *dt;//m_actualSpeed * dt;
-			}
-			if (Input::isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
-				m_velocity.y = -m_jump_force;// *dt;//m_actualSpeed * dt;
-			}
-
-			m_velocity.y += -9.81f * dt;
 
 			PxControllerCollisionFlags collisionFlags =
-				m_playerController->move(PxVec3(m_velocity.x, m_velocity.y, m_velocity.z), 0.001f, dt, PxControllerFilters());
+				m_playerController->move(PxVec3(this->m_velocity.x, this->m_velocity.y, this->m_velocity.z), 0.001f, dt, PxControllerFilters());
 
 			if (collisionFlags & PxControllerCollisionFlag::eCOLLISION_DOWN)
 				m_velocity.y = 0.0f;
-
-			// update GameObject 
-			updateTransform();
-
-			//m_gameObject->move(m_playerController->get);
-
-			m_velocity.x = 0.0f;
-			m_velocity.z = 0.0f;
-
-		}
 
 	}
 
@@ -134,7 +101,7 @@ public:
 
 			// Update GameObject with quaternion directly
 
-			getGameObject()->setPosition(position, false);
+			getGameObject().setPosition(position, false);
 			//getGameObject()->setRotationQuaternion(rotation, false);
 		}
 	}
@@ -161,19 +128,25 @@ public:
 
 	void updatePhysX() override {
 		setPosition(getWorldPosition());
+
 		//setRotation(getLocalRotation());
 		// m_playerController->setPosition(m_gameObject->getModelMatrix() * getLocalMatrix());
 	}
 
+	float get_walkSpeed() const { return m_walkSpeed; }
+	float get_sprintSpeed() const { return m_sprintSpeed; }
+	float get_jumpForce() const { return m_jump_force; }
+
+	bool is_sprinting() const { return m_isSprinting; }
+	void set_isSprinting(bool v) { m_isSprinting = v; }
+
 private:
-	const float m_walkSpeed = 3.0f;
-	const float m_sprintSpeed = 6.0f;
+	const float m_walkSpeed = 23.0f;
+	const float m_sprintSpeed = 46.0f;
 	const float m_jump_force{ 3.0f };
-	float m_actualSpeed = m_walkSpeed;
 	glm::vec3 m_velocity{ 0.0f,0.0f,0.0f };
 	glm::vec3 speed{ 0.0f,0.0f,0.0f };
 	bool m_isSprinting = 0;
-	bool m_isWalking{ 0 };
 
 	PxCapsuleControllerDesc m_desc;
 	PxController* m_playerController;

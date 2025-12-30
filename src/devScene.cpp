@@ -3,11 +3,10 @@
 #include <CORE/PhysicsScene.hpp>
 #include "Player.hpp"
 #include <CORE/RenderComponents/SphereRenderer.hpp>
+#include "CORE/Controllers/PlayerController.hpp"
 
 
 void DevScene::init() {
-	
-
 	
 	//auto prefCube = PrefabManager::instantiate("DynamicCubePrefab");
 	//addGameObject(prefCube);
@@ -84,10 +83,24 @@ void DevScene::init() {
 
 	addGameObject(player);
 
+	auto pc = std::make_unique<PlayerController>();
+	pc->set_target_object(player);
+	m_controllers.push_back(std::move(pc));
+
+
+
+
+	auto planetOne = std::make_shared<Planet>("planet ONE", 1000, 999999);
+	planetOne->setPosition(0, 10000, 0);
+
+
+	addGameObject(planetOne);
+
+
 
 	auto sunLightObj = std::make_shared<GameObject>("SunLight");
 	sunLightObj->addComponent<Light>(LightType::DIRECTIONAL,
-		glm::vec3(-2.0f, 200.0f, -1.0f),  // Position high up
+		glm::vec3(-2.0f, 200000.0f, -1.0f),  // Position high up
 		glm::vec3(-0.5f, -1.0f, -0.3f),  // Direction - angled for better shadows
 		glm::vec3(1.0f, 0.95f, 0.8f),    // Warm sunlight color
 		1.0f);
@@ -113,6 +126,12 @@ void DevScene::onUpdate() {
 		auto c = PrefabManager::instantiate("DynamicCubePrefab", glm::vec3(0.0f, 140.0f, 0.0f));
 		c->getComponent<RenderComponent>()->addTexture(TextureManager::getTexture("CAT.png"));
 	}
+
+
+	//if (!m_CameraRotationController->get_target_object())
+	//	m_CameraRotationController->set_target_object(getGameObject("Player"));
+
+
 	
 	else {
 

@@ -14,7 +14,6 @@ class CameraComponent : public TransformableComponent {
 public:
 	CameraComponent(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f);
 
-
 	void update(float dt) override;
 	// Camera control methods
 	void setPosition(const glm::vec3& pos);
@@ -49,6 +48,9 @@ public:
 	
 	const char* getName() override { return "Camera"; }
 
+	float getSensitivity() const { return m_sensitivity; }
+	float getYaw() const { return yaw; }
+	float getPitch() const { return pitch; }
 
 protected:
 	glm::vec3 m_forward{ 0.0f, 0.0f, -1.0f }; // Forward direction
@@ -63,6 +65,7 @@ protected:
 	float nearPlane;
 	float farPlane;
 	float maxLightDistance;
+	float m_sensitivity = 0.1f;
 
 	float yaw = 0.0f;
 	float pitch = 0.0f;

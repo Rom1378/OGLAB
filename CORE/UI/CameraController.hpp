@@ -6,7 +6,7 @@
 #include "imgui_impl_opengl3.h"
 
 namespace UI {
-	inline void UICameraController(std::shared_ptr<CameraComponent> cam) {
+	inline void UICameraRotationController(std::shared_ptr<CameraComponent> cam) {
 		if (!cam) {
 		///	LOG_WARN("camera is null");
 			return;

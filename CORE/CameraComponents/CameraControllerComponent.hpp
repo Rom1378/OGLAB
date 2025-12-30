@@ -1,15 +1,16 @@
 
+/*
 #pragma once
 
 #include "CORE/CameraComponents/Camera.hpp"
 #include "CORE/GameObject.hpp"
 
 
-class CameraControllerComponent : public Component {
+class CameraRotationControllerComponent : public Component {
 
 public:
-	CameraControllerComponent(float speed = 14.0) : m_speed{ speed } {}
-	~CameraControllerComponent() = default;
+	CameraRotationControllerComponent(float speed = 14.0) : m_speed{ speed } {}
+	~CameraRotationControllerComponent() = default;
 
 	void init() {}
 	void update(float dt) {
@@ -59,14 +60,16 @@ public:
 
 	}
 	void onImGuiRender() {
-		ImGui::Begin("CameraControllerComponent");
+		ImGui::Begin("CameraRotationControllerComponent");
 		ImGui::DragFloat("m_speed", &m_speed, 0.2, 0.01, 30.0);
 		ImGui::End();
 	}
-	const char* getName() { return "CameraControllerComponent"; }
+	const char* getName() { return "CameraRotationControllerComponent"; }
 
 private:
 
 	float m_speed;
 
 };
+
+*/

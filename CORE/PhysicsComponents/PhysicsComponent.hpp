@@ -68,7 +68,7 @@ public:
 
 	// Override update to call updateTransform
 	void update(float dt) override {
-		updateTransform();
+		//updateTransform();
 	}
 	// Set the position and rotation of the physics body from the GameObject
 

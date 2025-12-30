@@ -3,26 +3,65 @@
 #include "PhysicsComponents/PhysicsComponent.hpp"
 #include "renderComponents/Cursor.hpp"
 #include "CameraComponents/CameraMC.hpp"
-#include "CameraComponents/CameraControllerComponent.hpp"
 #include "Engine.hpp"
+#include "CORE/PhysicsSystem.hpp"
+#include "CORE/Controllers/CameraRotationController.hpp"
+
 
 Scene::Scene() : m_current_camera(nullptr), m_current_camera_component{ nullptr }, m_cubemap(nullptr),
-m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{ EDIT }, play_simulation{ 1 }
+m_devCamera{ nullptr }, m_gameCamera{ nullptr }, currentMode{ EDIT }, play_simulation{ 1 }, m_CameraRotationController{ nullptr }
 {
     m_physicsScene = std::make_shared<PhysicsScene>();
     m_physicsScene->init();
+
+
+    //Default GameObjects
     
     m_devCamera = std::make_shared<GameObject>("Dev Camera");
     m_current_camera_component=m_devCamera->addComponent<CameraMCComponent>();
-    m_devCamera->addComponent<CameraControllerComponent>();
+    //m_devCamera->addComponent<CameraRotationControllerComponent>();
+
+
+
+
+    m_CameraRotationController = std::make_shared<CameraRotationController>();
+    m_CameraRotationController->set_target_object(m_devCamera);
+    m_controllers.push_back(m_CameraRotationController);
+
+
 }
 void Scene::update(float dt) { 
 
-    // EDIT MODE // the SCENE should be paused
+    std::cout << m_CameraRotationController->get_target_object()->getName() << std::endl;;
+
+    // 1 Update controllers
+    for (const auto& ctrle : m_controllers) {
+        ctrle->update(dt);
+    }
+
+    // 2 Update GameObjects
+    for (auto& gameObject : m_gameObjects) {
+        gameObject->update(dt);
+    }
+    m_devCamera->update(dt);
+
+    // 3 Play physx simulation
+    if (play_simulation) {
+        m_physicsScene->update(dt);
+
+        //sync opengl pos with physx
+        PhysicsSystem::SyncGameObjectsFromPhysx(m_gameObjects);
+    }
+
+
+    // EDIT MODE 
     if (Input::isKeyJustPressed(GLFW_KEY_F1)) {
         currentMode = EDIT;
         m_current_camera = m_devCamera;
         m_current_camera_component = m_devCamera->getComponent<CameraComponent>();
+        //m_CameraRotationController->set_target_object(m_devCamera);
+        m_CameraRotationController->set_target_object(m_current_camera);
+
         LOG("Switched to EDIT mode");
     }
     // PLAY MORE THE scenes GameObj should be updated
@@ -33,28 +72,32 @@ void Scene::update(float dt) {
             m_current_camera = m_gameCamera;
             m_current_camera_component = m_current_camera->getComponent<CameraComponent>();
         }
+        m_CameraRotationController->set_target_object(m_current_camera);
 
         LOG("Switched to PLAY mode");
     }
     else if (Input::isKeyJustPressed(GLFW_KEY_F3)) {
         LOG_OK("change play_simulation state:", play_simulation);
         play_simulation = !play_simulation;
-        if (play_simulation)
             Engine::reset_dt();
 
     }
 
-    if (currentMode == PLAY) {
-        if (Input::isMouseLocked()) {
+
+
+
+    /*
+    if (currentMode == PLAY && Input::isMouseLocked()) {
             m_physicsScene->update(dt);
-            update_components(dt);// m_current_camera will be updated by the gameobject
-        }
+            update_components(dt); // m_current_camera will be updated by the gameobject
+
     }
     // EDIT MODE =>
     else if (currentMode == EDIT) {
         if (play_simulation) {
             m_physicsScene->update(dt);
             update_components(dt);
+
             if (Input::isMouseLocked())
                 m_devCamera->update(dt);
             //m_current_camera->update(dt);
@@ -65,6 +108,7 @@ void Scene::update(float dt) {
                 m_current_camera->update(dt);
         }
     }
+    */
 
     onUpdate();
 }
@@ -152,10 +196,4 @@ void Scene::renderPhysxDebugPass() {
 void saveScene(const std::string& file) {
 
 
-}
-
-void Scene::update_components(float dt) {
-    for (auto& gameObject : m_gameObjects) {
-        gameObject->update(dt);
-    }
 }

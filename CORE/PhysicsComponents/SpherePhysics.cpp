@@ -15,18 +15,18 @@ void SpherePhysics::init() {
 		return;
 	}
 
-	GameObject* gm = getGameObject();
+	GameObject& gm = getGameObject();
 
-	glm::vec3 scale = gm->getScale();
+	glm::vec3 scale = gm.getScale();
 
 
 	// Position and rotation
-	PxVec3 position(gm->getPosition().x, gm->getPosition().y, gm->getPosition().z);
+	PxVec3 position(gm.getPosition().x, gm.getPosition().y, gm.getPosition().z);
 
 	// Convert glm::vec3 rotation (Euler angles) to PxQuat
-	PxQuat quat = PxQuat(glm::radians(gm->getRotation().x), PxVec3(1, 0, 0)) *
-		PxQuat(glm::radians(gm->getRotation().y), PxVec3(0, 1, 0)) *
-		PxQuat(glm::radians(gm->getRotation().z), PxVec3(0, 0, 1));
+	PxQuat quat = PxQuat(glm::radians(gm.getRotation().x), PxVec3(1, 0, 0)) *
+		PxQuat(glm::radians(gm.getRotation().y), PxVec3(0, 1, 0)) *
+		PxQuat(glm::radians(gm.getRotation().z), PxVec3(0, 0, 1));
 
 	PxTransform transform(position, quat);
 

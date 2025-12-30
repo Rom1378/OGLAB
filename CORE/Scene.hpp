@@ -3,6 +3,8 @@
 #include <vector>
 #include "RenderComponents/CubeMap.hpp"
 #include "RenderComponents/Cursor.hpp"
+#include "CORE/Controllers/Controller.hpp"
+#include "CORE/Controllers/CameraRotationController.hpp"
 
 class PhysicsScene;
 class CameraComponent;
@@ -36,6 +38,12 @@ public:
 
 	void addGameObject(std::shared_ptr<GameObject> gameObject);
 	inline std::vector<std::shared_ptr<GameObject>> const& getGameObjects() const { return m_gameObjects; }
+	inline std::shared_ptr<GameObject> const& getGameObject(std::string_view name) const { 
+		for (auto& go : m_gameObjects) {
+			if (name._Equal(go->getName())) return go;
+		}
+	}
+
 	inline std::vector<std::shared_ptr<GameObject>> const& getShadowCasters() const { return m_shadowCasters; }
 	inline std::vector<std::shared_ptr<GameObject>> const& getUIComponents() const { return m_UIcomponents; }
 
@@ -64,7 +72,7 @@ public:
 	inline bool getIsSimlationPlaying() const { return play_simulation; }
 
 private: 
-	void update_components(float dt);
+
 protected:
 
 	enum mode {
@@ -89,6 +97,9 @@ protected:
 	
 	std::shared_ptr<GameObject> m_devCamera; // dev camera
 	std::shared_ptr<GameObject> m_gameCamera;// camera from the game
+
+	std::vector<std::shared_ptr<Controller>> m_controllers;
+	std::shared_ptr<CameraRotationController> m_CameraRotationController;
 
 
 

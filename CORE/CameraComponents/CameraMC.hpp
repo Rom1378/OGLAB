@@ -10,11 +10,10 @@ public:
 		//m_attachedToGameObject = false;
 	}
 
-	void update(float dt) override;
+	//void update(float dt) override;
 
 	const char* getName() override { return "CameraMC"; }
 
 private:
 	//float m_speed = 5.0f;
-	float m_sensitivity = 0.1f;
 };

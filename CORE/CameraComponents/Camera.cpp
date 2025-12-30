@@ -2,6 +2,7 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "CORE/GameObject.hpp"
 
 
 CameraComponent::CameraComponent(float fov, float aspectRatio, float nearPlane, float farPlane) :
@@ -17,8 +18,9 @@ void CameraComponent::update(float dt) {
 		setAspectRatio(Window::getFrameBufferWidth() / Window::getFrameBufferHeight());
 	}
 
-	//if  attached to gameObject freecam. need to check where we should enable it.
-	//if ();
+	auto rot = glm::quat(glm::vec3(0, glm::radians(yaw), 0.0f));
+
+	m_gameObject->setRotationQuaternion(rot);
 
 	updateView();
 }

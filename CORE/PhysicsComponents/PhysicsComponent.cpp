@@ -106,8 +106,8 @@ void PhysicsComponent::updateTransform() {
 
 		// Update GameObject with quaternion directly
 		
-		getGameObject()->setPosition(position, false);
-		getGameObject()->setRotationQuaternion(rotation, false);
+		getGameObject().setPosition(position, false);
+		getGameObject().setRotationQuaternion(rotation, false);
 	}
 }
 

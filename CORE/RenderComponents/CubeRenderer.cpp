@@ -70,7 +70,7 @@ void CubeRenderer::renderWithMaterials(const std::shared_ptr<CameraComponent>& c
 	// Standard matrix uniforms
 	m_shader->setMat4("model", glm::value_ptr(
 		
-		getGameObject()->getModelMatrix()));
+		getGameObject().getModelMatrix()));
 	m_shader->setMat4("view", glm::value_ptr(cam->getViewMatrix()));
 	m_shader->setMat4("projection", glm::value_ptr(cam->getProjectionMatrix()));
 	m_shader->setMat4("lightSpaceMatrix", LightManager::getShadowMapper()->getLightSpaceMatrix());

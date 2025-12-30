@@ -6,7 +6,9 @@
 class TransformableComponent : public Component {
 public:
 
-	TransformableComponent() = default;
+	TransformableComponent() {
+
+	}
 	//void update() override;
 
 	void onImGuiRender() override;

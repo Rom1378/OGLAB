@@ -28,7 +28,7 @@ public:
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
 		std::shared_ptr<T> component = std::make_shared<T>();
-		component->setGameObject(this);
+		component->setGameObject(*this);
 
 		//cameras are stored at the end because they must be updated last.
 		if (auto camera_component = std::dynamic_pointer_cast<CameraComponent>(component))
@@ -51,7 +51,7 @@ public:
 		static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
 
 		std::shared_ptr<T> component = std::make_shared<T>(std::forward<Args>(args)...);
-		component->setGameObject(this);
+		component->setGameObject(*this);
 		
 		
 		
