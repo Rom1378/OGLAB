@@ -1,4 +1,4 @@
-/*#pragma once
+#pragma once
 #include "../TransformableComponent.hpp"
 #include <memory>
 
@@ -35,4 +35,4 @@ private:
     float intensity;
 
 };
-*/
+

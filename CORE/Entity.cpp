@@ -1,0 +1,131 @@
+/*#include "GameObject.hpp"
+#include "PhysicsComponents/PhysicsComponent.hpp"
+
+
+// Update all components
+void GameObject::update(float dt) {
+	for (auto& component : m_components) {
+		component->update(dt);
+	}
+
+	onUpdate(dt);
+}
+
+
+void GameObject::ImGuiRender() {
+
+	//transform
+	glm::vec3 position = getPosition();
+	//glm::vec3 rotation = getRotation(); // Euler degrees
+	glm::vec3 scale = getScale();
+
+	if (ImGui::TreeNode("Game Object Transform")) {
+		if (ImGui::DragFloat3("Position", glm::value_ptr(position), 0.1f)) {
+			setPosition(position, 1);
+		}
+
+		if (ImGui::DragFloat3("Rotation", glm::value_ptr(m_rotation), 1.0f)) {
+			setRotation(m_rotation, 1);  // Will update quaternion
+		}
+		if (ImGui::DragFloat4("Rotation Quat", glm::value_ptr(m_rotationQuat), 0.2f)) {
+			setRotationQuaternion(m_rotationQuat, 1);
+			//setRotation(rotation, 1);  // Will update quaternion
+		}
+
+		if (ImGui::DragFloat3("Scale", glm::value_ptr(scale), 0.1f)) {
+			setScale(scale);
+		}
+
+		ImGui::TreePop();
+	}
+
+	onImGuiRender();
+}
+
+// Render if has RenderComponent
+void GameObject::render(const glm::mat4& view, const glm::mat4& projection) const {
+	if (auto& renderComponent = getComponent<RenderComponent>()) {
+		renderComponent->draw(view, projection);
+	}
+}
+
+void GameObject::render(std::shared_ptr<CameraComponent> cam) const {
+	if (auto& renderComponent = getComponent<RenderComponent>()) {
+		renderComponent->draw(cam);
+	}
+}
+
+// Set position and update physics component if exists
+void GameObject::setPosition(const glm::vec3& position, bool update_physx) {
+
+	Transform::setPosition(position);
+	if (update_physx)
+		update_physx_component();
+}
+
+void GameObject::setPosition(float x, float y, float z, bool update_physx) { setPosition(glm::vec3{ x,y,z }, update_physx); }
+void GameObject::setPosition(const PxVec3d& p, bool update_physx) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+void GameObject::setPosition(const PxVec3& p, bool update_physx) { setPosition(glm::vec3{ p.x,p.y,p.z }, update_physx); }
+
+void GameObject::move(const glm::vec3& offset, bool update_physx ) {
+	setPosition(getPosition() + offset, update_physx);
+}//m_position += offset; }
+
+void GameObject::move(const PxVec3d& offset, bool update_physx) { move(offset.x, offset.y, offset.z, update_physx); }
+void GameObject::move(float x, float y, float z, bool update_physx) { setPosition(getPosition() + glm::vec3(x, y, z), update_physx); }
+
+// Set rotation and update physics component if exists
+void GameObject::setRotation(const glm::vec3& rotation, bool update_physx) {
+
+	Transform::setRotation(rotation);
+	if (update_physx) {
+		auto& physicsComponent = getComponent<PhysicsComponent>();
+		if (physicsComponent) {
+			physicsComponent->updateRotation();
+
+			//physicsComponent->updatePhysX();
+		}
+	}
+	
+}
+
+// Add this to your GameObject class
+void GameObject::setRotationQuaternion(const glm::quat& rotation, bool update_physx) {
+	Transform::setRotationQuaternion(rotation);
+
+	if (update_physx) {
+		auto& physicsComponent = getComponent<PhysicsComponent>();
+		if (physicsComponent) {
+			physicsComponent->updateRotation();
+
+			//physicsComponent->updatePhysX();
+		}
+	}
+	//if (update_physx)
+	//	update_physx_component();
+}
+
+void GameObject::rotate(const glm::vec3& offset, bool update_physx) {
+	Transform::rotate(offset);
+	if (update_physx)
+		update_physx_component();
+}
+
+// Set scale and update physics component if exists
+void GameObject::setScale(const glm::vec3& scale) {
+
+	Transform::setScale(scale);
+
+	if (auto& physicsComponent = getComponent<PhysicsComponent>()) {
+		physicsComponent->setScale(scale);
+	}
+}
+
+void GameObject::update_physx_component() const {
+		// Update physics component if it exists
+		auto& physicsComponent = getComponent<PhysicsComponent>();
+		if (physicsComponent) {
+			physicsComponent->updatePhysX();
+		}
+}
+*/

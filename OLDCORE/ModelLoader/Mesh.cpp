@@ -1,7 +1,6 @@
 #include "Mesh.hpp"
 #include <iostream>
 #include "../Lights/LightManager.hpp"
-#include "CORE/Debug.hpp"
 
 Mesh::Mesh(std::vector<Vertex> vertices,
 	std::vector<unsigned int> indices,

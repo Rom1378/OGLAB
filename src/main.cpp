@@ -1,14 +1,16 @@
 
-#include "devScene.hpp"
 
+#include "../CORE/Engine.hpp"
+#include "../CORE/Window/Window.hpp"
+#include "../CORE/Window/Input.hpp"
+#include "../CORE/Scene.hpp"
 
 int main() {
 
 	Engine::init();
-
 	{
 		// Create scene
-		DevScene scene;
+		Scene scene;
 		scene.init();
 
 

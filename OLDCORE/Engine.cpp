@@ -1,17 +1,16 @@
-//#include "CORE/Lights/LightManager.hpp"
+#include "CORE/Lights/LightManager.hpp"
 #include "Engine.hpp"
-#include "CORE/Physics.hpp"
+#include "Physics.hpp"
 #include "Shader.hpp"
-//#include "Prefabs/SomePrefabs.hpp"
+#include "Prefabs/SomePrefabs.hpp"
 #include <iostream>
 #include <PxPhysicsAPI.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-//#include "UI/SceneObjectEditor.hpp"
+#include "UI/SceneObjectEditor.hpp"
 #include "Scene.hpp"
-//#include "LineRenderer.hpp"
-#include "CORE/TextureManager.hpp"
+#include "LineRenderer.hpp"
 
 
 #include <chrono>
@@ -35,7 +34,7 @@ namespace Engine {
 	void reset_dt() { getDeltaTime(); }
 
 	void init() {
-	//	registerPrefabs();
+		registerPrefabs();
 
 		Window::WindowProps props;
 		props.title = "CLC";
@@ -46,16 +45,16 @@ namespace Engine {
 		Input::init();
 		ShaderManager::loadConfigs("../../../Config/shaders.json");
 		Physics::init();
-		//LightManager::init();
+		LightManager::init();
 
-		//LineRenderer::init();
+		LineRenderer::init();
 
 		Window::setVSync(1);
 
 	}
 
 	void shutdown() {
-		//LightManager::shutdown();
+		LightManager::shutdown();
 		Physics::shutdown();
 		ShaderManager::cleanup();
 		TextureManager::clear();
@@ -68,7 +67,7 @@ namespace Engine {
 	void update(Scene* scene) {
 		m_dt = getDeltaTime();
 		//scene->update(m_dt);
-		std::cout << " updating " << std::endl;
+
 
 
 
@@ -80,7 +79,7 @@ namespace Engine {
 
 	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
 		// 1. Shadow Pass
-		//shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
+		shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
 
 		// 2. Main Pass
 		Window::bind_framebuffer();
@@ -103,7 +102,7 @@ namespace Engine {
 	void renderUI(Scene* scene) {
 
 		// Render UI
-		//scene->onImGuiRender();
+		scene->onImGuiRender();
 		
 
 		// Render ImGui
@@ -112,16 +111,16 @@ namespace Engine {
 
 	}
 	void render(Scene* scene) {
-		//renderFrame(scene, LightManager::getShadowMapper()); // == renderShaderPass TODO
+		renderFrame(scene, LightManager::getShadowMapper()); // == renderShaderPass TODO
 
 		// Render scene normally
-		//scene->renderMainPass();
+		scene->renderMainPass();
 
-		//scene->renderPhysxDebugPass();
+		scene->renderPhysxDebugPass();
 		// Physx debug pass
 
 		// Render UI pass 
-		//scene->renderUIPass();
+		scene->renderUIPass();
 
 		// --- PASS 1: Shadow Mapping (if needed) ---
 		//if (LightManager::hasShadows()) {
@@ -141,7 +140,7 @@ namespace Engine {
 			debugShader->setFloat("near_plane", 1.0f);
 			debugShader->setFloat("far_plane", 100.0f);
 			glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
+			glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
 			//LightManager::renderQuad();
 		}
 	}

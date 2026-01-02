@@ -1,4 +1,4 @@
-/*#include "Light.hpp"
+#include "Light.hpp"
 #include "LightManager.hpp"
 #include "../GameObject.hpp"
 
@@ -46,4 +46,4 @@ void Light::onImGuiRender() {
 		setIntensity(lightIntensity);
 	}
 }
-*/
+

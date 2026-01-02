@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include "CORE/GameObject.hpp"
 #include "CORE/Window/Input.hpp"
 #include "CORE/PhysicsComponents/CapsuleMotorComponent.hpp"
@@ -46,4 +46,4 @@ private:
 
 
 
-};
+};*/

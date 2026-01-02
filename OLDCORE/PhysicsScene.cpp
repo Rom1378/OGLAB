@@ -1,6 +1,6 @@
 #include "PhysicsScene.hpp"
 
-/*#include "LineRenderer.hpp"
+#include "LineRenderer.hpp"
 
 
 
@@ -21,4 +21,4 @@ void PhysicsScene::drawDebugVisualization() {
 
 void PhysicsScene::renderDebugVisualization(const std::shared_ptr<CameraComponent> cam) {
 	LineRenderer::render(cam);
-}*/
+}

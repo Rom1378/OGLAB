@@ -1,107 +1,46 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "RenderComponents/CubeMap.hpp"
-#include "RenderComponents/Cursor.hpp"
-#include "CORE/Controllers/Controller.hpp"
-#include "CORE/Controllers/CameraRotationController.hpp"
+#include "CORE/ComponentManager.hpp"
 
-class PhysicsScene;
-class CameraComponent;
+class Entity;
 
 class Scene {
 public:
-	Scene();
-	//Scene(const std::string & save);
-
+	Scene() = default;
 
 	virtual ~Scene() = default;
-	virtual void init() {}
+	virtual void init();
 	virtual void shutdown() {}
 	virtual void onUpdate() {}
 	virtual void onRender() {}
 	virtual void onImGuiRender() {}
 
-	void saveScene(const std::string& file);
-	
-
 	void update(float dt);
 
 
-	void renderShadowCasters(const glm::mat4& lightMatrix);
-	void renderMainPass();
-	void renderUIPass();
-	void renderPhysxDebugPass();
+	Entity createEntity();
+	bool DestroyEntity(Entity e);
 
-	std::shared_ptr<GameObject> createGameObject(const std::string& name);
-	void destroyGameObject(std::shared_ptr<GameObject> gameObject);
-
-	void addGameObject(std::shared_ptr<GameObject> gameObject);
-	inline std::vector<std::shared_ptr<GameObject>> const& getGameObjects() const { return m_gameObjects; }
-	inline std::shared_ptr<GameObject> const& getGameObject(std::string_view name) const { 
-		for (auto& go : m_gameObjects) {
-			if (name._Equal(go->getName())) return go;
-		}
+	template<typename T, typename... Args>
+	inline T* addComponent(Entity e, Args&&... args) {
+		return ComponentManager::addComponent<T>(e.getId(), std::forward<Args>(args)...);
+	}
+	template<typename T>
+	inline void removeComponent(Entity e) {
+		ComponentManager::removeComponent<T>(e.getId());
+	}
+	template<typename T>
+	inline T* getComponent(Entity e) {
+		return ComponentManager::getComponent<T>(e.getId());
+	}
+	template<typename T>
+	inline bool hasComponent(Entity e) {
+		return ComponentManager::hasComponent<T>(e.getId());
 	}
 
-	inline std::vector<std::shared_ptr<GameObject>> const& getShadowCasters() const { return m_shadowCasters; }
-	inline std::vector<std::shared_ptr<GameObject>> const& getUIComponents() const { return m_UIcomponents; }
+private:
 
-	//inline void setCamera(std::shared_ptr<Camera> camera) { m_camera = camera; }
-	inline void setCubemap(std::shared_ptr<CubeMap> cubemap) { m_cubemap = cubemap; }
-	inline std::shared_ptr<CubeMap> getCubemap() const { return m_cubemap; }
-	inline std::shared_ptr<PhysicsScene> getPhysicsScene() const { return m_physicsScene; }
-
-
-	inline const std::shared_ptr<CameraComponent>& getCurentCameraComponent() const { return m_current_camera_component; }
-	inline const std::shared_ptr<GameObject>& getCurrentCamera() const { return m_current_camera; }
-	inline const std::shared_ptr<GameObject>& getGameCameraHost() const { return m_gameCamera; }
-	inline const std::shared_ptr<GameObject>& getDevCamera() const { return m_devCamera; }
-
-	//inline void setGameCamera(const std::shared_ptr<CameraComponent>& cam) { m_gameCamera = cam; }
-	inline void setGameCameraHost(const std::shared_ptr<GameObject>& go) { 
-		if (go->getComponent<CameraComponent>() == nullptr)
-			throw std::exception("GameCameraHost must have a camera component");
-		else
-			m_gameCamera = go;
-	}
-	inline void setDevCamera(const std::shared_ptr<GameObject>& cam) { m_devCamera = cam; }
-
-
-	inline void setPlaySimulation(bool v) { play_simulation = v; }
-	inline bool getIsSimlationPlaying() const { return play_simulation; }
-
-private: 
-
-protected:
-
-	enum mode {
-		EDIT,
-		PLAY
-	} currentMode;
-
-	bool play_simulation{ 1 };
-
-
-
-	std::vector<std::shared_ptr<GameObject>> m_gameObjects;
-	std::vector<std::shared_ptr<GameObject>> m_shadowCasters; //this is not even used.... TODO
-	std::vector<std::shared_ptr<GameObject>> m_UIcomponents;
-	std::vector<std::shared_ptr<CameraComponent>> m_cameras;
-
-	std::shared_ptr<GameObject> m_current_camera; // currently used camera gameobject
-	std::shared_ptr<CameraComponent> m_current_camera_component;// camera component of the currently used camera gameobject
-
-	std::shared_ptr<CubeMap> m_cubemap;
-	std::shared_ptr<PhysicsScene> m_physicsScene;
-	
-	std::shared_ptr<GameObject> m_devCamera; // dev camera
-	std::shared_ptr<GameObject> m_gameCamera;// camera from the game
-
-	std::vector<std::shared_ptr<Controller>> m_controllers;
-	std::shared_ptr<CameraRotationController> m_CameraRotationController;
-
-
-
+	std::vector<Entity> entities;
 
 };

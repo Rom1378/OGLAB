@@ -5,14 +5,10 @@
 #include <memory>
 #include <iostream>
 #include <memory>
-#include <glm/glm.hpp>
-#include <glm/matrix.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 class CameraComponent;
-class Light;
+//class Light;
 class Scene;
-
 
 namespace LightManager {
 

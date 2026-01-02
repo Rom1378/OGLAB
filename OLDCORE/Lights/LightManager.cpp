@@ -3,10 +3,8 @@
 #include "CORE/Scene.hpp"
 
 #include <iostream>
-//#include "../CameraComponents/Camera.hpp"
+#include "../CameraComponents/Camera.hpp"
 #include <glm/glm.hpp>
-#include "CORE/Debug.hpp"
-#include "CORE/Window/Window.hpp"
 
 
 namespace LightManager
@@ -17,7 +15,6 @@ namespace LightManager
 		return &shadowMapper;
 	}
 
-	/*
 	void ShadowMapper::renderShadowPass(Scene* scene, const std::shared_ptr<Light> light) {
 		// 1. Configure render target
 		glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
@@ -31,7 +28,7 @@ namespace LightManager
 
 		// 3. Render all shadow casters
 		glCullFace(GL_FRONT);
-		//scene->renderShadowCasters(lightSpaceMatrix);
+		scene->renderShadowCasters(lightSpaceMatrix);
 		glCullFace(GL_BACK);
 
 		// 4. Reset state
@@ -99,6 +96,13 @@ namespace LightManager
 		return relevantLights;
 	}
 
+	/*void addLight(const std::shared_ptr<Light> light) {
+		// Add logging to verify light addition
+		std::cout << "Adding light. Current size before: " << s_lights.size() << std::endl;
+		s_lights.push_back(light);
+		std::cout << "Adding light. Current size after: " << s_lights.size() << std::endl;
+	}
+	*/
 	void addLight(const std::shared_ptr<Light> light) {
 		lights.push_back(light);
 	
@@ -126,7 +130,7 @@ namespace LightManager
 	const std::vector<std::shared_ptr<Light>>& getLights() {
 		return lights;
 	}
-*/
+
 	//std::shared_ptr<Light> getLight(const char* name) {
 	//	auto it = lights.find(name);
 	//	if (it != lights.end()) {
