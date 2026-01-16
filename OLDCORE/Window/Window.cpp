@@ -148,8 +148,9 @@ namespace Window
 
 	void clear()
 	{
+
 		// Bind our framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, Window::Internal::fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, Renderer::getFBO());
 		
 		// Set viewport to match framebuffer size
 		glViewport(0, 0, Internal::frameBufferWidth, Internal::frameBufferHeight);
@@ -380,6 +381,7 @@ namespace Window
 		static ImVec2 lastSize = ImVec2(0, 0);
 
 		if (currentSize.x != lastSize.x || currentSize.y != lastSize.y) {
+
 			rescale_framebuffer(currentSize.x, currentSize.y);
 			lastSize = currentSize;
 			Internal::viewport_changed = true;
@@ -421,7 +423,7 @@ namespace Window
 
 		// Display the OpenGL scene
 		ImVec2 availSize = ImGui::GetContentRegionAvail();
-		ImGui::Image((ImTextureID)(intptr_t)Window::getTexture(), availSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)Renderer::getTextureObject(), availSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 

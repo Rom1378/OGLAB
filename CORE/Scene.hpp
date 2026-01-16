@@ -2,8 +2,11 @@
 #include <memory>
 #include <vector>
 #include "CORE/ComponentManager.hpp"
+#include "CORE/Systemes/Renderer/Skybox.hpp"
+
 
 class Entity;
+class Camera;
 
 class Scene {
 public:
@@ -20,6 +23,7 @@ public:
 
 
 	Entity createEntity();
+	Entity createEntity(const char* name);
 	bool DestroyEntity(Entity e);
 
 	template<typename T, typename... Args>
@@ -39,8 +43,20 @@ public:
 		return ComponentManager::hasComponent<T>(e.getId());
 	}
 
+
+	Entity getActiveCamera() const { return activeCamera; }
+	bool hasSkybox() const { return skybox.isValid(); }
+	const Skybox::skyboxHandle& getSkyboxHandle() const { return skybox; }
 private:
 
 	std::vector<Entity> entities;
+
+	Skybox::skyboxHandle skybox = Skybox::INVALID_HANDLE;
+
+	//scene camera
+	Entity cameraEntity;
+
+	Entity activeCamera;
+
 
 };

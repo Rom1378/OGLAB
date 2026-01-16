@@ -7,13 +7,15 @@
 #include "Input.hpp"
 #include <chrono>
 
+#include "CORE/Systemes/Renderer/Renderer.hpp"
+
 namespace Window
 {
 	namespace Internal
 	{
 		inline GLFWwindow* m_window = nullptr;
 		inline WindowProps m_props;
-		GLuint fbo, texture, rbo;
+		//GLuint fbo, texture, rbo;
 		//opengl scene size 
 
 		float frameBufferX;
@@ -38,10 +40,10 @@ namespace Window
 
 
 	//get texture for rendering
-	GLuint getTexture() {
-		return Internal::texture;
-		return 1;
-	}
+	//GLuint getTexture() {
+	//	return Internal::texture;
+//		return 1;
+//	}
 
 	void init(const WindowProps& props)
 	{
@@ -93,7 +95,7 @@ namespace Window
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.IniFilename = "../../../Config/imgui.ini";
 
-		io.MouseDrawCursor = true; // Force ImGui to draw the cursor
+		io.MouseDrawCursor = false; // Force ImGui to draw the cursor
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;    // Enable Gamepad Controls
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
@@ -148,18 +150,7 @@ namespace Window
 
 	void clear()
 	{
-		// Bind our framebuffer
-		glBindFramebuffer(GL_FRAMEBUFFER, Window::Internal::fbo);
-		
-		// Set viewport to match framebuffer size
-		glViewport(0, 0, Internal::frameBufferWidth, Internal::frameBufferHeight);
-		
-		// Clear both color and depth buffers
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		// Enable depth testing
-		glEnable(GL_DEPTH_TEST);
+		//Renderer::clearFBO();
 	}
 
 	void shutdown()
@@ -208,7 +199,7 @@ namespace Window
 		glfwSwapInterval(enabled ? 1 : 0);
 	}
 
-	void CreateFramebuffer(int width, int height) {
+	/*void CreateFramebuffer(int width, int height) {
 		glGenFramebuffers(1, &Internal::fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, Internal::fbo);
 
@@ -243,6 +234,7 @@ namespace Window
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, Internal::fbo);
 	}
+	*/
 
 	//a function that size the viewport correctly
 	//	ImVec2 pos = ImGui::GetCursorScreenPos();
@@ -263,6 +255,10 @@ namespace Window
 	}
 	void rescale_framebuffer(float width, float height)
 	{
+		Renderer::rescale_framebuffer(width, height);
+		Internal::frameBufferWidth = width;
+		Internal::frameBufferHeight = height;
+		/*
 		std::cout << "Rescaling framebuffer to " << width << "x" << height << std::endl;
 		glBindFramebuffer(GL_FRAMEBUFFER, Internal::fbo);
 
@@ -287,17 +283,14 @@ namespace Window
 		Internal::frameBufferHeight = height;
 
 		//should update camera data. (aspect ratio and camera center moved)
-		
-
-
-
+		*/
 
 	}
 
-	GLuint getFramebufferTexture()
-	{
-		return Internal::texture;
-	}
+	//GLuint getFramebufferTexture()
+	//{
+	//	return Internal::texture;
+	//}
 
 	
 	WindowProps const* getWindowProps()
@@ -421,7 +414,7 @@ namespace Window
 
 		// Display the OpenGL scene
 		ImVec2 availSize = ImGui::GetContentRegionAvail();
-		ImGui::Image((ImTextureID)(intptr_t)Window::getTexture(), availSize, ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)Renderer::getColorTextureBuffer(), availSize, ImVec2(0, 1), ImVec2(1, 0));
 
 		ImGui::End();
 

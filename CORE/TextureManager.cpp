@@ -101,7 +101,7 @@ namespace TextureManager
 		glBindTexture(GL_TEXTURE_CUBE_MAP, texture->id);
 
 		int width, height, nrChannels;
-		for (unsigned int i = 0; i < faces.size(); i++)
+		for (unsigned int i = 0; i < 6; i++)
 		{
 			unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
 			if (data)
@@ -125,7 +125,6 @@ namespace TextureManager
 
 		return texture;
 	}
-
 	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, const std::string& name)
 	{
 		auto it = Internal::textures.find(name);

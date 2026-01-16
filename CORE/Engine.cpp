@@ -12,6 +12,7 @@
 #include "Scene.hpp"
 //#include "LineRenderer.hpp"
 #include "CORE/TextureManager.hpp"
+#include "CORE/Systemes/Renderer/Renderer.hpp"
 
 
 #include <chrono>
@@ -67,7 +68,7 @@ namespace Engine {
 
 	void update(Scene* scene) {
 		m_dt = getDeltaTime();
-		//scene->update(m_dt);
+		scene->update(m_dt);
 		std::cout << " updating " << std::endl;
 
 
@@ -83,9 +84,9 @@ namespace Engine {
 		//shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
 
 		// 2. Main Pass
-		Window::bind_framebuffer();
+		//Window::bind_framebuffer();
 		Window::update_viewport();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		//3. physx debug pass
 
@@ -112,38 +113,10 @@ namespace Engine {
 
 	}
 	void render(Scene* scene) {
-		//renderFrame(scene, LightManager::getShadowMapper()); // == renderShaderPass TODO
+		//std::cout << "nothing rendering right now"<< std::endl;
 
-		// Render scene normally
-		//scene->renderMainPass();
+		Renderer::render(scene);
 
-		//scene->renderPhysxDebugPass();
-		// Physx debug pass
-
-		// Render UI pass 
-		//scene->renderUIPass();
-
-		// --- PASS 1: Shadow Mapping (if needed) ---
-		//if (LightManager::hasShadows()) {
-	//		renderShadowPass(scene, LightManager::getShadowMapper());
-		//}
-
-		// --- PASS 2: Main Geometry (3D world) ---
-		//scene->renderMainPass(); // Uses depth testing, lighting, etc.
-
-		// --- PASS 3: UI Rendering (Cursor, HUD, etc.) ---
-		//renderUIPass(scene); // Disables depth test, renders last
-
-		// Optional: Render debug quad in a separate window
-		if (0) {
-			auto debugShader = ShaderManager::getShader("debugDepthQuad");
-			debugShader->use();
-			debugShader->setFloat("near_plane", 1.0f);
-			debugShader->setFloat("far_plane", 100.0f);
-			glActiveTexture(GL_TEXTURE0);
-			//glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
-			//LightManager::renderQuad();
 		}
-	}
 	bool isRunning() { return m_isRunning; }
 }

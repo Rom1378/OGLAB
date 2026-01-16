@@ -24,7 +24,9 @@ int main() {
 
 
 		// Create the framebuffer
-		Window::CreateFramebuffer(1280, 720); // Initialize with proper size
+		//Window::CreateFramebuffer(1280, 720); // Initialize with proper size
+
+
 		while (Window::isOpen()) {
 
 			Input::resetFrameKeys();
@@ -54,7 +56,6 @@ int main() {
 
 		
 			Window::update();
-			Window::clear();
 
 			//LightManager::compute_shadow_mapping(&scene);
 		}
