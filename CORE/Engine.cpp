@@ -1,6 +1,6 @@
 //#include "CORE/Lights/LightManager.hpp"
 #include "Engine.hpp"
-#include "CORE/Physics.hpp"
+//#include "CORE/Physics.hpp"
 #include "Shader.hpp"
 //#include "Prefabs/SomePrefabs.hpp"
 #include <iostream>
@@ -12,7 +12,12 @@
 #include "Scene.hpp"
 //#include "LineRenderer.hpp"
 #include "CORE/TextureManager.hpp"
-#include "CORE/Systemes/Renderer/Renderer.hpp"
+
+#include "CORE/Systems/Renderer/Renderer.hpp"
+#include "CORE/Systems/Physics/Physics.hpp"
+
+#include "CORE/UI/Entity.hpp"
+
 
 
 #include <chrono>
@@ -43,10 +48,18 @@ namespace Engine {
 		props.width = 1280;
 		props.height = 720;
 		Window::init(props);
-		std::cout << Window::isVSync() << std::endl;
+		LOG("Is VSync: ", Window::isVSync());
+
+		//systems inits
 		Input::init();
 		ShaderManager::loadConfigs("../../../Config/shaders.json");
-		Physics::init();
+
+
+
+		PhysicsSystem::init();
+
+		Renderer::init();
+
 		//LightManager::init();
 
 		//LineRenderer::init();
@@ -57,21 +70,21 @@ namespace Engine {
 
 	void shutdown() {
 		//LightManager::shutdown();
-		Physics::shutdown();
+		Renderer::cleanup();
+		PhysicsSystem::shutdown();
+
+
 		ShaderManager::cleanup();
 		TextureManager::clear();
 		Input::shutdown();
 		Window::shutdown();
 		m_isRunning = false;
-		std::cout << "Engine shutdown complete." << std::endl;
+		LOG_OK("Engine shutdown complete.");
 	}
 
 	void update(Scene* scene) {
 		m_dt = getDeltaTime();
 		scene->update(m_dt);
-		std::cout << " updating " << std::endl;
-
-
 
 		//Window::update(); //swapbuffer
 		//Input::update(); //shit + pollenvent
@@ -106,6 +119,8 @@ namespace Engine {
 		// Render UI
 		//scene->onImGuiRender();
 		
+
+		UI::DrawEntityTree(scene);
 
 		// Render ImGui
 		ImGui::Render();

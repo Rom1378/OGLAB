@@ -3,7 +3,7 @@
 #include "CORE/Mesh/CubeMap.hpp"
 #include "CORE/Shader.hpp"
 #include "CORE/Debug.hpp"
-#include "CORE/Systemes/Renderer/Renderer.hpp"
+#include "CORE/Systems/Renderer/Renderer.hpp"
 
 #include "CORE/TextureManager.hpp"
 #include "CORE/Scene.hpp"
@@ -29,8 +29,10 @@ namespace Skybox {
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * MeshData::CubeMap::vertices.size(), MeshData::CubeMap::vertices.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+		glBindVertexArray(0);
 
 		cubeMapShader = ShaderManager::getShader("cubemap").get();
+
 	}
 
 	skyboxHandle createSkybox(const std::vector<std::string>& faces) {

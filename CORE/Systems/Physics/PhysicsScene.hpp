@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 #include <memory>
 #include "Physics.hpp"
 
@@ -37,6 +37,7 @@ public:
 
 private:
 	PxScene* m_scene;
+	PxControllerManager* controllerManager;
 	glm::vec3 m_gravity;
 
-};
+};*/

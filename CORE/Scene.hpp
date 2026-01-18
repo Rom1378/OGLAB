@@ -1,8 +1,9 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include "CORE/Debug.hpp"
 #include "CORE/ComponentManager.hpp"
-#include "CORE/Systemes/Renderer/Skybox.hpp"
+#include "CORE/Systems/Renderer/Skybox.hpp"
 
 
 class Entity;
@@ -36,17 +37,23 @@ public:
 	}
 	template<typename T>
 	inline T* getComponent(Entity e) {
-		return ComponentManager::getComponent<T>(e.getId());
+		T* component = ComponentManager::getComponent<T>(e.getId());
+		if (!component) {
+			LOG_WARN("No component of type" ,typeid(T).name(), " for entity ID:", e.getId() );
+		}
+		return component;
 	}
 	template<typename T>
 	inline bool hasComponent(Entity e) {
 		return ComponentManager::hasComponent<T>(e.getId());
 	}
 
-
+	Entity getActiveEntity() const { return activeEntity; }
 	Entity getActiveCamera() const { return activeCamera; }
 	bool hasSkybox() const { return skybox.isValid(); }
 	const Skybox::skyboxHandle& getSkyboxHandle() const { return skybox; }
+
+	const std::vector<Entity>& getEntities() const { return entities; }
 private:
 
 	std::vector<Entity> entities;
@@ -56,7 +63,9 @@ private:
 	//scene camera
 	Entity cameraEntity;
 
+	// will be controlled by Systems.
 	Entity activeCamera;
+	Entity activeEntity; //the player. the things that the player control at the moment
 
 
 };

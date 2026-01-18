@@ -7,7 +7,7 @@
 #include "Input.hpp"
 #include <chrono>
 
-#include "CORE/Systemes/Renderer/Renderer.hpp"
+#include "CORE/Systems/Renderer/Renderer.hpp"
 
 namespace Window
 {

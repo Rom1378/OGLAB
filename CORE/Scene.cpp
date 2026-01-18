@@ -5,23 +5,38 @@
 #include "CORE/Entity.hpp"
 #include "CORE/EntityManager.hpp"
 
-#include "CORE/Systemes/Renderer/Renderer.hpp"
+#include "CORE/Systems/Renderer/Renderer.hpp"
+
+#include "CORE/Systems/Input/Mouvement.hpp"
+
+#include "CORE/Systems/Physics/Physics.hpp"
+#include "CORE/Systems/TransformSync/Sync.hpp"
+
 #include "CORE/Camera.hpp"
 
 #include "CORE/Components/Camera.hpp"
 #include "CORE/Components/Transform.hpp"
+#include "CORE/Components/Physics.hpp"
 
 
 void Scene::init() {
 
-	//systems inits
-	Renderer::init();
+
 
 	cameraEntity= createEntity("Camera entity");
 	addComponent<CameraComponent>(cameraEntity);
 	addComponent<TransformComponent>(cameraEntity);
+	
+	// stores dx dt dz yaw pitch
+	addComponent<CharacterControllerStateComponent>(cameraEntity);
+	
+	// simulate dx dt dz yaw pitch
+	addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
+	
+
 
 	activeCamera = cameraEntity;
+	activeEntity = cameraEntity; //will 
 
 	system("cd");
 	skybox = Skybox::createSkybox({
@@ -39,16 +54,24 @@ void Scene::init() {
 void Scene::update(float dt) {
 
 
+// 1 input system
+// 2 simulate physx
+// 3 sync
+// 4 update 3d
 
-	//InputSystem(world);
-	//MouseLookSystem(world);
+	if (Input::isMouseLocked())
+		InputSystem::update(this, dt);
+	PhysicsSystem::update(this, dt);
+	TransformSyncSystem::update(this);
+//	PhysicsStep(world, dt);
 	//PlayerMovementSystem(world, dt);
-	//PhysicsStep(world, dt);
-	//TransformSyncSystem(world);
 	//RenderSystem(world);
 
 	Camera cam = getComponent<CameraComponent>(activeCamera)->cam;
 	TransformComponent* transform = getComponent<TransformComponent>(activeCamera);
+
+	//MouseLok
+	//MouseLookSystem::update();
 
 	Renderer::setViewProjection(transform->getViewMatrix(), cam.getProjection());
 	Renderer::update(dt);

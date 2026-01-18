@@ -20,6 +20,7 @@ namespace Renderer {
 	void update(float dt);
 	void draw();//submit ()receive draw call from components
 
+	void cleanup();
 
 	void render(Scene* scene);
 

@@ -1,4 +1,4 @@
-#include "CORE/Systemes/Renderer/Renderer.hpp"
+#include "CORE/Systems/Renderer/Renderer.hpp"
 
 
 #include "CORE/Debug.hpp"
@@ -167,5 +167,6 @@ namespace Renderer {
 	const glm::mat4& getProjection() { return renderCam.projection; }
 
 
-}
 
+
+}

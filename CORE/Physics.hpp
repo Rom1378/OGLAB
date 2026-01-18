@@ -1,4 +1,4 @@
-#pragma once
+/*#pragma once
 
 #include <PxPhysicsAPI.h>
 #include <glm/glm.hpp>
@@ -26,4 +26,4 @@ namespace Physics
 	PxControllerManager& getControllerManger() ;
 
 }
-
+*/
