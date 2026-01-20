@@ -29,7 +29,18 @@ struct TransformComponent {
 		return glm::lookAt(pos, target, up);
 	}
 
-	glm::mat4 toMat4() const { 
+	glm::mat4 getModelMatrix() const {
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, pos);
+
+		// Use quaternion for rotation instead of Euler angles
+		model *= glm::toMat4(rot);
+
+		model = glm::scale(model, scale);
+		return model;
+	}
+
+	glm::mat4 toMat4() const {
 		glm::mat4 transform(1.0f);
 		transform = glm::translate(transform, pos);
 		transform = transform * glm::mat4_cast(rot);
@@ -37,7 +48,7 @@ struct TransformComponent {
 
 	void fromPx(const physx::PxTransform& t) {
 		pos = glm::vec3(t.p.x, t.p.y, t.p.z);
-		rot= glm::quat(t.q.x, t.q.y, t.q.z, t.q.w);
+		rot = glm::quat(t.q.x, t.q.y, t.q.z, t.q.w);
 	}
 
 

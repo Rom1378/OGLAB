@@ -3,11 +3,10 @@
 #include "../Lights/LightManager.hpp"
 #include "CORE/Debug.hpp"
 
-Mesh::Mesh(std::vector<Vertex> vertices,
-	std::vector<unsigned int> indices,
-	std::vector<Texture> textures)
-	: vertices(vertices), indices(indices), textures(textures) {
-	setupMesh();
+Mesh::Mesh(const std::vector<Vertex>& vertices,
+	const std::vector<uint32_t>& indices)
+	: vertices(vertices), indices(indices) {
+	//setupMesh();
 }
 
 void Mesh::setupMesh() {
@@ -39,7 +38,9 @@ void Mesh::setupMesh() {
 
 	glBindVertexArray(0);
 }
+*/
 
+/*
 void Mesh::Draw(std::shared_ptr<ShaderProgram> shader) {
 	// Start texture units after shadow map (unit 15)
 	unsigned int textureUnit = 1; // Start from 1 to leave 0 free
@@ -125,4 +126,12 @@ void Mesh::printInfo() const {
 		std::cout << "    TexCoords: " << vertices[0].TexCoords.x << ", "
 			<< vertices[0].TexCoords.y << "\n";
 	}
-}*/
+}
+
+void drawRawGeometry() const
+{
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+*/

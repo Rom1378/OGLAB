@@ -1,4 +1,4 @@
-// Mesh.h
+/*// Mesh.h
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
@@ -43,4 +43,4 @@ public:
 private:
     unsigned int VAO, VBO, EBO;
     void setupMesh();
-};
+};*/

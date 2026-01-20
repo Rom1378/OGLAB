@@ -7,6 +7,8 @@
 #include <glm/glm.hpp>
 
 
+//TODO: rewrite all this
+
 namespace LightManager
 {
 	ShadowMapper shadowMapper;

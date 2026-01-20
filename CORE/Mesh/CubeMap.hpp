@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-namespace MeshData {
+namespace MeshRawData {
 	namespace CubeMap
 	{
 		static  std::vector<float> vertices = {

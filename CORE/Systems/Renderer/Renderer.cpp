@@ -10,6 +10,7 @@
 
 //passes
 #include "Skybox.hpp"
+#include "MeshRenderer.hpp"
 
 
 class frameBuffer {
@@ -75,6 +76,8 @@ namespace Renderer {
 
 
 		Skybox::init();
+		MeshRenderer::initMeshRenderer();
+		
 		LOG_OK("Skybox initialized");
 	}
 
@@ -90,6 +93,8 @@ namespace Renderer {
 		if (scene->hasSkybox()) {
 			Skybox::skyboxPass(scene);
 		}
+
+		MeshRenderer::renderPass(scene);
 
 
 		//draw each pass.

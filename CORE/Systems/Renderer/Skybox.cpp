@@ -26,7 +26,7 @@ namespace Skybox {
 		glGenBuffers(1, &gVBO);
 		glBindVertexArray(gVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, gVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * MeshData::CubeMap::vertices.size(), MeshData::CubeMap::vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * MeshRawData::CubeMap::vertices.size(), MeshRawData::CubeMap::vertices.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 		glBindVertexArray(0);

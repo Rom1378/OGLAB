@@ -5,6 +5,7 @@
 #include "CORE/Entity.hpp"
 #include "CORE/EntityManager.hpp"
 
+#include "CORE/Systems/Renderer/MeshRenderer.hpp"
 #include "CORE/Systems/Renderer/Renderer.hpp"
 
 #include "CORE/Systems/Input/Mouvement.hpp"
@@ -17,13 +18,15 @@
 #include "CORE/Components/Camera.hpp"
 #include "CORE/Components/Transform.hpp"
 #include "CORE/Components/Physics.hpp"
+#include "CORE/Components/Mesh.hpp"
 
 
 void Scene::init() {
 
 
 
-	cameraEntity= createEntity("Camera entity");
+	cameraEntity= createEntity("Dev camera");
+
 	addComponent<CameraComponent>(cameraEntity);
 	addComponent<TransformComponent>(cameraEntity);
 	
@@ -33,12 +36,9 @@ void Scene::init() {
 	// simulate dx dt dz yaw pitch
 	addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
 	
-
-
 	activeCamera = cameraEntity;
 	activeEntity = cameraEntity; //will 
 
-	system("cd");
 	skybox = Skybox::createSkybox({
 		"res/textures/CubeMaps/skybox/right.jpg",
 		"res/textures/CubeMaps/skybox/left.jpg",
@@ -46,8 +46,12 @@ void Scene::init() {
 		"res/textures/CubeMaps/skybox/bottom.jpg",
 		"res/textures/CubeMaps/skybox/front.jpg",
 		"res/textures/CubeMaps/skybox/back.jpg"
-
 		});
+
+	Entity cube = createEntity("Cube");
+	MeshRenderer::MeshComponent cubeMesh;
+	cubeMesh.mesh=
+	addComponent<MeshCompo
 
 }
 
