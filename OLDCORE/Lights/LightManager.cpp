@@ -83,7 +83,7 @@ namespace LightManager
 		}
 	}
 
-	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<CameraComponent> cam, int maxLights) { //TODO UPDATE FOR WEAK PTR USAGE
+	std::vector<std::shared_ptr<Light>> getRelevantLights(CameraComponent cam, int maxLights) { //TODO UPDATE FOR WEAK PTR USAGE
 
 		std::vector<std::shared_ptr<Light>> relevantLights;
 		for (const auto& light : lights) {

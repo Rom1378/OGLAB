@@ -33,7 +33,8 @@ namespace PhysicsSystem {
 	std::queue<PhysicsBodyComponent*> creationQueue{};
 	std::queue<PhysicsBodyComponent*> destructionQueue{};
 
-	PxVec3 gravity{ 0.0f, 9.1f, 0.0f };
+	PxVec3 gravity{ 0.0f, 0, 0.0f };
+	//PxVec3 gravity{ 0.0f, -9.81f, 0.0f };
 
 
 	struct visualisationParametersStates {

@@ -48,8 +48,12 @@ void Scene::init() {
 		});
 
 	Entity cube = createEntity("Cube");
-	MeshRenderer::RenderableHandle cubeHandle = MeshRenderer::createCube();
-	addComponent<RenderableComponent>(cube, cubeHandle);
+	auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
+
+	MeshRenderer::setCubeTextures(rdcomp->rhandle, *TextureManager::loadTexture("res/textures/CAT.png", "cat"));
+	TransformComponent comp{  };
+	comp.scale = { 1.0,3.0f,1.0f };
+	addComponent<TransformComponent>(cube, comp);
 
 }
 

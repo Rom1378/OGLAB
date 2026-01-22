@@ -113,7 +113,7 @@ namespace LightManager {
 
 
 
-	std::vector<std::shared_ptr<Light>> getRelevantLights(const std::shared_ptr<CameraComponent> cam, int maxLights);
+	std::vector<std::shared_ptr<Light>> getRelevantLights(const CameraComponent& cam, int maxLights);
 	//void addLight(const std::shared_ptr<Light> light); //TODO: added map and names to light so you can ask lightmanager for the light you want
 	void addLight(const std::shared_ptr<Light> light);
 	void removeLight(const std::shared_ptr<Light> light);

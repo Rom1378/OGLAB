@@ -31,7 +31,7 @@ namespace assimpLoader {
 			std::string directory = path.substr(0, path.find_last_of('/'));
 			processNode(rd, scene->mRootNode, scene, directory);
 
-
+			rd.shader = &*ShaderManager::getShader("assimpModel");
 			// Print model information
 			printModelInfo(rd);
 
@@ -52,8 +52,7 @@ namespace assimpLoader {
 			std::pair<MeshRenderer::MeshData, std::vector<Texture>> meshAndTexture = processMesh(mesh, scene, directory);
 
 			MeshRenderer::Material m{
-				.textures = meshAndTexture.second,
-				.shader = &*ShaderManager::getShader("assimpModel")
+				.textures = meshAndTexture.second
 			};
 			rd.meshdatas.push_back(meshAndTexture.first);
 			rd.material.push_back(m);
@@ -140,7 +139,7 @@ namespace assimpLoader {
 			textures.push_back({
 				.id = TextureFromFile(str.C_Str(), directory),
 				.type = typeName,
-				.path =  str.C_Str(),
+				.path = str.C_Str(),
 				});
 		}
 		return textures;

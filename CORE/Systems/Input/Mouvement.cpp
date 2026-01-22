@@ -49,13 +49,13 @@ namespace InputSystem {
 		forward = glm::normalize(forward);
 
 		if (Input::isKeyPressed(GLFW_KEY_W))
-			dir += forward;
-		if (Input::isKeyPressed(GLFW_KEY_S))
 			dir -= forward;
+		if (Input::isKeyPressed(GLFW_KEY_S))
+			dir += forward;
 		if (Input::isKeyPressed(GLFW_KEY_A))
-			dir += left;
-		if (Input::isKeyPressed(GLFW_KEY_D))
 			dir -= left;
+		if (Input::isKeyPressed(GLFW_KEY_D))
+			dir += left;
 
 		state->isSprinting = Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT);
 
@@ -74,7 +74,7 @@ namespace InputSystem {
 			vel.y = jumpForce;
 		}
 		if (Input::isKeyPressed(GLFW_KEY_LEFT_CONTROL)) {
-			//vel.y = -jump_force;
+			vel.y = -jumpForce;
 		}
 
 		state->velocity = vel;

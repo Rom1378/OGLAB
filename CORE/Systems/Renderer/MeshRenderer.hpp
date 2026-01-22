@@ -30,15 +30,13 @@ namespace MeshRenderer {
 
 	struct Material {
 		std::vector<Texture> textures = {};
-		ShaderProgram* shader{ nullptr };
-
 		// Textures are shared resources - use handles
 		//TODO: Texture* should become some kind of TextureHandle
 		//Texture* albedoTexture{ INVALID_TEXTURE };
 		//Texture* normalMap{ INVALID_TEXTURE };
 		//Texture* metallicRoughnessMap{ INVALID_TEXTURE };
-
-		//glm::vec4 albedoColor{ 1.0f };
+		glm::vec4 color{ 1.0f };
+		glm::vec4 albedoColor{ 1.0f };
 		float metallic{ 0.0f };
 		float roughness{ 0.5f };
 		float emissive{ 0.0f };
@@ -56,6 +54,7 @@ namespace MeshRenderer {
 	struct RenderableData {
 		std::vector<MeshData> meshdatas{};
 		std::vector<Material> material{};
+		ShaderProgram* shader{ nullptr };
 		RenderState rdState{};
 	};
 
@@ -72,6 +71,7 @@ namespace MeshRenderer {
 
 	void destroyRenderable(RenderableHandle handle);
 
+	void setCubeTextures(RenderableHandle handle, const Texture& texture);
 	void setTextures(const std::vector<Texture>& textures);
 
 

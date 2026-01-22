@@ -64,10 +64,10 @@ namespace Renderer {
 
 		// In init() function, add this check:
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			LOG_ERROR("Framebuffer is not complete!");
 			// Check specific error
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 			// Log status for debugging
+			LOG_ERROR("Framebuffer is not complete! status: ", status);
 		}
 		else {
 			LOG_OK("Created FBO + texture and RBO");
