@@ -1,8 +1,7 @@
 #include "MeshRenderer.hpp"
 
-#include "Mesh.hpp"
-
 #include "CORE/Mesh/CubeMesh.hpp"
+
 #include "CORE/Components/Transform.hpp"
 #include "CORE/Shader.hpp"
 #include "CORE/Lights/LightManager.hpp"
@@ -15,59 +14,36 @@
 
 #include "CORE/Scene.hpp"
 #include <unordered_map>
-#include <string>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glad/glad.h>
+#include "CORE/Systems/Renderer/Sphere.hpp"
+
+
+
 
 
 namespace MeshRenderer {
 
-	std::unordered_map<RenderableHandle, RenderableData> meshes;
+	std::unordered_map<RenderableHandle, RenderableData> meshes{};
 	RenderableHandle nextHandle = 1;
 
 	RenderableHandle cubeHandle;
 	RenderableHandle sphereHandle;
 
-	struct RenderState {
-		bool renderGeometryOnly	{false};
-		bool shadowcaster{ true };
-		bool hide{ false };
-	};
 
-	struct Material {
-		ShaderProgram* shader{ nullptr };
-		std::vector<Texture*> textures{};
 
-		glm::vec4 albedoColor{ 1.0f };
-		float metallic{ 0.0f };
-		float roughness{ 0.5f };
-		float emissive{ 0.0f };
-
-		// Textures are shared resources - use handles
-		//TODO: Texture* should become some kind of TextureHandle
-		Texture* albedoTexture{ INVALID_TEXTURE };
-		Texture* normalMap{ INVALID_TEXTURE };
-		Texture* metallicRoughnessMap{ INVALID_TEXTURE };
-	};
-
-	struct MeshData {
-		std::vector<Vertex> vertices;
-		std::vector<uint32_t> indices;
-		GLuint vbo, ebo, vao;
-		uint32_t indexCount;
-	};
-
-	struct RenderableData{
-		std::vector<MeshData> meshdatas;
-		Material material;
-		RenderState rdState;
-	};
-
+	std::vector<Material>* getMaterial(RenderableHandle handle) {
+		auto mit = meshes.find(handle);
+		if (mit == meshes.end()) {
+			LOG_ERROR("Handle does not link to any renderable");
+			return nullptr;
+		}
+		else
+			return &mit->second.material;
+	}
 
 	RenderableHandle createCube() {
+		if (cubeHandle)
+			return cubeHandle;
 		GLuint VAO, VBO, EBO;
 		// Generate and bind VAO, VBO, and EBO
 		glGenVertexArrays(1, &VAO);
@@ -98,8 +74,7 @@ namespace MeshRenderer {
 		// Set default shader
 
 		Material m;
-		m.shader = &*ShaderManager::getShader("cube");
-		RenderState s;
+		m.shader = &*ShaderManager::getShader("standard");
 		RenderableData rd{
 			.meshdatas = {
 				MeshData{
@@ -111,70 +86,74 @@ namespace MeshRenderer {
 					static_cast<uint32_t>(MeshRawData::Cube::indices.size())
 				}
 			},
-			.material = m,
-			.rdState = s
+			.material = {m},
 		};
+
+		meshes[nextHandle] = std::move(rd);
+		return nextHandle++;
 	}
 
-	RenderableHandle createSphere() {
-		LOG("createSphere not implemented");
+	RenderableHandle createSphere(float radius, unsigned int sectorCount, unsigned int stackCount) {
+		if (sphereHandle)
+			return sphereHandle;
+		MeshData meshData{};
+		generateSphere(meshData.vertices, meshData.indices, radius, sectorCount, stackCount);
+		glGenVertexArrays(1, &meshData.vao);
+		glGenBuffers(1, &meshData.vbo);
+		glGenBuffers(1, &meshData.ebo);
+
+		glBindVertexArray(meshData.vao);
+
+		// Bind and fill VBO
+		glBindBuffer(GL_ARRAY_BUFFER, meshData.vbo);
+		glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(float), meshData.vertices.data(), GL_STATIC_DRAW);
+
+		// Bind and fill EBO
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data(), GL_STATIC_DRAW);
+
+		// Position attribute
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(0);
+
+		// Normal attribute
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
+
+		Material m{
+				.shader = &*ShaderManager::getShader("sphere")
+		};
+		RenderableData rd{
+			.meshdatas = { meshData },
+			.material = {m}
+		};
+		meshes[nextHandle] = std::move(rd);
+		return nextHandle++;
 	}
+
 
 	RenderableHandle createRenderableFromFile(const std::string& path) {
-
+		RenderableData rd{};
+		if (assimpLoader::loadModel(rd, path)) {
+			meshes[nextHandle] = rd;
+			return nextHandle++;
+		}
+		else
+			return INVALID_HANDLE;
 	}
 
-	void destroy(RenderableHandle handle);
-
-
-	void initPrimitives() {
+	static void initPrimitives() {
 		//init primitives
 		cubeHandle = createCube();
-		sphereHandle = createSphere();
+		sphereHandle = createSphere(1,5,5);
+		LOG_OK("Primitives initialized");
 	}
 	void init() {
-		glGenVertexArrays(1, &VAO);
 		initPrimitives();
 	}
 
-	RenderableComponent(RenderableHandle handle);
-	RenderableComponent(Primitive t);
-
-	RenderComponent::RenderComponent(const std::string& model_path) : meshType{ MeshType::MODEL } {
-		meshHandle = createMesh(model_path);
-		shader = &*ShaderManager::getShader("assimpModel");
-	}
-
-	RenderComponent::RenderComponent(MeshType t) : meshType{ t } {
-		switch (t)
-		{
-		case MeshRenderer::MeshType::CUBE:
-			shader = &*ShaderManager::getShader("cube");
-			break;
-		case MeshRenderer::MeshType::SPHERE:
-			shader = &*ShaderManager::getShader("sphere");
-			break;
-		case MeshRenderer::MeshType::MODEL:
-			shader = &*ShaderManager::getShader("assimpModel");
-			break;
-		default:
-			LOG_ERROR("Mesh type does not exist");
-			return;
-			break;
-		}
-		meshHandle = createMesh(t);
-	}
-
-	MeshHandle createMesh(const std::string& model_path) {
-		assimpLoader::loadModel(model_path);
-	}
-
-	MeshHandle createMesh(MeshType t) {
-
-	}
-
-	void destroyMesh(MeshHandle handle) {
-
+	void destroyRenderable(RenderableHandle handle) {
+		meshes.erase(handle);
 	}
 
 
@@ -190,7 +169,7 @@ namespace MeshRenderer {
 				continue;
 			}
 
-			ShaderProgram* shader= renderComponent->shader;
+			ShaderProgram* shader = renderComponent->shader;
 			if (!shader) {
 				LOG_ERROR("RenderComponent must have a shader bound");
 				continue;
@@ -207,8 +186,8 @@ namespace MeshRenderer {
 
 			renderComponent->material.
 
-			// Material properties
-			shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
+				// Material properties
+				shader->setVec3("objectColor", m_color.x, m_color.y, m_color.z);
 			shader->setVec3("viewPos", cam->getWorldPosition());
 
 
@@ -235,7 +214,6 @@ namespace MeshRenderer {
 				//m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
 			}
 			*/
-
 			for (size_t i = 0; i < relevantLights.size(); i++) {
 				std::string base = "lights[" + std::to_string(i) + "].";
 				shader->setVec3(base + "position", relevantLights[i]->getWorldPosition());
@@ -247,14 +225,19 @@ namespace MeshRenderer {
 					!relevantLights.empty(), true);
 			}
 
+
 		}
 	}
 
 	void cleanup() {
-		for (auto mesh : meshes) {
-			delete mesh;
-		}
-		cubeMesh = nullptr;
-		LOG_WARN("Nothing to cleanup inMeshRenderer");
+		meshes.clear();
+		cubeHandle = INVALID_HANDLE;
+		sphereHandle = INVALID_HANDLE;
 	}
+	bool isValidHandle(RenderableHandle handle) {
+		return meshes.find(handle) != meshes.end();
+	}
+
 }
+
+

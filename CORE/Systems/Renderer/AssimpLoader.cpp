@@ -1,14 +1,24 @@
 #pragma once
 
 #include "AssimpLoader.hpp"
+#include "stb_image.h"
+#include <glad/glad.h>
+#include <stdexcept>
+#include "CORE/Debug.hpp"
+
+#include "MeshRenderer.hpp"
+#include "CORE/Mesh/Vertex.hpp"
+#include "CORE/TextureManager.hpp"
+#include "CORE/Shader.hpp"
+#include "CORE/Systems/Renderer/MeshRenderer.hpp"
 
 namespace assimpLoader {
-	void loadModel() {
+	bool loadModel(MeshRenderer::RenderableData& rd, const std::string& path) {
 		Assimp::Importer importer;
 
 		try
 		{
-			const aiScene* scene = importer.ReadFile(m_path,
+			const aiScene* scene = importer.ReadFile(path,
 				aiProcess_Triangulate |
 				aiProcess_GenSmoothNormals |
 				aiProcess_FlipUVs |
@@ -18,38 +28,48 @@ namespace assimpLoader {
 				throw std::runtime_error("Assimp error: " + std::string(importer.GetErrorString()));
 			}
 
-			directory = m_path.substr(0, m_path.find_last_of('/'));
-			processNode(scene->mRootNode, scene);
+			std::string directory = path.substr(0, path.find_last_of('/'));
+			processNode(rd, scene->mRootNode, scene, directory);
+
 
 			// Print model information
-			printModelInfo();
+			printModelInfo(rd);
+
+			return true;
 		}
 		catch (const std::exception& e)
 		{
 			LOG_ERROR(e.what());
+			return false;
 		}
 
 	}
 
-	void processNode(aiNode* node, const aiScene* scene) {
+	void processNode(MeshRenderer::RenderableData& rd, aiNode* node, const aiScene* scene, const std::string& directory) {
 		// Process all meshes in node
 		for (unsigned int i = 0; i < node->mNumMeshes; i++) {
 			aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-			meshes.push_back(processMesh(mesh, scene));
+			std::pair<MeshRenderer::MeshData, std::vector<Texture>> meshAndTexture = processMesh(mesh, scene, directory);
+
+			MeshRenderer::Material m{
+				.textures = meshAndTexture.second,
+				.shader = &*ShaderManager::getShader("assimpModel")
+			};
+			rd.meshdatas.push_back(meshAndTexture.first);
+			rd.material.push_back(m);
+
+
 		}
 
 		// Process children recursively
 		for (unsigned int i = 0; i < node->mNumChildren; i++) {
-			processNode(node->mChildren[i], scene);
+			processNode(rd, node->mChildren[i], scene, directory);
 		}
 	}
 
-	Mesh processMesh(aiMesh* mesh, const aiScene* scene) {
-		std::vector<Vertex> vertices;
-		std::vector<unsigned int> indices;
-		std::vector<Texture> textures;
-
+	std::pair<MeshRenderer::MeshData, std::vector<Texture>> processMesh(aiMesh* mesh, const aiScene* scene, const std::string& directory) {
 		// Process vertices
+		MeshRenderer::MeshData meshdata;
 		for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
 			Vertex vertex{};
 
@@ -79,50 +99,49 @@ namespace assimpLoader {
 			else {
 				vertex.TexCoords = glm::vec2(0.0f);
 			}
-
-			vertices.push_back(vertex);
+			meshdata.vertices.push_back(vertex);
 		}
 
 		// Process indices
 		for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
 			aiFace face = mesh->mFaces[i];
 			for (unsigned int j = 0; j < face.mNumIndices; j++) {
-				indices.push_back(face.mIndices[j]);
+				meshdata.indices.push_back(face.mIndices[j]);
 			}
 		}
 
+		std::vector<Texture> textures;
 		// Process material
 		if (mesh->mMaterialIndex >= 0) {
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 			// Diffuse maps
 			std::vector<Texture> diffuseMaps = loadMaterialTextures(
-				material, aiTextureType_DIFFUSE, "texture_diffuse");
+				material, aiTextureType_DIFFUSE, "texture_diffuse", directory);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
 			// Specular maps
 			std::vector<Texture> specularMaps = loadMaterialTextures(
-				material, aiTextureType_SPECULAR, "texture_specular");
+				material, aiTextureType_SPECULAR, "texture_specular", directory);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
-		return Mesh(vertices, indices, textures);
+		return { meshdata, textures };
 	}
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat,
 		aiTextureType type,
-		const std::string& typeName) {
+		const std::string& typeName, const std::string& directory) {
 		std::vector<Texture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 			aiString str;
-			mat->GetTexture(type, i, &str);
+			auto t = mat->GetTexture(type, i, &str);
 
-
-			Texture texture;
-			texture.id = TextureFromFile(str.C_Str(), directory);
-			texture.type = typeName;
-			texture.path = str.C_Str();
-			textures.push_back(texture);
+			textures.push_back({
+				.id = TextureFromFile(str.C_Str(), directory),
+				.type = typeName,
+				.path =  str.C_Str(),
+				});
 		}
 		return textures;
 	}
@@ -165,18 +184,18 @@ namespace assimpLoader {
 		return textureID;
 	}
 
-	void printModelInfo() const {
+	void printModelInfo(const MeshRenderer::RenderableData& data) {
 		LOG("Model Information:");
 
-		std::cout << "  Meshes: " << meshes.size() << "\n";
+		std::cout << "  Meshes: " << data.meshdatas.size() << "\n";
 
-		for (size_t i = 0; i < meshes.size(); i++) {
+		for (size_t i = 0; i < data.meshdatas.size(); i++) {
 			std::cout << "  Mesh " << i << ":\n";
-			std::cout << "    Vertices: " << meshes[i].vertices.size() << "\n";
-			std::cout << "    Indices: " << meshes[i].indices.size() << "\n";
-			std::cout << "    Textures: " << meshes[i].textures.size() << "\n";
+			std::cout << "    Vertices: " << data.meshdatas[i].vertices.size() << "\n";
+			std::cout << "    Indices: " << data.meshdatas[i].indices.size() << "\n";
+			std::cout << "    Textures: " << data.material[i].textures.size() << "\n";
 
-			for (const auto& tex : meshes[i].textures) {
+			for (auto tex : data.material[i].textures) {
 				std::cout << "      " << tex.type << ": " << tex.path << "\n";
 			}
 		}

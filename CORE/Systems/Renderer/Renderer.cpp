@@ -76,7 +76,7 @@ namespace Renderer {
 
 
 		Skybox::init();
-		MeshRenderer::initMeshRenderer();
+		MeshRenderer::init();
 		
 		LOG_OK("Skybox initialized");
 	}
@@ -131,6 +131,9 @@ namespace Renderer {
 
 	void cleanup() {
 		deleteBuffers();
+		Skybox::cleanup();
+		MeshRenderer::cleanup();
+
 	}
 
 	void rescale_framebuffer(float width, float height) {

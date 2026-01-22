@@ -4,8 +4,6 @@
 #include <unordered_map>
 #include "CORE/Entity.hpp"
 
-class Entity;
-
 class IComponentStorage {
 public:
 	virtual ~IComponentStorage() = default;

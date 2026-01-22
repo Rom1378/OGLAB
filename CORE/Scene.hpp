@@ -39,7 +39,7 @@ public:
 	inline T* getComponent(Entity e) {
 		T* component = ComponentManager::getComponent<T>(e.getId());
 		if (!component) {
-			LOG_WARN("No component of type" ,typeid(T).name(), " for entity ID:", e.getId() );
+			//LOG_WARN("No component of type" ,typeid(T).name(), " for entity ID:", e.getId() );
 		}
 		return component;
 	}

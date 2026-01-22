@@ -2,6 +2,8 @@
 #include <cstdint>
 
 
+//#include "CORE/ComponentManager.hpp"
+
 constexpr uint32_t INVALID_ENTITY_ID = UINT32_MAX;
 
 
@@ -13,6 +15,7 @@ public:
 
 	Entity& operator=(const Entity& e) = default;
 
+	/*
 	template<typename T, typename... Args>
 	T* addComponent(Args&&... args) { 
 		return ComponentManager::addComponent<T>(entity_id, std::forward<Args>(args)...); 
@@ -30,7 +33,7 @@ public:
 	template<typename T>
 	bool hasComponent() const { return ComponentManager::hasComponent<T>(entity_id); }
 
-
+*/
 	inline uint32_t getId() const { return entity_id; }
 	inline bool isValid() const { return entity_id != INVALID_ID; }
 

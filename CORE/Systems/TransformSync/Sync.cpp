@@ -38,7 +38,7 @@ namespace TransformSyncSystem {
                 //charController->yaw = 0;
                 //charController->pitch = 0;
 
-                LOG(transform->pos.x, transform->pos.y);
+                LOG(transform->pos.x," ",  transform->pos.y);
             }
 
             if (phys->role == PhysicsBodyComponent::PhysicsRole::Dynamic) {

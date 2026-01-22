@@ -5,6 +5,7 @@
 #include <mutex>
 #include <glm/gtc/type_ptr.hpp>
 #include "CORE/Debug.hpp"
+#include <exception>
 
 // Static variable initialization
 bool GLDebug::debugCallbackInitialized = false;
@@ -221,7 +222,7 @@ void ShaderProgram::loadFromFiles(const std::string& vertexPath, const std::stri
         if (!success) {
             GLchar infoLog[1024];
             glGetProgramInfoLog(m_program, sizeof(infoLog), nullptr, infoLog);
-            std::cerr << "ERROR::PROGRAM::VALIDATION_FAILED\n" << infoLog << "\n";
+            throw std::runtime_error("ERROR::PROGRAM::VALIDATION_FAILED\n" + std::string(infoLog));
         }
 
         GL_CLEAR_ERROR();
@@ -229,9 +230,8 @@ void ShaderProgram::loadFromFiles(const std::string& vertexPath, const std::stri
         glDeleteShader(fragmentShader);
         GL_CHECK_ERROR();
     }
-    catch (const std::exception& e) {
-        std::cerr << "Shader loading error: " << e.what() << std::endl;
-        throw;
+    catch (const std::runtime_error& e) {
+        LOG_ERROR("Shader loading error: " , e.what());
     }
 }
 

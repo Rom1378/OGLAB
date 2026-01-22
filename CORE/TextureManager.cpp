@@ -8,7 +8,7 @@
 #include "stb_image.h"
 
 #include "Shader.hpp"
-#include "Mesh/CubeMap.hpp"
+#include "CORE/Mesh/CubeMap.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -304,8 +304,8 @@ namespace TextureManager
 			glGenBuffers(1, &cubeVBO);
 			glBindVertexArray(cubeVAO);
 			glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
-			glBufferData(GL_ARRAY_BUFFER, MeshData::CubeMap::vertices.size() * sizeof(float),
-				MeshData::CubeMap::vertices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, MeshRawData::CubeMap::vertices.size() * sizeof(float),
+				MeshRawData::CubeMap::vertices.data(), GL_STATIC_DRAW);
 			glEnableVertexAttribArray(0);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 			glBindVertexArray(0);

@@ -2,7 +2,6 @@
 #include "CORE/Entity.hpp"
 
 #include "CORE/Components/Transform.hpp"
-#include "CORE/Components/Mesh.hpp"
 
 Game::Game() : Scene(), player{}, terrain{} {}
 

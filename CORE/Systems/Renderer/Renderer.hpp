@@ -13,7 +13,6 @@
 
 
 
-
 class Scene;
 
 namespace Renderer {

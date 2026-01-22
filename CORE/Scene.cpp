@@ -18,8 +18,7 @@
 #include "CORE/Components/Camera.hpp"
 #include "CORE/Components/Transform.hpp"
 #include "CORE/Components/Physics.hpp"
-#include "CORE/Components/Mesh.hpp"
-
+#include "CORE/Components/Renderable.hpp"
 
 void Scene::init() {
 
@@ -49,9 +48,8 @@ void Scene::init() {
 		});
 
 	Entity cube = createEntity("Cube");
-	MeshRenderer::MeshComponent cubeMesh;
-	cubeMesh.mesh=
-	addComponent<MeshCompo
+	MeshRenderer::RenderableHandle cubeHandle = MeshRenderer::createCube();
+	addComponent<RenderableComponent>(cube, cubeHandle);
 
 }
 
