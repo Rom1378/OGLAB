@@ -116,12 +116,12 @@ namespace assimpLoader {
 
 			// Diffuse maps
 			std::vector<Texture> diffuseMaps = loadMaterialTextures(
-				material, aiTextureType_DIFFUSE, "texture_diffuse", directory);
+				material, aiTextureType_DIFFUSE, Texture::Type::DIFFUSE, directory);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
 			// Specular maps
 			std::vector<Texture> specularMaps = loadMaterialTextures(
-				material, aiTextureType_SPECULAR, "texture_specular", directory);
+				material, aiTextureType_SPECULAR, Texture::Type::SPECULAR, directory);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
@@ -130,7 +130,7 @@ namespace assimpLoader {
 
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat,
 		aiTextureType type,
-		const std::string& typeName, const std::string& directory) {
+		Texture::Type typeName, const std::string& directory) {
 		std::vector<Texture> textures;
 		for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
 			aiString str;
@@ -195,7 +195,7 @@ namespace assimpLoader {
 			std::cout << "    Textures: " << data.material[i].textures.size() << "\n";
 
 			for (auto tex : data.material[i].textures) {
-				std::cout << "      " << tex.type << ": " << tex.path << "\n";
+				std::cout << "      " << (uint32_t)tex.type << ": " << tex.path << "\n";
 			}
 		}
 	}

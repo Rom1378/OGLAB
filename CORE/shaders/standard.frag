@@ -12,6 +12,7 @@ struct Light {
 #define POINT_LIGHT 0
 #define DIRECTIONAL_LIGHT 1
 #define SPOT_LIGHT 2
+
 in vec3 FragPos;  // Fragment position in world space
 in vec3 Normal;   // Transformed normal
 in vec2 TexCoords;  // Texture coordinates
@@ -25,6 +26,15 @@ uniform Light lights[MAX_LIGHTS];
 uniform vec3 objectColor;
 uniform sampler2D texture_diffuse1;
 uniform bool useTexture;
+
+struct Material {
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+    float shininess;
+} 
+
+uniform Material material;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D shadowMap;
@@ -82,24 +92,32 @@ void main() {
     vec3 lightColor = lights[0].color * lights[0].intensity;
 
     // Ambient
-    vec3 ambient = 0.1 * lightColor;
+    vec3 ambient = material.ambient * lightColor;
     
     // Diffuse
-    vec3 lightDir = normalize(lights[0].position - FragPos);
+    //vec3 lightDir = normalize(lights[0].position - FragPos);
+
+    //float diff = max(dot(norm, lightDir), 0.0);
+    //vec3 diffuse = diff * lightColor;
+
+    vec3 norm = normalize(Normal);
+    vec3 lightDir = normalize(lightPos - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor;
+    vec3 diffuse = lightColor * (diff * material.diffuse);
+
 
     // Specular
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);
-    vec3 specular = spec * lightColor;
+    float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
+    vec3 specular = spec * lightColor * material.specular;
     
     // Shadow
-    float shadow = ShadowCalculation(FragPosLightSpace);
+    //float shadow = ShadowCalculation(FragPosLightSpace);
+    float shadow = 0.0;
     
     // Final color
-    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * baseColor;
+    vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * baseColor; //base color is texture or object color
     FragColor = vec4(lighting, 1.0);
     
     }

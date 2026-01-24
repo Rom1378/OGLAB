@@ -37,10 +37,16 @@ namespace MeshRenderer {
 		//Texture* metallicRoughnessMap{ INVALID_TEXTURE };
 		glm::vec4 color{ 1.0f };
 		glm::vec4 albedoColor{ 1.0f };
+		float shininess{ 64.0f };
+
+		glm::vec3 ambient{ 1.0f, 0.5f, 0.31f };
+
+
 		float metallic{ 0.0f };
 		float roughness{ 0.5f };
 		float emissive{ 0.0f };
 
+		
 	};
 
 	struct MeshData {
@@ -71,7 +77,8 @@ namespace MeshRenderer {
 
 	void destroyRenderable(RenderableHandle handle);
 
-	void setCubeTextures(RenderableHandle handle, const Texture& texture);
+	void setCubeTextures(RenderableHandle handle, const std::vector<Texture>& textures);
+
 	void setTextures(const std::vector<Texture>& textures);
 
 

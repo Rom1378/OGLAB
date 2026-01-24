@@ -1,4 +1,8 @@
-#version 460 core
+
+//https://learnopengl.com/code_viewer_gh.php?code=src/2.lighting/6.multiple_lights/6.multiple_lights.fs
+
+
+/*#version 460 core
 struct Light {
     int type;
     vec3 position;
@@ -89,3 +93,4 @@ void main() {
     
     FragColor = vec4(lighting, 1.0);
 }
+*/

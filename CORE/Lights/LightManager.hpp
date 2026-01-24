@@ -122,5 +122,8 @@ namespace LightManager {
 	const std::vector<std::shared_ptr<Light>>& getLights();
 	//const std::unordered_map<std::string, std::shared_ptr<Light>>& getLights();
 
+	
+
+
 
 }

@@ -7,10 +7,12 @@
 
 struct Texture
 {
+	enum class Type { UNDEFINED, DIFFUSE, SPECULAR, NORMAL};
 	unsigned int id = 0; // OpenGL texture ID
 	int width = 0, height = 0; // dimensions of the texture
 
-	std::string type = "";
+	Type type{ Type::UNDEFINED };
+	uint32_t indexTexture;
 	std::string path; // we store the path of the texture to compare with other textures (e.g. when loading a model)
 };
 

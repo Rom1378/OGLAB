@@ -50,9 +50,19 @@ void Scene::init() {
 	Entity cube = createEntity("Cube");
 	auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
 
-	MeshRenderer::setCubeTextures(rdcomp->rhandle, *TextureManager::loadTexture("res/textures/CAT.png", "cat"));
+	Texture& cat = *TextureManager::loadTexture("res/textures/CAT.png", "cat");
+	Texture& container = *TextureManager::loadTexture("res/textures/container/container2.png", "container");
+	container.type = Texture::Type::DIFFUSE;
+	cat.type = Texture::Type::DIFFUSE;
+	Texture& specular = *TextureManager::loadTexture("res/textures/container/container2_specular.png", "container_specular");
+	specular.type = Texture::Type::SPECULAR;
+
+	MeshRenderer::setCubeTextures(rdcomp->rhandle, { container, specular});
+
+
 	TransformComponent comp{  };
 	comp.scale = { 1.0,3.0f,1.0f };
+	comp.pos = { 0,-4,0 };
 	addComponent<TransformComponent>(cube, comp);
 
 }

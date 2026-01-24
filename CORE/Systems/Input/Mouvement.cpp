@@ -9,7 +9,7 @@
 
 namespace InputSystem {
 
-	float jumpForce{ 20.0f };
+	float jumpForce{ 3.0f };
 	float movementSpeed{ 4.f };
 	float sprintMultiplier{ 2.5f };
 

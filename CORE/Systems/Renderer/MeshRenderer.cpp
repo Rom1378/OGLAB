@@ -30,6 +30,8 @@ namespace MeshRenderer {
 
 
 
+
+
 	std::vector<Material>* getMaterial(RenderableHandle handle) {
 		auto mit = meshes.find(handle);
 		if (mit == meshes.end()) {
@@ -86,7 +88,7 @@ namespace MeshRenderer {
 				}
 			},
 			.material = {m},
-			.shader= &*ShaderManager::getShader("standard")
+			.shader = &*ShaderManager::getShader("standard")
 		};
 
 		meshes[nextHandle] = std::move(rd);
@@ -183,7 +185,18 @@ namespace MeshRenderer {
 
 			shader->setVec3("viewPos", transform->pos);
 
+
+
+
 			//LIGHT CODE TODO
+			glm::vec3 lightPos(0.0f+ 3*std::cos(glfwGetTime()), 0.0f+3*std::cos(glfwGetTime()), 0.0f+3* std::cos(glfwGetTime()));
+			shader->setVec3("pointLights[0].position", lightPos);
+			shader->setVec3("pointLights[0].ambient", 0.2f, 0.2f, 0.2f);
+			shader->setVec3("pointLights[0].diffuse", 0.5f, 0.5f, 0.5f);
+			shader->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+
+			shader->setFloat("blinn", false);
+
 			/*
 
 			shader->setMat4("lightSpaceMatrix", LightManager::getShadowMapper()->getLightSpaceMatrix());
@@ -239,16 +252,36 @@ namespace MeshRenderer {
 				shader->setBool("useTexture", !material.textures.empty());
 
 				shader->setBool("useLighting", 0);
+				
+
+
 				//shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
 				shader->setMat4("lightSpaceMatrix", glm::mat4(1.0f));
 
 
+
+				shader->setFloat("material.shininess", material.shininess);
+
 				// Bind first diffuse texture if it exists
 				for (const Texture& texture : material.textures) {
-					if (texture.type == "texture_diffuse") {
+					switch (texture.type)
+					{
+					case Texture::Type::DIFFUSE:
 						glActiveTexture(GL_TEXTURE0);
-						shader->setInt("material.diffuse1", 0);
+						shader->setInt("material.diffuse", 0);
 						glBindTexture(GL_TEXTURE_2D, texture.id);
+						break;
+					case Texture::Type::NORMAL:
+						glActiveTexture(GL_TEXTURE2);
+						shader->setInt("material.normal", 2);
+						glBindTexture(GL_TEXTURE_2D, texture.id);
+						break;
+					case Texture::Type::SPECULAR:
+						glActiveTexture(GL_TEXTURE1);
+						shader->setInt("material.specular", 1);
+						glBindTexture(GL_TEXTURE_2D, texture.id);
+						break;
+					default:
 						break;
 					}
 				}
@@ -282,10 +315,10 @@ namespace MeshRenderer {
 		return meshes.find(handle) != meshes.end();
 	}
 
-	void setCubeTextures(RenderableHandle handle, const Texture& texture) {
+	void setCubeTextures(RenderableHandle handle, const std::vector<Texture>& textures) {
 		if (isValidHandle(handle))
-			meshes[handle].material[0].textures = { texture };
-			
+			meshes[handle].material[0].textures =  textures ;
+
 	}
 
 

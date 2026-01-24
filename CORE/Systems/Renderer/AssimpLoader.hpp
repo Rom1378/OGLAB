@@ -7,7 +7,8 @@
 #include <assimp/postprocess.h>
 #include <string>
 
-struct Texture;
+#include "CORE/TextureManager.hpp"
+
 namespace MeshRenderer{
 struct RenderableData;
 struct MeshData;
@@ -21,7 +22,7 @@ namespace assimpLoader {
 	std::pair<MeshRenderer::MeshData, std::vector<Texture>> processMesh(aiMesh* mesh, const aiScene* scene, const std::string& directory);
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat,
 		aiTextureType type,
-		const std::string& typeName, const std::string& directory);
+		Texture::Type typeName, const std::string& directory);
 	unsigned int TextureFromFile(const char* path, const std::string& directory);
 
 	void printModelInfo(const MeshRenderer::RenderableData& data);
