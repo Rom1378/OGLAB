@@ -17,6 +17,7 @@
 #include "CORE/Systems/Physics/Physics.hpp"
 
 #include "CORE/UI/Entity.hpp"
+#include "CORE/UI/LightEdit.hpp"
 
 
 
@@ -119,7 +120,7 @@ namespace Engine {
 		// Render UI
 		//scene->onImGuiRender();
 		
-
+		UI::renderLightControlMenu(*scene);
 		UI::DrawEntityTree(scene);
 
 		// Render ImGui

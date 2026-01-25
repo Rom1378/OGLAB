@@ -16,6 +16,11 @@
 class Scene;
 
 namespace Renderer {
+	struct RendererSettings {
+		bool enableBlinn = true;
+		bool enableLighting = true;
+	};
+
 
 	void init();
 	void update(float dt);
@@ -36,5 +41,7 @@ namespace Renderer {
 	void setViewProjection(const glm::mat4& view, const glm::mat4& proj);
 	const glm::mat4& getView();
 	const glm::mat4& getProjection();
+
+	RendererSettings& getRendererSettings();
 	
 }

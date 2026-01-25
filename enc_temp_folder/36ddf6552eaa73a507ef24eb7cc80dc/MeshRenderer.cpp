@@ -349,6 +349,7 @@ namespace MeshRenderer {
 				// Material properties
 				shader->setBool("useTexture", !material.textures.empty());
 
+				shader->setBool("useLighting", 0);
 				
 
 

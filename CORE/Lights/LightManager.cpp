@@ -1,4 +1,37 @@
-#include "Light.hpp"
+
+#include "LightManager.hpp"
+#include "CORE/Entity.hpp"
+#include "CORE/Scene.hpp"
+#include "CORE/ComponentManager.hpp"
+
+namespace LightManager {
+	std::vector<Entity> lightsEntity;
+	//LightData* m_shadowCaster = nullptr;
+
+	void registerLight(Entity e) {
+		lightsEntity.push_back(e);
+	}
+	void destroyLight(Entity e) {
+		auto it = std::find(lightsEntity.begin(), lightsEntity.end(), e);
+		if (it != lightsEntity.end())
+			lightsEntity.erase(it);
+		else
+			LOG("Light entity not found, can't be removed");
+
+	}
+
+	//ComponentManager::ComponentStorage<LightComponent>::ComponentView getRelevantLights(Camera* cam, int maxLights = 8) {
+		//auto lightscomp = ComponentManager::getStorage<LightComponent>()->getComponentView();	}
+
+	//std::vector<LightData> getLightsInRadius(glm::vec3 pos, float radius) {	}
+
+	//void update(Scene* scene) {
+	//
+	//
+//}
+
+
+/*#include "Light.hpp"
 #include "LightManager.hpp"
 #include "CORE/Scene.hpp"
 
@@ -135,3 +168,4 @@ namespace LightManager
 	//	return nullptr; // Return nullptr if light not found
 	//}
 }
+

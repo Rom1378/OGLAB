@@ -34,6 +34,14 @@ namespace Renderer {
 	} renderCam;
 
 
+	RendererSettings rdSettings{};
+
+	RendererSettings& getRendererSettings() {
+		return rdSettings;
+	}
+
+
+
 	void init() {
 
 		// Framebuffer init

@@ -25,6 +25,7 @@ public:
 
 	Entity createEntity();
 	Entity createEntity(const char* name);
+	Entity createEntity(std::string name);
 	bool DestroyEntity(Entity e);
 
 	template<typename T, typename... Args>
@@ -43,6 +44,18 @@ public:
 		}
 		return component;
 	}
+
+	
+	template<typename T>
+	auto getComponentView() {
+		auto* storage = ComponentManager::getStorage<T>();
+		if (!storage) {
+			return typename ComponentManager::ComponentStorage<T>::ComponentView{ nullptr, nullptr };
+
+		}
+		return storage->getComponentView();
+	}
+
 	template<typename T>
 	inline bool hasComponent(Entity e) {
 		return ComponentManager::hasComponent<T>(e.getId());

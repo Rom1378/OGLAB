@@ -81,6 +81,60 @@ namespace ComponentManager {
 		}
 
 
+
+		std::vector<std::pair<Entity, T*>> getComponentsWithEntities() {
+			std::vector<std::pair<Entity, T*>> result;
+			result.reserve(components.size());
+
+			for (size_t i = 0; i < components.size(); ++i) {
+				result.emplace_back(entities[i], &components[i]);
+			}
+
+			return result;
+		}
+
+
+		//view
+		struct ComponentView {
+			std::vector<T>* components;  
+			std::vector<Entity>* entities; 
+
+			struct Iterator {
+				size_t index;
+				std::vector<T>* components;  // Changed to pointer
+				std::vector<Entity>* entities; // Changed to pointer
+
+				auto operator*() {
+					return std::pair<Entity, T*>{(*entities)[index], & (*components)[index]};
+				}
+
+				Iterator& operator++() { ++index; return *this; }
+				bool operator!=(const Iterator& other) const { return index != other.index; }
+			};
+
+			Iterator begin() {
+				return { 0, components, entities };
+			}
+
+			Iterator end() {
+				size_t size = (components && entities) ? components->size() : 0;
+				return { size, components, entities };
+			}
+
+			size_t size() const {
+				return (components && entities) ? components->size() : 0;
+			}
+
+			bool empty() const {
+				return !components || !entities || components->empty();
+			}
+		};
+
+		ComponentView getComponentView() {
+			return { &components, &entities };  // Return pointers
+		}
+
+
 	private:
 		std::vector<T> components;
 		std::vector<Entity> entities; //all entity that have a component T

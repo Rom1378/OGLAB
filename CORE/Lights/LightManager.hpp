@@ -1,4 +1,48 @@
 #pragma once
+
+#include "CORE/Components/Light.hpp"
+#include "CORE/Components/Transform.hpp"
+#include "CORE/Components/Camera.hpp"
+
+#include <vector>
+#include "CORE/ComponentManager.hpp"
+
+class Entity;
+class Scene;
+
+namespace LightManager {
+
+	//void registerLight(Entity e);
+
+	//void destroyLight(Entity e);
+	// Get lights relevant to a camera frustum
+	//ComponentManager::ComponentStorage<LightComponent>::ComponentView getRelevantLights(Camera* cam, int maxLights = 8);
+
+	// Get lights affecting a specific position/radius
+	//std::vector<LightData> getLightsInRadius(glm::vec3 pos, float radius);
+
+	// Update light cache (call once per frame)
+	void update(Scene* scene);
+
+	// Shadow mapping support
+	//void setShadowCaster(Entity lightEntity);
+	//LightData* getShadowCaster() { return m_shadowCaster; }
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+/*#pragma once
 #include "../ShaderProgram.hpp"
 #include "Light.hpp"
 #include <vector>
@@ -127,3 +171,5 @@ namespace LightManager {
 
 
 }
+
+*/

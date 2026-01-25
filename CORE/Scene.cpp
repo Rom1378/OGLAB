@@ -19,11 +19,9 @@
 #include "CORE/Components/Transform.hpp"
 #include "CORE/Components/Physics.hpp"
 #include "CORE/Components/Renderable.hpp"
+#include "CORE/Components/Light.hpp"
 
 void Scene::init() {
-
-
-
 	cameraEntity= createEntity("Dev camera");
 
 	addComponent<CameraComponent>(cameraEntity);
@@ -34,6 +32,14 @@ void Scene::init() {
 	
 	// simulate dx dt dz yaw pitch
 	addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
+
+
+    LightComponent spotLight;
+    spotLight.type = LightComponent::Type::SPOT;
+    spotLight.data = SpotLightData();
+
+    addComponent<LightComponent>(cameraEntity, spotLight);
+
 	
 	activeCamera = cameraEntity;
 	activeEntity = cameraEntity; //will 
@@ -65,9 +71,135 @@ void Scene::init() {
 	comp.pos = { 0,-4,0 };
 	addComponent<TransformComponent>(cube, comp);
 
+
+    // Create cubes in a grid
+    for (int x = -2; x <= 2; x++) {
+        for (int z = -2; z <= 2; z++) {
+            Entity cube = createEntity("Cube_" + std::to_string(x) + "_" + std::to_string(z));
+            auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
+            MeshRenderer::setCubeTextures(rdcomp->rhandle, { container, specular });
+
+            TransformComponent transform;
+            transform.pos = glm::vec3(x * 3.0f, 0.0f, z * 3.0f);
+            transform.scale = glm::vec3(1.0f);
+            addComponent<TransformComponent>(cube, transform);
+        }
+    }
+
+    // Floor
+    Entity floor = createEntity("Floor");
+    auto floorRd = addComponent<RenderableComponent>(floor, MeshRenderer::createCube());
+    MeshRenderer::setCubeTextures(floorRd->rhandle, { container, specular });
+    TransformComponent floorTransform;
+    floorTransform.pos = glm::vec3(0.0f, -3.0f, 0.0f);
+    floorTransform.scale = glm::vec3(20.0f, 0.5f, 20.0f);
+    addComponent<TransformComponent>(floor, floorTransform);
+
+    // ================= LIGHTS (BRIGHTER) =================
+
+    // Point Light 1 - White (center, moving in circle)
+    Entity pointLight1 = createEntity("Point Light 1 (White)");
+    LightComponent light1;
+    light1.type = LightComponent::Type::POINT;
+    light1.ambient = glm::vec3(0.3f);
+    light1.diffuse = glm::vec3(2.0f);  // Brighter!
+    light1.specular = glm::vec3(2.0f);
+    light1.data = PointLightData{ 1.0f, 0.07f, 0.017f };  // Less attenuation
+    addComponent<LightComponent>(pointLight1, light1);
+    TransformComponent light1Transform;
+    light1Transform.pos = glm::vec3(0.0f, 5.0f, 0.0f);
+    addComponent<TransformComponent>(pointLight1, light1Transform);
+
+    // Point Light 2 - Red (moving)
+    Entity pointLight2 = createEntity("Point Light 2 (Red)");
+    LightComponent light2;
+    light2.type = LightComponent::Type::POINT;
+    light2.ambient = glm::vec3(0.1f, 0.0f, 0.0f);
+    light2.diffuse = glm::vec3(3.0f, 0.0f, 0.0f);
+    light2.specular = glm::vec3(1.5f, 0.0f, 0.0f);
+    light2.data = PointLightData{ 1.0f, 0.07f, 0.017f };
+    addComponent<LightComponent>(pointLight2, light2);
+    TransformComponent light2Transform;
+    light2Transform.pos = glm::vec3(-8.0f, 3.0f, 0.0f);
+    addComponent<TransformComponent>(pointLight2, light2Transform);
+
+    // Point Light 3 - Blue (moving)
+    Entity pointLight3 = createEntity("Point Light 3 (Blue)");
+    LightComponent light3;
+    light3.type = LightComponent::Type::POINT;
+    light3.ambient = glm::vec3(0.0f, 0.0f, 0.1f);
+    light3.diffuse = glm::vec3(0.0f, 0.0f, 3.0f);
+    light3.specular = glm::vec3(0.0f, 0.0f, 1.5f);
+    light3.data = PointLightData{ 1.0f, 0.07f, 0.017f };
+    addComponent<LightComponent>(pointLight3, light3);
+    TransformComponent light3Transform;
+    light3Transform.pos = glm::vec3(8.0f, 3.0f, 0.0f);
+    addComponent<TransformComponent>(pointLight3, light3Transform);
+
+    // Point Light 4 - Green (moving)
+    Entity pointLight4 = createEntity("Point Light 4 (Green)");
+    LightComponent light4;
+    light4.type = LightComponent::Type::POINT;
+    light4.ambient = glm::vec3(0.0f, 0.1f, 0.0f);
+    light4.diffuse = glm::vec3(0.0f, 3.0f, 0.0f);
+    light4.specular = glm::vec3(0.0f, 1.5f, 0.0f);
+    light4.data = PointLightData{ 1.0f, 0.07f, 0.017f };
+    addComponent<LightComponent>(pointLight4, light4);
+    TransformComponent light4Transform;
+    light4Transform.pos = glm::vec3(0.0f, 3.0f, 8.0f);
+    addComponent<TransformComponent>(pointLight4, light4Transform);
+
+    // Directional Light - Subtle ambient
+    Entity dirLight = createEntity("Directional Light");
+    LightComponent dirLightComp;
+    dirLightComp.type = LightComponent::Type::DIR;
+    dirLightComp.ambient = glm::vec3(0.1f);
+    dirLightComp.diffuse = glm::vec3(0.4f);
+    dirLightComp.specular = glm::vec3(0.5f);
+    //dirLightComp.data = DirLightData{ glm::vec3(-0.2f, -1.0f, -0.3f) };
+    addComponent<LightComponent>(dirLight, dirLightComp);
+
+
 }
 
 void Scene::update(float dt) {
+
+    //lights move
+    {
+        float time = glfwGetTime();
+
+        // Get light entities
+        auto lightView = getComponentView<LightComponent>();
+
+        int lightIndex = 0;
+        for (auto [entity, light] : lightView) {
+            if (light->type != LightComponent::Type::POINT) continue;
+
+            TransformComponent* transform = getComponent<TransformComponent>(entity);
+            if (!transform) continue;
+
+            // Each light moves in a different pattern
+            float radius = 8.0f;
+            float speed = 0.5f;
+            float offset = lightIndex * glm::pi<float>() / 2.0f;  // 90 degree offset each
+
+            transform->pos.x = radius * glm::cos(time * speed + offset);
+            transform->pos.z = radius * glm::sin(time * speed + offset);
+            transform->pos.y = 3.0f + 2.0f * glm::sin(time * speed * 2.0f + offset);
+
+            lightIndex++;
+        }
+
+    }
+
+
+
+
+
+
+
+
+
 
 
 // 1 input system
@@ -98,6 +230,11 @@ void Scene::update(float dt) {
 Entity Scene::createEntity() {
 	entities.push_back(EntityManager::Create());
 	return entities.back();
+}
+
+Entity Scene::createEntity(std::string name) {
+    LOG_WARN("NO name for now");
+    return createEntity();
 }
 
 Entity Scene::createEntity(const char* name) {
