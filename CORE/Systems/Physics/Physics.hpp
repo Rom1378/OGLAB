@@ -17,10 +17,9 @@ namespace PhysicsSystem {
 	const physx::PxPhysics* getPhysics();
 	const physx::PxScene* getScene();
 
-	void flushQueues(Scene* scene);
 
-	void requestCreation(PhysicsBodyComponent* c);
-	void requestDestruction(PhysicsBodyComponent* c);
+	//void requestCreation(PhysicsBodyComponent* c);
+	//void requestDestruckotion(PhysicsBodyComponent* c);
 
 
 	bool raycast(physx::PxScene* scene, const glm::vec3& origin, const glm::vec3& direction, float maxDistance, physx::PxRaycastHit& hitInfo);

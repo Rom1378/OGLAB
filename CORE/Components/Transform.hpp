@@ -14,7 +14,7 @@ struct TransformComponent {
 	glm::vec3 scale;
 
 	TransformComponent(const glm::vec3& pos = glm::vec3(0.0f),
-		const glm::quat& rot = glm::quat(0, 0, 0, 0),
+		const glm::quat& rot = glm::quat(1, 0, 0, 0),
 		const glm::vec3& scale = glm::vec3(1.0f))
 		: pos(pos), rot(rot), scale(scale) {}
 	TransformComponent(const TransformComponent&) = default;
@@ -48,9 +48,32 @@ struct TransformComponent {
 
 	void fromPx(const physx::PxTransform& t) {
 		pos = glm::vec3(t.p.x, t.p.y, t.p.z);
-		rot = glm::quat(t.q.x, t.q.y, t.q.z, t.q.w);
+		//glm::quat newRot = glm::quat(t.q.x, t.q.y, t.q.z, t.q.w);
+		glm::quat newRot = glm::quat(t.q.w, t.q.x, t.q.y, t.q.z);
+
+		if (glm::dot(rot, rot) < 0.0f) {
+			newRot = -newRot;
+		}
+
+		rot = glm::normalize(newRot);
 	}
 
+	physx::PxTransform toPx() {
+		return physx::PxTransform(
+			physx::PxVec3(pos.x, pos.y, pos.z),
+			physx::PxQuat(rot.x, rot.y, rot.z, rot.w)
+			);
+	}
+
+
+
+	void rotate(float pitch, float yaw, float roll) {
+		glm::quat pitchQuat = glm::angleAxis(pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+		glm::quat yawQuat = glm::angleAxis(yaw, glm::vec3(0.0f, 1.0f, 0.0f));
+		glm::quat rollQuat = glm::angleAxis(roll, glm::vec3(0.0f, 0.0f, 1.0f));
+		rot = yawQuat * pitchQuat * rollQuat * rot;
+		rot = glm::normalize(rot);
+	}
 
 
 	//http://www.gamedev.net/forums/topic/56471-extracting-direction-vectors-from-quaternion/1273785
@@ -67,5 +90,14 @@ struct TransformComponent {
 		return glm::vec3{ 1 - 2 * (y * y + z * z), 2 * (x * y + w * z),2 * (x * z - w * y) };
 	}
 
+	glm::vec3 getEulerAngles() const {
+		return glm::degrees(glm::eulerAngles(rot));
+	}
+
+	void setEulerAngles(const glm::vec3& euler) {
+		rot = glm::quat(glm::radians(euler));
+	}
+
 };
+
 

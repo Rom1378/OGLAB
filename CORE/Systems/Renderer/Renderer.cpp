@@ -90,7 +90,7 @@ namespace Renderer {
 	}
 
 	void update(float dt) {
-		LOG_OK("updating in renderer");
+
 	}
 
 	void render(Scene* scene) {

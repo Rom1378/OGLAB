@@ -236,7 +236,7 @@ namespace MeshRenderer {
 				}
 
 				shader.setVec3(base + "position", transform->pos);
-				shader.setVec3(base + "direction", glm::eulerAngles(transform->rot));
+				shader.setVec3(base + "direction", transform->forward());
 				shader.setVec3(base + "ambient", light->ambient);
 				shader.setVec3(base + "diffuse", light->diffuse);
 				shader.setVec3(base + "specular", light->specular);
@@ -353,7 +353,7 @@ namespace MeshRenderer {
 
 
 				//shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-				shader->setMat4("lightSpaceMatrix", glm::mat4(1.0f));
+				//shader->setMat4("lightSpaceMatrix", glm::mat4(1.0f));
 
 
 

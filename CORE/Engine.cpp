@@ -16,8 +16,7 @@
 #include "CORE/Systems/Renderer/Renderer.hpp"
 #include "CORE/Systems/Physics/Physics.hpp"
 
-#include "CORE/UI/Entity.hpp"
-#include "CORE/UI/LightEdit.hpp"
+#include "CORE/UI/UI.hpp"
 
 
 
@@ -55,12 +54,11 @@ namespace Engine {
 		Input::init();
 		ShaderManager::loadConfigs("../../../Config/shaders.json");
 
-
-
 		PhysicsSystem::init();
 
 		Renderer::init();
 
+		UI::init();
 		//LightManager::init();
 
 		//LineRenderer::init();
@@ -119,9 +117,8 @@ namespace Engine {
 
 		// Render UI
 		//scene->onImGuiRender();
-		
-		UI::renderLightControlMenu(*scene);
-		UI::DrawEntityTree(scene);
+			
+		UI::render(scene);
 
 		// Render ImGui
 		ImGui::Render();

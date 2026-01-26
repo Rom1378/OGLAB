@@ -46,25 +46,100 @@ namespace PhysicsSystem {
 	} visParamStates;
 
 
-	void update(Scene* scene, float dt) {
-		flushQueues(scene);
+	static void attachCollider(physx::PxRigidActor* actor, const ColliderComponent& col, physx::PxMaterial* defaultMat);
+	static void destroyBody(PhysicsBodyComponent* body);
+	static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const TransformComponent& transform);
 
 
-		//updates simulation based on component data
-		for (Entity e : scene->getEntities()) {
-			PhysicsBodyComponent* physcsBody = scene->getComponent<PhysicsBodyComponent>(e);
-			if (!physcsBody)
+
+	static void flushCreationDeletion(Scene* scene) {
+		// --- CREATE ---
+		auto physicsBodycomps = scene->getComponentView<PhysicsBodyComponent>();
+
+		for (auto [entity, physicsComp] : physicsBodycomps) {
+			TransformComponent* transform = scene->getComponent<TransformComponent>(entity);
+
+			if (physicsComp->state != PhysicsBodyComponent::State::Uninitialized)
 				continue;
 
+			if (physicsComp->role == PhysicsBodyComponent::PhysicsRole::CharacterController) {
 
-			switch (physcsBody->role) {
+				PxCapsuleControllerDesc desc;
+				desc.height = 1.8f;
+				desc.radius = 0.4f;
+				desc.stepOffset = 0.4f;
+				desc.position = PxExtendedVec3(transform->pos.x, transform->pos.y, transform->pos.z);
+				desc.material = defaultMaterial;
+
+				physicsComp->controller = Internal::controllerManager->createController(desc);
+
+			}
+			else {
+				physicsComp->actor = createActor(physicsComp, *transform);
+				if (!physicsComp->actor) {
+					LOG_WARN("Could not create actor");
+					continue;
+				}
+				auto colliderComponents = scene->getComponent<ColliderComponent>(entity);
+				if (!colliderComponents) {
+					LOG_WARN("Entity with PhysicsBodyComponent and non CharacterController must have a ColliderComponent");
+					continue;
+				}
+				else {
+
+					attachCollider(physicsComp->actor, *colliderComponents, defaultMaterial);
+
+				}
+
+				Internal::pxScene->addActor(*physicsComp->actor);
+			}
+
+			physicsComp->state = PhysicsBodyComponent::State::Alive;
+		}
+
+		// --- DESTROY ---
+		for (auto [entity, physicsComp] : physicsBodycomps) {
+			if (physicsComp->state == PhysicsBodyComponent::State::PendingDestroy) {
+				destroyBody(physicsComp);
+				physicsComp->state = PhysicsBodyComponent::State::Uninitialized;
+			}
+		}
+	}
+	void update(Scene* scene, float dt) {
+		flushCreationDeletion(scene);
+
+		//TODO USE VIEW
+		// 1 update physx from game transforms
+		for (Entity e : scene->getEntities()) {
+			PhysicsBodyComponent* physicsBody = scene->getComponent<PhysicsBodyComponent>(e);
+			TransformComponent* transform = scene->getComponent<TransformComponent>(e);
+
+			if (!physicsBody || !transform)
+				continue;
+
+			if (physicsBody->controlledByPhysics)
+				continue;
+			//physicsBody->releaseControl();
+
+
+			switch (physicsBody->role) {
 			case PhysicsBodyComponent::PhysicsRole::CharacterController: {
+				if (physicsBody->controller) {
+					physicsBody->controller->setPosition(physx::PxExtendedVec3(
+						transform->pos.x, transform->pos.y, transform->pos.z
+					));
+				}
+				break;
+
+
+				/*
+
 				auto* state = scene->getComponent<CharacterControllerStateComponent>(e);
 				if (!state) {
 					LOG_WARN("CharacaterController has no CharacterControllerStateComponent");
 					break;
 				}
-				PxController* controller = physcsBody->controller;
+				PxController* controller = physicsBody->controller;
 				if (!controller) {
 					LOG_WARN("CharacaterController has no PxController");
 					break;
@@ -73,26 +148,82 @@ namespace PhysicsSystem {
 				PxControllerFilters filters;
 
 				PxVec3 displacement{ state->velocity.x, state->velocity.y, state->velocity.z };
-				displacement += gravity * physcsBody->mass * dt;
+				displacement += gravity * physicsBody->mass * dt;
 
 				controller->move(displacement, 0.001f, dt, filters);
+				//state->isOnTheGround = filters.
 				state->velocity = { 0,0,0 };
 				//controller dont rotate, the rotation on the transform will be done in the Transformsync systems
 
-				break;
+				break;*/
+
+
 			}
 			case PhysicsBodyComponent::PhysicsRole::Dynamic: {
 				// forces already applied elsewhere
+				if (auto* dynamic = physicsBody->actor->is<physx::PxRigidDynamic>()) {
+					dynamic->setGlobalPose(transform->toPx());
+					// Clear velocities to prevent momentum issues after manual positioning
+					dynamic->setLinearVelocity(physx::PxVec3(0));
+					dynamic->setAngularVelocity(physx::PxVec3(0));
+				}
 				break;
 			}
 
 			case PhysicsBodyComponent::PhysicsRole::Kinematic: {
-				// setKinematicTarget()
+				if (auto* dynamic = physicsBody->actor->is<physx::PxRigidDynamic>()) {
+					dynamic->setKinematicTarget(transform->toPx());
+				}
+				break;
+			}
+			case PhysicsBodyComponent::PhysicsRole::Static: {
+				if (auto* staticActor = physicsBody->actor->is<physx::PxRigidStatic>()) {
+					staticActor->setGlobalPose(transform->toPx());
+				}
 				break;
 			}
 			}
 
 
+		}
+
+
+		// 2 apply gameplay forces/velocities
+		for (Entity e : scene->getEntities()) {
+			PhysicsBodyComponent* physicsBody = scene->getComponent<PhysicsBodyComponent>(e);
+			if (!physicsBody)
+				continue;
+
+			switch (physicsBody->role) {
+			case PhysicsBodyComponent::PhysicsRole::CharacterController: {
+				auto* state = scene->getComponent<CharacterControllerStateComponent>(e);
+				if (!state) {
+					LOG_WARN("CharacterController has no CharacterControllerStateComponent");
+					break;
+				}
+
+				physx::PxController* controller = physicsBody->controller;
+				if (!controller) {
+					LOG_WARN("CharacterController has no PxController");
+					break;
+				}
+
+				physx::PxControllerFilters filters;
+				physx::PxVec3 displacement{ state->velocity.x, state->velocity.y, state->velocity.z };
+				displacement += gravity * physicsBody->mass * dt;
+				controller->move(displacement, 0.001f, dt, filters);
+				state->velocity = { 0, 0, 0 };
+				break;
+			}
+			case PhysicsBodyComponent::PhysicsRole::Dynamic: {
+				// Apply forces here
+				break;
+			}
+			case PhysicsBodyComponent::PhysicsRole::Kinematic: {
+				// Kinematic movement handled in phase 1 or here depending on your needs
+				break;
+			}
+			}
 		}
 
 		//step simulation
@@ -152,7 +283,7 @@ namespace PhysicsSystem {
 	}
 
 
-	
+
 
 	const PxPhysics* getPhysics()
 	{
@@ -202,100 +333,178 @@ namespace PhysicsSystem {
 		return *Internal::controllerManager;
 	}
 
-	
 
+	/*
 
-	void createBody(PhysicsBodyComponent* phys) {
-		if (!phys) return;
+		static void createBody(PhysicsBodyComponent* phys) {
+			if (!phys) return;
 
-		PxMaterial* material = phys->material;
-		if (!material) {
-			material = defaultMaterial;
-		}
-		switch (phys->role) {
-		case PhysicsBodyComponent::PhysicsRole::Dynamic: {
-			PxRigidDynamic* dynamic = PxCreateDynamic(
-				*Internal::gPhysics,
-				PxTransform(PxVec3(0, 5, 0)), // TODO: use entity transform
-				PxBoxGeometry(0.5f, 0.5f, 0.5f), // Example box
-				*material,
-				phys->mass // mass TODO use component mass
-			);
-			Internal::pxScene->addActor(*dynamic);
-			phys->rigidDynamic = dynamic;
-			break;
-		}
-
-		case PhysicsBodyComponent::PhysicsRole::Kinematic: {
-			PxRigidDynamic* kinematic = PxCreateDynamic(
-				*Internal::gPhysics,
-				PxTransform(PxVec3(0, 5, 0)),
-				PxBoxGeometry(0.5f, 0.5f, 0.5f),
-				*material,
-				0.0f
-			);
-			kinematic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
-			Internal::pxScene->addActor(*kinematic);
-			phys->rigidDynamic = kinematic;
-			break;
-		}
-
-		case PhysicsBodyComponent::PhysicsRole::CharacterController: {
-			PxCapsuleControllerDesc desc;
-			desc.height = 1.8f;
-			desc.radius = 0.4f;
-			desc.stepOffset = 0.4f;
-			desc.position = PxExtendedVec3(0, 5, 0); // TODO: entity transform
-			desc.material = material;
-
-			phys->controller = Internal::controllerManager->createController(desc);
-			break;
-		}
-		}
-	}
-
-	void destroyBody(PhysicsBodyComponent* phys) {
-		if (!phys) return;
-
-		switch (phys->role) {
-		case PhysicsBodyComponent::PhysicsRole::Dynamic:
-		case PhysicsBodyComponent::PhysicsRole::Kinematic:
-			if (phys->rigidDynamic) {
-				phys->rigidDynamic->release();
-				phys->rigidDynamic = nullptr;
+			PxMaterial* material = phys->material;
+			if (!material) {
+				material = defaultMaterial;
 			}
-			break;
-
-		case PhysicsBodyComponent::PhysicsRole::CharacterController:
-			if (phys->controller) {
-				phys->controller->release();
-				phys->controller = nullptr;
+			switch (phys->role) {
+			case PhysicsBodyComponent::PhysicsRole::Dynamic: {
+				PxRigidDynamic* dynamic = PxCreateDynamic(
+					*Internal::gPhysics,
+					PxTransform(PxVec3(0, 5, 0)), // TODO: use entity transform
+					PxBoxGeometry(0.5f, 0.5f, 0.5f), // Example box
+					*material,
+					phys->mass // mass TODO use component mass
+				);
+				Internal::pxScene->addActor(*dynamic);
+				phys->rigidDynamic = dynamic;
+				break;
 			}
+
+			case PhysicsBodyComponent::PhysicsRole::Kinematic: {
+				PxRigidDynamic* kinematic = PxCreateDynamic(
+					*Internal::gPhysics,
+					PxTransform(PxVec3(0, 5, 0)),
+					PxBoxGeometry(0.5f, 0.5f, 0.5f),
+					*material,
+					0.0f
+				);
+				kinematic->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+				Internal::pxScene->addActor(*kinematic);
+				phys->rigidDynamic = kinematic;
+				break;
+			}
+
+			case PhysicsBodyComponent::PhysicsRole::CharacterController: {
+
+			}
+			}
+		}
+
+		
+
+
+		/*
+		void requestCreation(PhysicsBodyComponent* c) {
+			creationQueue.push(c);
+		}
+		void requestDestruction(PhysicsBodyComponent* c) {
+			destructionQueue.push(c);
+		}
+
+		void flushQueues(Scene* scene) {
+			while (!creationQueue.empty()) {
+				PhysicsBodyComponent* comp = creationQueue.front();
+				creationQueue.pop();
+
+				if (comp->role == PhysicsBodyComponent::PhysicsRole::CharacterController)
+				{
+					PxCapsuleControllerDesc desc;
+					desc.height = 1.8f;
+					desc.radius = 0.4f;
+					desc.stepOffset = 0.4f;
+					desc.position = PxExtendedVec3(0, 5, 0); // TODO: entity transform
+					desc.material = material;
+
+					phys->controller = Internal::controllerManager->createController(desc);
+					break;
+				}
+				else {
+					createActor();
+				createBody(comp); // TODO pass a shape or add the shape data in the component
+				}
+
+			}
+
+			while (!destructionQueue.empty()) {
+				PhysicsBodyComponent* comp = destructionQueue.front();
+				destructionQueue.pop();
+				destroyBody(comp);
+			}
+		}
+
+	*/
+
+
+
+	static void destroyBody(PhysicsBodyComponent* body) {
+		if (!body)
+			return;
+
+		// --- Character Controller ---
+		if (body->controller) {
+			body->controller->release();
+			body->controller = nullptr;
+		}
+
+		// --- Rigid Actor (dynamic / kinematic) ---
+		if (body->actor) {
+			body->actor->release(); // releases attached shapes automatically
+			body->actor = nullptr;
+		}
+	}
+
+static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const TransformComponent& transform) {
+			PxTransform pxT(
+				PxVec3(transform.pos.x, transform.pos.y, transform.pos.z),
+				PxQuat(transform.rot.x, transform.rot.y, transform.rot.z, transform.rot.w)
+			);
+
+			switch (body->role) {
+			case PhysicsBodyComponent::PhysicsRole::Dynamic: {
+				auto* a = Internal::gPhysics->createRigidDynamic(pxT);
+				a->setMass(body->mass);
+				return a;
+			}
+			case PhysicsBodyComponent::PhysicsRole::Kinematic: {
+				auto* a = Internal::gPhysics->createRigidDynamic(pxT);
+				a->setRigidBodyFlag(PxRigidBodyFlag::eKINEMATIC, true);
+				return a;
+			}
+			case PhysicsBodyComponent::PhysicsRole::Static: {
+				auto* a = Internal::gPhysics->createRigidStatic(pxT);
+				return a;
+			}
+			default:
+				return nullptr;
+			}
+		}
+
+
+	static void attachCollider(physx::PxRigidActor* actor, const ColliderComponent& col, physx::PxMaterial* defaultMat) {
+		PxMaterial* mat = col.material ? col.material : defaultMat;
+
+		PxShape* shape = nullptr;
+
+		switch (col.type) {
+		case ColliderComponent::Type::Box:
+			shape = Internal::gPhysics->createShape(
+				PxBoxGeometry(col.halfExtents.x, col.halfExtents.y, col.halfExtents.z),
+				*mat
+			);
+			break;
+
+		case ColliderComponent::Type::Sphere:
+			shape = Internal::gPhysics->createShape(
+				PxSphereGeometry(col.radius),
+				*mat
+			);
+			break;
+
+		case ColliderComponent::Type::Capsule:
+			shape = Internal::gPhysics->createShape(
+				PxCapsuleGeometry(col.radius, col.height * 0.5f),
+				*mat
+			);
 			break;
 		}
+
+		PxTransform localT(
+			PxVec3(col.localPosition.x, col.localPosition.y, col.localPosition.z),
+			PxQuat(col.localRotation.x, col.localRotation.y, col.localRotation.z, col.localRotation.w)
+		);
+
+		shape->setLocalPose(localT);
+		actor->attachShape(*shape);
+		shape->release(); // actor keeps a ref
 	}
 
-
-	void requestCreation(PhysicsBodyComponent* c) {
-		creationQueue.push(c);
-	}
-	void requestDestruction(PhysicsBodyComponent* c) {
-		destructionQueue.push(c);
-	}
-
-	void flushQueues(Scene* scene) {
-		while (!creationQueue.empty()) {
-			PhysicsBodyComponent* comp = creationQueue.front();
-			creationQueue.pop();
-			createBody(comp); // TODO pass a shape or add the shape data in the component
-		}
-
-		while (!destructionQueue.empty()) {
-			PhysicsBodyComponent* comp = destructionQueue.front();
-			destructionQueue.pop();
-			destroyBody(comp);
-		}
-	}
 
 
 }

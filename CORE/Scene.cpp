@@ -34,6 +34,8 @@ void Scene::init() {
 	addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
 
 
+
+
     LightComponent spotLight;
     spotLight.type = LightComponent::Type::SPOT;
     spotLight.data = SpotLightData();
@@ -73,14 +75,20 @@ void Scene::init() {
 
 
     // Create cubes in a grid
-    for (int x = -2; x <= 2; x++) {
-        for (int z = -2; z <= 2; z++) {
+    for (int x = -2; x <= 3; x++) {
+        for (int z = -2; z <= 3; z++) {
             Entity cube = createEntity("Cube_" + std::to_string(x) + "_" + std::to_string(z));
             auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
+            PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Dynamic };
+            ColliderComponent collider{ ColliderComponent::Type::Box };
+            addComponent<PhysicsBodyComponent>(cube, body);
+            addComponent<ColliderComponent>(cube, collider);
+
+            collider.halfExtents = { 0.5,0.5,0.5 };
             MeshRenderer::setCubeTextures(rdcomp->rhandle, { container, specular });
 
             TransformComponent transform;
-            transform.pos = glm::vec3(x * 3.0f, 0.0f, z * 3.0f);
+            transform.pos = glm::vec3(x * 3.0f, 100.0f, z * 3.0f);
             transform.scale = glm::vec3(1.0f);
             addComponent<TransformComponent>(cube, transform);
         }
@@ -89,10 +97,15 @@ void Scene::init() {
     // Floor
     Entity floor = createEntity("Floor");
     auto floorRd = addComponent<RenderableComponent>(floor, MeshRenderer::createCube());
+    PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent collider{ColliderComponent::Type::Box};
+    collider.halfExtents = glm::vec3{ 100.,0.5,100 };
+    addComponent<ColliderComponent>(floor, collider);
+    auto physxCube = addComponent<PhysicsBodyComponent>(floor, body);
     MeshRenderer::setCubeTextures(floorRd->rhandle, { container, specular });
     TransformComponent floorTransform;
     floorTransform.pos = glm::vec3(0.0f, -3.0f, 0.0f);
-    floorTransform.scale = glm::vec3(20.0f, 0.5f, 20.0f);
+    floorTransform.scale = glm::vec3(200.0f, 0.5f, 200.0f);
     addComponent<TransformComponent>(floor, floorTransform);
 
     // ================= LIGHTS (BRIGHTER) =================
@@ -215,13 +228,19 @@ void Scene::update(float dt) {
 	//PlayerMovementSystem(world, dt);
 	//RenderSystem(world);
 
-	Camera cam = getComponent<CameraComponent>(activeCamera)->cam;
+    CameraComponent* camComp = getComponent<CameraComponent>(activeCamera);
 	TransformComponent* transform = getComponent<TransformComponent>(activeCamera);
 
-	//MouseLok
-	//MouseLookSystem::update();
+    const Camera* cam;
+    if (camComp && transform) {
+        cam = &camComp->cam;
+        if (cam)
+            Renderer::setViewProjection(transform->getViewMatrix(), cam->getProjection());
+    }
+    else {
+        LOG_WARN("No Active CameraComponent or Transform component!!!");
+    }
 
-	Renderer::setViewProjection(transform->getViewMatrix(), cam.getProjection());
 	Renderer::update(dt);
 
 	onUpdate();

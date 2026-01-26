@@ -1,8 +1,9 @@
 #pragma once
-
 class Scene;
+
 namespace UI {
-	void DrawEntityTree(Scene* scene) {
-		LOG("No DrawEntityTree for now");
-	}
+    	void DrawEntityTree(Scene* scene);
+
+        void initEntityTreeBrowser();
+
 }

@@ -41,6 +41,8 @@ public:
 	operator uint32_t() const { return entity_id; }
 	bool operator==(const Entity& other) const { return entity_id == other.entity_id; }
 	bool operator!=(const Entity& other) const { return entity_id != other.entity_id; }
+	bool operator!=(const uint32_t& other) const { return entity_id != other; }
+
 	//uint32_t operator+
 
 	static constexpr uint32_t INVALID_ID = UINT32_MAX;

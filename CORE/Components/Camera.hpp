@@ -27,4 +27,13 @@ struct CameraComponent {
 		cam(glm::perspective(fov, aspectRatio, nearPlane, farPlane)),
 		fov{fov}, aspectRatio{aspectRatio}, nearPlane{nearPlane}, farPlane{farPlane}
 	{ }
+
+	void updateProjection() {
+		cam = Camera(glm::perspective(
+			glm::radians(fov),
+			aspectRatio,
+			nearPlane,
+			farPlane
+		));
+	}
 };

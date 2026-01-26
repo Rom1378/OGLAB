@@ -23,3 +23,6 @@ height map generation
 add water at level -378
 
 Add cool fps camera
+
+
+think about adding local transform to component that should have there own

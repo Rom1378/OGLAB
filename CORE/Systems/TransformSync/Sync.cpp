@@ -9,7 +9,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp> // This header contains toMat4
+#include <glm/gtx/quaternion.hpp>
 
 #include <PxPhysicsAPI.h>
 
@@ -18,35 +18,87 @@ using namespace physx;
 namespace TransformSyncSystem {
 
 	void update(Scene* scene) {
-        for (Entity e : scene->getEntities()) {
+		auto bodies = scene->getComponentView<PhysicsBodyComponent>();
 
-            auto* phys = scene->getComponent<PhysicsBodyComponent>(e);
-            auto* transform = scene->getComponent<TransformComponent>(e);
-            auto* charController = scene->getComponent<CharacterControllerStateComponent>(e);
+		for (auto [entity, phys] : bodies) {
+
+			// Only sync active physics objects
+			if (phys->state != PhysicsBodyComponent::State::Alive)
+				continue;
+
+			TransformComponent* transform = scene->getComponent<TransformComponent>(entity);
+			if (!transform)
+				continue;
 
 
+			if (!phys->controlledByPhysics)
+				continue;
+			// --- Character Controller ---
 
-            if (!phys || !transform) continue;
+			switch (phys->role) {
+			case PhysicsBodyComponent::PhysicsRole::CharacterController: {
+				PxExtendedVec3 p = phys->controller->getPosition();
+				transform->pos = { p.x,p.y,p.z };
 
-            if (phys->role == PhysicsBodyComponent::PhysicsRole::CharacterController) {
-                PxExtendedVec3 p = phys->controller->getPosition();
-                transform->pos = { (float)p.x, (float)p.y, (float)p.z };
+				// Rotation is gameplay-driven, not physics-driven
+				if (auto* cc = scene->getComponent<CharacterControllerStateComponent>(entity)) {
+					glm::vec3 rpy{
+						cc->pitch,
+						cc->yaw,
+						0.0f
+					};
 
-                glm::vec3 rpy{ charController->pitch, charController->yaw, 0,  };
-                rpy = glm::radians(rpy);
-                transform->rot = glm::quat(rpy);
-                //charController->yaw = 0;
-                //charController->pitch = 0;
+					transform->rot = glm::quat(glm::radians(rpy));
+				}
 
-                LOG(transform->pos.x," ",  transform->pos.y);
-            }
+				continue;
 
-            if (phys->role == PhysicsBodyComponent::PhysicsRole::Dynamic) {
-                PxTransform t = phys->rigidDynamic->getGlobalPose();
-                transform->fromPx(t);
-            }
-        }
+				break;
+			}
+			case PhysicsBodyComponent::PhysicsRole::Dynamic:
+			case PhysicsBodyComponent::PhysicsRole::Kinematic:
+			case PhysicsBodyComponent::PhysicsRole::Static: {
+				if (phys->actor) {
+					physx::PxTransform pxTrans = phys->actor->getGlobalPose();
+					transform->fromPx(pxTrans);
+				}
+				break;
+			}
+
+
+														  /*
+			if (phys->role == PhysicsBodyComponent::PhysicsRole::CharacterController) {
+
+				if (!phys->controller)
+					continue;
+
+				PxExtendedVec3 p = phys->controller->getPosition();
+				transform->pos = { p.x,p.y,p.z };
+
+				// Rotation is gameplay-driven, not physics-driven
+				if (auto* cc = scene->getComponent<CharacterControllerStateComponent>(entity)) {
+					glm::vec3 rpy{
+						cc->pitch,
+						cc->yaw,
+						0.0f
+					};
+
+					transform->rot = glm::quat(glm::radians(rpy));
+				}
+
+				continue;
+			}
+
+			// --- Rigid Bodies ---
+			if (!phys->actor)
+				continue;
+
+			// Only dynamic / kinematic actors reach here
+			PxTransform pxT = phys->actor->getGlobalPose();
+			transform->fromPx(pxT);
+			*/
+			}
+
+		}
 	}
-
-
 }

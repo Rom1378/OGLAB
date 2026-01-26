@@ -40,9 +40,22 @@ target_include_directories(${PROJECT_NAME} SYSTEM PRIVATE ${VCPKG_INSTALLED_DIR}
 # this copies all resource files in the build directory
 # we need this, because we want to work with paths relative to the executable
 # file(COPY ${resources} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/res DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 #copy shaders too 
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/CORE/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/CORE/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/res
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
+    COMMENT "Copying resources to build directory"
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/CORE/shaders
+    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+    COMMENT "Copying shaders to build directory"
+)
 
 
 #file(COPY Config DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
