@@ -112,24 +112,29 @@ namespace MeshRenderer {
 
 		// Bind and fill VBO
 		glBindBuffer(GL_ARRAY_BUFFER, meshData.vbo);
-		glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(float), meshData.vertices.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data(), GL_STATIC_DRAW);
 
 		// Bind and fill EBO
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data(), GL_STATIC_DRAW);
 
 		// Position attribute
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,  sizeof(Vertex), (void*)offsetof(Vertex, Position));
 		glEnableVertexAttribArray(0);
 
 		// Normal attribute
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
 		glEnableVertexAttribArray(1);
 
+		// Texture coordinates
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
+		glEnableVertexAttribArray(2);
+
+		Material m;
 		RenderableData rd{
 			.meshdatas = { meshData },
-			.material = {},
-			.shader = &*ShaderManager::getShader("sphere")
+			.material = {m},
+			.shader = &*ShaderManager::getShader("standard")
 
 		};
 		meshes[nextHandle] = std::move(rd);
@@ -332,7 +337,7 @@ namespace MeshRenderer {
 			}
 			*/
 
-			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
+d			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
 				///////////////////////				//MESH DRAW
 				const MeshData& mesh = rdata.meshdatas[i];
 				const Material& material = rdata.material[i];

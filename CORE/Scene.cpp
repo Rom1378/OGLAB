@@ -108,6 +108,21 @@ void Scene::init() {
     floorTransform.scale = glm::vec3(200.0f, 0.5f, 200.0f);
     addComponent<TransformComponent>(floor, floorTransform);
 
+	Entity Sphere = createEntity("Sphere");
+	auto sphereRd = addComponent<RenderableComponent>(Sphere, MeshRenderer::createSphere(1.0f, 32, 32));
+	PhysicsBodyComponent sphereBody{ PhysicsBodyComponent::PhysicsRole::Dynamic };
+	ColliderComponent sphereCollider{ ColliderComponent::Type::Sphere };
+	sphereCollider.radius = 1.0f;
+
+	addComponent<ColliderComponent>(Sphere, sphereCollider);
+	auto physxSphere = addComponent<PhysicsBodyComponent>(Sphere, sphereBody);
+	MeshRenderer::setCubeTextures(sphereRd->rhandle, { container, specular });
+	TransformComponent sphereTransform;
+	sphereTransform.pos = glm::vec3(5.0f, 250.0f, 0.0f);
+	addComponent<TransformComponent>(Sphere, sphereTransform);
+
+
+
     // ================= LIGHTS (BRIGHTER) =================
 
     // Point Light 1 - White (center, moving in circle)

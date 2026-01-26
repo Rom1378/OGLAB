@@ -90,13 +90,13 @@ namespace assimpLoader {
 
 			// Texture coordinates
 			if (mesh->mTextureCoords[0]) {
-				vertex.TexCoords = glm::vec2(
+				vertex.TexCoord = glm::vec2(
 					mesh->mTextureCoords[0][i].x,
 					mesh->mTextureCoords[0][i].y
 				);
 			}
 			else {
-				vertex.TexCoords = glm::vec2(0.0f);
+				vertex.TexCoord = glm::vec2(0.0f);
 			}
 			meshdata.vertices.push_back(vertex);
 		}
