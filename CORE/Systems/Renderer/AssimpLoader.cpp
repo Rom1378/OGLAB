@@ -31,7 +31,8 @@ namespace assimpLoader {
 			std::string directory = path.substr(0, path.find_last_of('/'));
 			processNode(rd, scene->mRootNode, scene, directory);
 
-			rd.shader = &*ShaderManager::getShader("assimpModel");
+			rd.shader = &*ShaderManager::getShader("standard");
+			//rd.shader = &*ShaderManager::getShader("assimpModel");
 			// Print model information
 			printModelInfo(rd);
 

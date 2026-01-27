@@ -96,7 +96,7 @@ void Scene::init() {
 
     // Floor
     Entity floor = createEntity("Floor");
-    auto floorRd = addComponent<RenderableComponent>(floor, MeshRenderer::createCube());
+    auto floorRd = addComponent<RenderableComponent>(floor, MeshRenderer::Primitive::CUBE);
     PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Static };
     ColliderComponent collider{ColliderComponent::Type::Box};
     collider.halfExtents = glm::vec3{ 100.,0.5,100 };
@@ -120,6 +120,19 @@ void Scene::init() {
 	TransformComponent sphereTransform;
 	sphereTransform.pos = glm::vec3(5.0f, 250.0f, 0.0f);
 	addComponent<TransformComponent>(Sphere, sphereTransform);
+
+
+
+
+
+    //load a 3D Model
+    Entity paleVisitor = createEntity("PaleVisitor");
+
+
+    addComponent<RenderableComponent>(paleVisitor, "res/3DModels/paleVisitor/source/PaleVisitor.fbx");
+    auto t = addComponent<TransformComponent>(paleVisitor);
+    t->pos = glm::vec3(-5.0f, 20.0f, 0.0f);
+
 
 
 

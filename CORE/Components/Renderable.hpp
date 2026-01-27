@@ -9,7 +9,7 @@ struct RenderableComponent {
 
 	RenderableComponent(MeshRenderer::RenderableHandle handle);
 	RenderableComponent(MeshRenderer::Primitive t);
-	RenderableComponent(const std::string& model_path);
+	RenderableComponent(std::string model_path);
 
 
 	MeshRenderer::RenderableHandle rhandle{ MeshRenderer::INVALID_HANDLE };

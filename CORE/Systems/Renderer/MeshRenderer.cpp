@@ -46,98 +46,70 @@ namespace MeshRenderer {
 			return &mit->second.material;
 	}
 
+	//init VAO VBO EBO... ogl buffers
+	static void createMeshBuffers(RenderableData& data) {
+		for (uint32_t i{ 0 }; i < data.meshdatas.size(); i++) {
+
+			glGenVertexArrays(1, &data.meshdatas[i].vao);
+			glGenBuffers(1, &data.meshdatas[i].vbo);
+			glGenBuffers(1, &data.meshdatas[i].ebo);
+
+			glBindVertexArray(data.meshdatas[i].vao);
+
+			// Bind and fill VBO
+			glBindBuffer(GL_ARRAY_BUFFER, data.meshdatas[i].vbo);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * data.meshdatas[i].vertices.size(), data.meshdatas[i].vertices.data(), GL_STATIC_DRAW);
+			// Bind and fill EBO
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, data.meshdatas[i].ebo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * data.meshdatas[i].indices.size(), data.meshdatas[i].indices.data(), GL_STATIC_DRAW);
+
+			// Position attribute
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Position));
+			glEnableVertexAttribArray(0);
+
+			// Normal attribute
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
+			glEnableVertexAttribArray(1);
+
+			// Texture coordinates
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
+			glEnableVertexAttribArray(2);
+		}
+
+	}
+
 	RenderableHandle createCube() {
 		if (cubeHandle)
 			return cubeHandle;
-		GLuint VAO, VBO, EBO;
-		// Generate and bind VAO, VBO, and EBO
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		glGenBuffers(1, &EBO);
 
-		glBindVertexArray(VAO);
-
-		// Bind and fill VBO
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * MeshRawData::Cube::vertices.size(), MeshRawData::Cube::vertices.data(), GL_STATIC_DRAW);
-
-		// Bind and fill EBO
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32_t) * MeshRawData::Cube::indices.size(), MeshRawData::Cube::indices.data(), GL_STATIC_DRAW);
-
-		// Position attribute
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		// Normal attribute
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-		// Texture coordinates
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(6 * sizeof(float)));
-		glEnableVertexAttribArray(2);
-
-		// Set default shader
-
-		Material m;
 		RenderableData rd{
-			.meshdatas = {
-				MeshData{
-					MeshRawData::Cube::vertices ,
-					MeshRawData::Cube::indices,
-					VBO,
-					EBO,
-					VAO,
-					static_cast<uint32_t>(MeshRawData::Cube::indices.size())
-				}
-			},
-			.material = {m},
+			.meshdatas = { {
+					.vertices = MeshRawData::Cube::vertices,
+					.indices = MeshRawData::Cube::indices,
+				} },
+			.material = { Material() },
 			.shader = &*ShaderManager::getShader("standard")
 		};
+		createMeshBuffers(rd);
 
-		meshes[nextHandle] = std::move(rd);
+		meshes[nextHandle] = rd;
 		return nextHandle++;
 	}
 
 	RenderableHandle createSphere(float radius, unsigned int sectorCount, unsigned int stackCount) {
 		if (sphereHandle)
 			return sphereHandle;
-		MeshData meshData{};
-		generateSphere(meshData.vertices, meshData.indices, radius, sectorCount, stackCount);
-		glGenVertexArrays(1, &meshData.vao);
-		glGenBuffers(1, &meshData.vbo);
-		glGenBuffers(1, &meshData.ebo);
-
-		glBindVertexArray(meshData.vao);
-
-		// Bind and fill VBO
-		glBindBuffer(GL_ARRAY_BUFFER, meshData.vbo);
-		glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data(), GL_STATIC_DRAW);
-
-		// Bind and fill EBO
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, meshData.ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(uint32_t), meshData.indices.data(), GL_STATIC_DRAW);
-
-		// Position attribute
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,  sizeof(Vertex), (void*)offsetof(Vertex, Position));
-		glEnableVertexAttribArray(0);
-
-		// Normal attribute
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-		glEnableVertexAttribArray(1);
-
-		// Texture coordinates
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
-		glEnableVertexAttribArray(2);
-
-		Material m;
 		RenderableData rd{
-			.meshdatas = { meshData },
-			.material = {m},
+			.meshdatas = {{}	},
+			.material = { Material() },
 			.shader = &*ShaderManager::getShader("standard")
-
 		};
-		meshes[nextHandle] = std::move(rd);
+
+		generateSphere(rd.meshdatas[0].vertices, rd.meshdatas[0].indices, radius, sectorCount, stackCount);
+
+		createMeshBuffers(rd);
+
+		meshes[nextHandle] = rd;
 		return nextHandle++;
 	}
 
@@ -145,6 +117,8 @@ namespace MeshRenderer {
 	RenderableHandle createRenderableFromFile(const std::string& path) {
 		RenderableData rd{};
 		if (assimpLoader::loadModel(rd, path)) {
+			createMeshBuffers(rd);
+
 			meshes[nextHandle] = rd;
 			return nextHandle++;
 		}
@@ -289,6 +263,7 @@ namespace MeshRenderer {
 			}
 
 			shader->use();
+			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
 
 			// Standard matrix uniforms
 			shader->setMat4("model", glm::value_ptr(transform->getModelMatrix()));
@@ -337,7 +312,6 @@ namespace MeshRenderer {
 			}
 			*/
 
-d			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
 				///////////////////////				//MESH DRAW
 				const MeshData& mesh = rdata.meshdatas[i];
 				const Material& material = rdata.material[i];

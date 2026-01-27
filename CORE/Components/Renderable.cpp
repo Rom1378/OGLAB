@@ -14,7 +14,7 @@ RenderableComponent::RenderableComponent(MeshRenderer::RenderableHandle handle) 
 	
 }
 
-RenderableComponent::RenderableComponent(const std::string& model_path) {
+RenderableComponent::RenderableComponent(std::string model_path) {
 	this->rhandle = MeshRenderer::createRenderableFromFile(model_path);
 }
 
