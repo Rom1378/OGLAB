@@ -11,6 +11,7 @@
 //passes
 #include "Skybox.hpp"
 #include "MeshRenderer.hpp"
+#include "LineRenderer.hpp"
 
 
 class frameBuffer {
@@ -33,7 +34,7 @@ namespace Renderer {
 		glm::mat4 view{};
 	} renderCam;
 
-	const glm::vec3& getViewPosition() {
+	glm::vec3 getViewPosition() {
 		return glm::vec3(glm::inverse(renderCam.view)[3]);
 	}
 
@@ -88,6 +89,7 @@ namespace Renderer {
 
 		Skybox::init();
 		MeshRenderer::init();
+		LineRenderer::init();
 		
 		LOG_OK("Skybox initialized");
 	}
@@ -106,6 +108,7 @@ namespace Renderer {
 		}
 
 		MeshRenderer::renderPass(scene);
+		LineRenderer::render();
 
 
 		//draw each pass.
@@ -144,6 +147,7 @@ namespace Renderer {
 		deleteBuffers();
 		Skybox::cleanup();
 		MeshRenderer::cleanup();
+		LineRenderer::cleanup();
 
 	}
 

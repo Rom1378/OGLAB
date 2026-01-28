@@ -41,7 +41,7 @@ namespace Renderer {
 	void setViewProjection(const glm::mat4& view, const glm::mat4& proj);
 	const glm::mat4& getView();
 	const glm::mat4& getProjection();
-	const glm::vec3& getViewPosition();
+	glm::vec3 getViewPosition();
 	RendererSettings& getRendererSettings();
 	
 }

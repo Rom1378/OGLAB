@@ -1,7 +1,7 @@
 #include "CORE/Scene.hpp"
 #include "CORE/Components/Physics.hpp"
-#include "CORE/Components/Transform.hpp"
 #include "CORE/Window/Input.hpp"
+#include "CORE/Components/Camera.hpp"
 
 
 namespace InputSystem {
@@ -14,11 +14,11 @@ namespace InputSystem {
 
 	void updateActiveCameraRotation(Scene* scene) {
 		Entity camEtt = scene->getActiveCamera();
-		TransformComponent* transform = scene->getComponent<TransformComponent>(camEtt);
+		CameraComponent* camcomp= scene->getComponent<CameraComponent>(camEtt);
 		CharacterControllerStateComponent* charController = scene->getComponent<CharacterControllerStateComponent>(camEtt);
-
-		if (!charController || !transform) {
-			LOG_WARN("Camera must have KinematicBody and a Transform component");
+	
+		if (!charController || !camcomp) {
+			LOG_WARN("Camera entity must have CharacterControllerStateComponent");
 			return;
 		}
 

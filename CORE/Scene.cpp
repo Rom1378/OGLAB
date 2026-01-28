@@ -81,6 +81,7 @@ void Scene::init() {
             auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
             PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Dynamic };
             ColliderComponent collider{ ColliderComponent::Type::Box };
+            collider.localTransform.pos = { -0.2f,0,0};
             addComponent<PhysicsBodyComponent>(cube, body);
             addComponent<ColliderComponent>(cube, collider);
 
@@ -267,20 +268,25 @@ void Scene::update(float dt) {
 	//PlayerMovementSystem(world, dt);
 	//RenderSystem(world);
 
+	Renderer::update(dt);
+
     CameraComponent* camComp = getComponent<CameraComponent>(activeCamera);
 	TransformComponent* transform = getComponent<TransformComponent>(activeCamera);
 
     const Camera* cam;
     if (camComp && transform) {
         cam = &camComp->cam;
-        if (cam)
-            Renderer::setViewProjection(transform->getViewMatrix(), cam->getProjection());
+        if (cam) 
+        {
+            Transform world = *transform * camComp->localTransform;
+            Renderer::setViewProjection(world.getViewMatrix(), cam->getProjection());
+
+        }
     }
     else {
         LOG_WARN("No Active CameraComponent or Transform component!!!");
     }
 
-	Renderer::update(dt);
 
 	onUpdate();
 }

@@ -1,6 +1,7 @@
 #include "UI.hpp"
 
-#include "Entity.hpp"
+#include "CORE/UI/Entity.hpp"
+#include "CORE/UI/Physics.hpp"
 
 namespace UI {
 	void init() {
@@ -9,5 +10,6 @@ namespace UI {
 
 	void render(Scene* scene) {
 		DrawEntityTree(scene);
+		imgui_physics_menu();
 	}
 }

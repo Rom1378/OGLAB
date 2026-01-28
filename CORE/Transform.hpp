@@ -57,6 +57,14 @@ struct Transform {
 		return result;
 	}
 
+	Transform inverse() const {
+		Transform inv;
+		inv.rot = glm::inverse(rot);
+		inv.scale = 1.0f / scale; // Component-wise division
+		inv.pos = inv.rot * (-pos / scale);
+		return inv;
+	}
+
 	void fromPx(const physx::PxTransform& t) {
 		pos = glm::vec3(t.p.x, t.p.y, t.p.z);
 		//glm::quat newRot = glm::quat(t.q.x, t.q.y, t.q.z, t.q.w);

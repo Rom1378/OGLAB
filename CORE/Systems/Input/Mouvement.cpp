@@ -29,6 +29,7 @@ namespace InputSystem {
 
 		TransformComponent* transform = scene->getComponent<TransformComponent>(activeEntity);
 
+
 		if (!state) {
 			LOG_WARN("ActiveEntity must have a CharacterControllerStateComponent");
 			return;

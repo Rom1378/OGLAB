@@ -23,8 +23,9 @@ namespace PhysicsSystem {
 
 
 	bool raycast(physx::PxScene* scene, const glm::vec3& origin, const glm::vec3& direction, float maxDistance, physx::PxRaycastHit& hitInfo);
-	void enable_debug_visualization(physx::PxScene* scene, bool enable);
-	void imgui_debug_menu(physx::PxScene* scene);
+	void enable_debug_visualization(bool enable);
+	void drawDebugVisualization();
+	void imgui_debug_menu();
 	physx::PxControllerManager& getControllerManger();
 
 

@@ -5,6 +5,7 @@
 #include "CORE/Components/Transform.hpp"
 #include "CORE/Components/Physics.hpp"
 #include "CORE/Systems/Physics/PhysicsScene.hpp"
+#include "CORE/Systems/Renderer/LineRenderer.hpp"
 
 #include <imgui.h>
 
@@ -48,7 +49,7 @@ namespace PhysicsSystem {
 
 	static void attachCollider(physx::PxRigidActor* actor, const ColliderComponent& col, physx::PxMaterial* defaultMat);
 	static void destroyBody(PhysicsBodyComponent* body);
-	static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const TransformComponent& transform);
+	static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const Transform& transform);
 
 
 
@@ -57,25 +58,38 @@ namespace PhysicsSystem {
 		auto physicsBodycomps = scene->getComponentView<PhysicsBodyComponent>();
 
 		for (auto [entity, physicsComp] : physicsBodycomps) {
-			TransformComponent* transform = scene->getComponent<TransformComponent>(entity);
-
+			TransformComponent* Etransform = scene->getComponent<TransformComponent>(entity);
 			if (physicsComp->state != PhysicsBodyComponent::State::Uninitialized)
 				continue;
 
 			if (physicsComp->role == PhysicsBodyComponent::PhysicsRole::CharacterController) {
+				CharacterControllerStateComponent* charComp = scene->getComponent<CharacterControllerStateComponent>(entity);
+				if (!charComp) {
+					LOG_WARN("Entity with PhysicsBodyComponent of type CharacterController must have a CharacterControllerStateComponent");
+					continue;
+				}
+	
 
+				Transform worldTransform = *Etransform * charComp->localTransform;
 				PxCapsuleControllerDesc desc;
 				desc.height = 1.8f;
 				desc.radius = 0.4f;
 				desc.stepOffset = 0.4f;
-				desc.position = PxExtendedVec3(transform->pos.x, transform->pos.y, transform->pos.z);
+				desc.position = PxExtendedVec3(worldTransform.pos.x, worldTransform.pos.y, worldTransform.pos.z);
 				desc.material = defaultMaterial;
 
 				physicsComp->controller = Internal::controllerManager->createController(desc);
 
 			}
 			else {
-				physicsComp->actor = createActor(physicsComp, *transform);
+				ColliderComponent* colliderComp = scene->getComponent<ColliderComponent>(entity);
+				if (!colliderComp) {
+					LOG_WARN("Entity with PhysicsBodyComponent and non CharacterController must have a ColliderComponent");
+					continue;
+				}
+				Transform worldTransform = *Etransform * colliderComp->localTransform;
+
+				physicsComp->actor = createActor(physicsComp, worldTransform);
 				if (!physicsComp->actor) {
 					LOG_WARN("Could not create actor");
 					continue;
@@ -112,21 +126,37 @@ namespace PhysicsSystem {
 		// 1 update physx from game transforms
 		for (Entity e : scene->getEntities()) {
 			PhysicsBodyComponent* physicsBody = scene->getComponent<PhysicsBodyComponent>(e);
-			TransformComponent* transform = scene->getComponent<TransformComponent>(e);
+			TransformComponent* Etransform = scene->getComponent<TransformComponent>(e);
 
-			if (!physicsBody || !transform)
+			if (!physicsBody || !Etransform)
 				continue;
 
 			if (physicsBody->controlledByPhysics)
 				continue;
-			//physicsBody->releaseControl();
 
+
+			Transform Wtransform = *Etransform;
+
+			CharacterControllerStateComponent* charComp = scene->getComponent<CharacterControllerStateComponent>(e);
+			ColliderComponent* colliderComp = scene->getComponent<ColliderComponent>(e);
+			if (charComp) {
+				Wtransform = Wtransform * charComp->localTransform;
+			}
+			else if (colliderComp) {
+				Wtransform = Wtransform * colliderComp->localTransform;
+			}
+			else {
+				LOG_WARN("Entity with PhysicsBodyComponent must have either CharacterControllerStateComponent or ColliderComponent");
+				continue;
+			}
+			//physicsBody->releaseControl();
 
 			switch (physicsBody->role) {
 			case PhysicsBodyComponent::PhysicsRole::CharacterController: {
 				if (physicsBody->controller) {
+					
 					physicsBody->controller->setPosition(physx::PxExtendedVec3(
-						transform->pos.x, transform->pos.y, transform->pos.z
+						Wtransform.pos.x, Wtransform.pos.y, Wtransform.pos.z
 					));
 				}
 				break;
@@ -162,7 +192,7 @@ namespace PhysicsSystem {
 			case PhysicsBodyComponent::PhysicsRole::Dynamic: {
 				// forces already applied elsewhere
 				if (auto* dynamic = physicsBody->actor->is<physx::PxRigidDynamic>()) {
-					dynamic->setGlobalPose(transform->toPx());
+					dynamic->setGlobalPose(Wtransform.toPx());
 					// Clear velocities to prevent momentum issues after manual positioning
 					dynamic->setLinearVelocity(physx::PxVec3(0));
 					dynamic->setAngularVelocity(physx::PxVec3(0));
@@ -172,13 +202,13 @@ namespace PhysicsSystem {
 
 			case PhysicsBodyComponent::PhysicsRole::Kinematic: {
 				if (auto* dynamic = physicsBody->actor->is<physx::PxRigidDynamic>()) {
-					dynamic->setKinematicTarget(transform->toPx());
+					dynamic->setKinematicTarget(Wtransform.toPx());
 				}
 				break;
 			}
 			case PhysicsBodyComponent::PhysicsRole::Static: {
 				if (auto* staticActor = physicsBody->actor->is<physx::PxRigidStatic>()) {
-					staticActor->setGlobalPose(transform->toPx());
+					staticActor->setGlobalPose(Wtransform.toPx());
 				}
 				break;
 			}
@@ -230,7 +260,7 @@ namespace PhysicsSystem {
 		Internal::pxScene->simulate(dt);
 		Internal::pxScene->fetchResults(true);
 
-
+		drawDebugVisualization();
 
 	}
 
@@ -270,6 +300,7 @@ namespace PhysicsSystem {
 
 		defaultMaterial = Internal::gPhysics->createMaterial(0.5, 0.5, 0.5);
 
+
 	}
 
 	void shutdown()
@@ -306,26 +337,28 @@ namespace PhysicsSystem {
 		return status;
 	}
 
-	void enable_debug_visualization(PxScene* scene, bool enable) {
-		scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * enable);
-		scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * enable);
+	void enable_debug_visualization(bool enable) {
+		Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * enable);
+		Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * enable);
+		Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f * enable);
+		Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eCULL_BOX, 1.0f * enable);
 	}
 
-	void imgui_debug_menu(PxScene* scene) {
+	void imgui_debug_menu() {
 
-		visParamStates.eSCALE = scene->getVisualizationParameter(PxVisualizationParameter::eSCALE);
-		visParamStates.eACTOR_AXES = scene->getVisualizationParameter(PxVisualizationParameter::eACTOR_AXES);
-		visParamStates.eCOLLISION_SHAPES = scene->getVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES);
-		visParamStates.eCULL_BOX = scene->getVisualizationParameter(PxVisualizationParameter::eCULL_BOX);
+		visParamStates.eSCALE = Internal::pxScene->getVisualizationParameter(PxVisualizationParameter::eSCALE);
+		visParamStates.eACTOR_AXES = Internal::pxScene->getVisualizationParameter(PxVisualizationParameter::eACTOR_AXES);
+		visParamStates.eCOLLISION_SHAPES = Internal::pxScene->getVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES);
+		visParamStates.eCULL_BOX = Internal::pxScene->getVisualizationParameter(PxVisualizationParameter::eCULL_BOX);
 
 		if (ImGui::Checkbox("eCOLLISION_SHAPES", &visParamStates.eCOLLISION_SHAPES))
-			scene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f * visParamStates.eCOLLISION_SHAPES);
+			Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f * visParamStates.eCOLLISION_SHAPES);
 		if (ImGui::Checkbox("eACTOR_AXES", &visParamStates.eACTOR_AXES))
-			scene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * visParamStates.eACTOR_AXES);
+			Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eACTOR_AXES, 2.0f * visParamStates.eACTOR_AXES);
 		if (ImGui::Checkbox("eSCALE", &visParamStates.eSCALE))
-			scene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * visParamStates.eSCALE);
+			Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eSCALE, 1.0f * visParamStates.eSCALE);
 		if (ImGui::Checkbox("eCULL_BOX", &visParamStates.eCULL_BOX))
-			scene->setVisualizationParameter(PxVisualizationParameter::eCULL_BOX, 1.0f * visParamStates.eCULL_BOX);
+			Internal::pxScene->setVisualizationParameter(PxVisualizationParameter::eCULL_BOX, 1.0f * visParamStates.eCULL_BOX);
 
 	}
 
@@ -440,7 +473,7 @@ namespace PhysicsSystem {
 		}
 	}
 
-static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const TransformComponent& transform) {
+static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const Transform& transform) {
 			PxTransform pxT(
 				PxVec3(transform.pos.x, transform.pos.y, transform.pos.z),
 				PxQuat(transform.rot.x, transform.rot.y, transform.rot.z, transform.rot.w)
@@ -493,9 +526,12 @@ static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const Transf
 				*mat
 			);
 			break;
+		default:
+			LOG_WARN("Unsupported collider type");
+			return;
 		}
 
-
+		//todo: local transform or world transform?
 		PxTransform localT(
 			col.localTransform.toPx()
 			//PxVec3(col.localTransform.pos.x localPosition.x, col.localPosition.y, col.localPosition.z),
@@ -507,6 +543,20 @@ static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const Transf
 		shape->release(); // actor keeps a ref
 	}
 
+
+	void drawDebugVisualization() {
+		if (Internal::pxScene) {
+			const PxRenderBuffer& renderBuffer = Internal::pxScene->getRenderBuffer();
+			for (PxU32 i = 0; i < renderBuffer.getNbLines(); ++i) {
+				const PxDebugLine& line = renderBuffer.getLines()[i];
+				glm::vec3 start(line.pos0.x, line.pos0.y, line.pos0.z);
+				glm::vec3 end(line.pos1.x, line.pos1.y, line.pos1.z);
+				glm::vec4 color(0, 1, 0, 1);
+				// Render the line using your rendering engine
+				LineRenderer::draw(start, end, color);
+			}
+		}
+	}
 
 
 }

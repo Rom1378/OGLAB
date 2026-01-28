@@ -314,6 +314,10 @@ namespace UI {
 				// Display as degrees too
 				ImGui::Text("Yaw (degrees): %.1f", glm::degrees(state.yaw));
 				ImGui::Text("Pitch (degrees): %.1f", glm::degrees(state.pitch));
+
+				ImGui::Separator();
+				ImGui::TextDisabled("Local Transform:");
+				TransformEditMenu(state.localTransform, e);
 			});
 	}
 
