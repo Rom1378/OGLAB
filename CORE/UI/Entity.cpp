@@ -88,62 +88,64 @@ namespace UI {
 		ImGui::End();
 	}
 
+	static void TransformEditMenu(Transform& t, const Entity& e) {
 
+		// Check if entity has PhysicsBodyComponent and is controlled by physics
+		bool needsControl = false;
+		if (auto* physicsBody = ComponentManager::getComponent<PhysicsBodyComponent>(e.getId())) {
+			if (physicsBody->controlledByPhysics) {
+				needsControl = true;
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);
+			}
+		}
+
+		ImGui::DragFloat3("Position", &t.pos.x, 0.1f);
+		if (needsControl && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+			ImGui::SetTooltip("This entity has a PhysicsBodyComponent controlled by physics.\nYou need to call takeControl() to modify transform manually.");
+		}
+
+		// Display rotation as Euler angles for easier editing
+		glm::vec3 euler = t.getEulerAngles();
+		if (ImGui::DragFloat3("Rotation (Euler)", &euler.x, 1.0f)) {
+			t.setEulerAngles(euler);
+		}
+		if (needsControl && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+			ImGui::SetTooltip("This entity has a PhysicsBodyComponent controlled by physics.\nYou need to call takeControl() to modify transform manually.");
+		}
+
+		// Option: Show quaternion values (read-only)
+		if (ImGui::TreeNode("Quaternion (Raw)")) {
+			ImGui::Text("x: %.3f, y: %.3f, z: %.3f, w: %.3f",
+				t.rot.x, t.rot.y, t.rot.z, t.rot.w);
+			ImGui::TreePop();
+		}
+
+		ImGui::DragFloat3("Scale", &t.scale.x, 0.01f, 0.001f, 100.0f);
+		if (needsControl && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+			ImGui::SetTooltip("This entity has a PhysicsBodyComponent controlled by physics.\nYou need to call takeControl() to modify transform manually.");
+		}
+
+		if (needsControl) {
+			ImGui::PopStyleVar();
+		}
+
+		// Display direction vectors
+		if (ImGui::TreeNode("Direction Vectors")) {
+			glm::vec3 fwd = t.forward();
+			glm::vec3 up = t.up();
+			glm::vec3 right = t.right();
+			ImGui::Text("Forward: (%.2f, %.2f, %.2f)", fwd.x, fwd.y, fwd.z);
+			ImGui::Text("Up: (%.2f, %.2f, %.2f)", up.x, up.y, up.z);
+			ImGui::Text("Right: (%.2f, %.2f, %.2f)", right.x, right.y, right.z);
+			ImGui::TreePop();
+		}
+	}
 
 	void initEntityTreeBrowser() {
-		EntityBrowser::registerComponent<TransformComponent>("Transform",
-			[](TransformComponent& t, Entity e) {
-
-				// Check if entity has PhysicsBodyComponent and is controlled by physics
-				bool needsControl = false;
-				if (auto* physicsBody = ComponentManager::getComponent<PhysicsBodyComponent>(e.getId())) {
-					if (physicsBody->controlledByPhysics) {
-						needsControl = true;
-						ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);
-					}
-				}
-
-				ImGui::DragFloat3("Position", &t.pos.x, 0.1f);
-				if (needsControl && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-					ImGui::SetTooltip("This entity has a PhysicsBodyComponent controlled by physics.\nYou need to call takeControl() to modify transform manually.");
-				}
-
-				// Display rotation as Euler angles for easier editing
-				glm::vec3 euler = t.getEulerAngles();
-				if (ImGui::DragFloat3("Rotation (Euler)", &euler.x, 1.0f)) {
-					t.setEulerAngles(euler);
-				}
-				if (needsControl && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-					ImGui::SetTooltip("This entity has a PhysicsBodyComponent controlled by physics.\nYou need to call takeControl() to modify transform manually.");
-				}
-
-				// Option: Show quaternion values (read-only)
-				if (ImGui::TreeNode("Quaternion (Raw)")) {
-					ImGui::Text("x: %.3f, y: %.3f, z: %.3f, w: %.3f",
-						t.rot.x, t.rot.y, t.rot.z, t.rot.w);
-					ImGui::TreePop();
-				}
-
-				ImGui::DragFloat3("Scale", &t.scale.x, 0.01f, 0.001f, 100.0f);
-				if (needsControl && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
-					ImGui::SetTooltip("This entity has a PhysicsBodyComponent controlled by physics.\nYou need to call takeControl() to modify transform manually.");
-				}
-
-				if (needsControl) {
-					ImGui::PopStyleVar();
-				}
-
-				// Display direction vectors
-				if (ImGui::TreeNode("Direction Vectors")) {
-					glm::vec3 fwd = t.forward();
-					glm::vec3 up = t.up();
-					glm::vec3 left = t.left();
-					ImGui::Text("Forward: (%.2f, %.2f, %.2f)", fwd.x, fwd.y, fwd.z);
-					ImGui::Text("Up: (%.2f, %.2f, %.2f)", up.x, up.y, up.z);
-					ImGui::Text("Left: (%.2f, %.2f, %.2f)", left.x, left.y, left.z);
-					ImGui::TreePop();
-				}
-			});
+		EntityBrowser::registerComponent<TransformComponent>("Transform", 
+			TransformEditMenu
+			//[](TransformComponent& t, Entity e) {}
+		);
 		// Register LightComponent
 		EntityBrowser::registerComponent<LightComponent>("Light",
 			[](LightComponent& light, Entity e) {
@@ -195,6 +197,13 @@ namespace UI {
 					ImGui::DragFloat("Linear", &spotData->linear, 0.001f, 0.0f, 1.0f);
 					ImGui::DragFloat("Quadratic", &spotData->quadratic, 0.0001f, 0.0f, 1.0f);
 				}
+
+				ImGui::Separator();
+
+				//say that it is local transform
+				ImGui::TextDisabled("Local Transform:");
+				TransformEditMenu(light.localTransform, e);
+
 			});
 
 		// Register RenderableComponent
@@ -206,6 +215,10 @@ namespace UI {
 				}
 				// Add buttons to change mesh if needed
 				// if (ImGui::Button("Change Mesh...")) { /* open mesh selector */ }
+
+				ImGui::Separator();
+				ImGui::TextDisabled("Local Transform:");
+				TransformEditMenu(r.localTransform, e);
 			});
 
 		// Register PhysicsBodyComponent
@@ -239,6 +252,7 @@ namespace UI {
 				ImGui::Separator();
 				ImGui::Text("Actor: %s", body.actor ? "Valid" : "NULL");
 				ImGui::Text("Controller: %s", body.controller ? "Valid" : "NULL");
+
 			});
 
 		// Register ColliderComponent
@@ -271,14 +285,9 @@ namespace UI {
 				}
 
 				ImGui::Separator();
-				ImGui::DragFloat3("Local Position", &collider.localPosition.x, 0.01f);
-
-				// Display quaternion as Euler for easier editing
-				glm::vec3 euler = collider.getLocalEulerAngles();
-				if (ImGui::DragFloat3("Local Rotation", &euler.x, 1.0f)) {
-					collider.setLocalEulerAngles(euler);
-				}
-
+				ImGui::TextDisabled("Local Transform:");
+				TransformEditMenu(collider.localTransform, e);
+				
 				ImGui::Separator();
 				ImGui::Text("Material: %s", collider.material ? "Valid" : "NULL");
 			});

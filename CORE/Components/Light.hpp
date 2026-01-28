@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "CORE/Lights/LightManager.hpp"
+#include "CORE/Transform.hpp"
 
 struct SpotLightData {
     float cutOff;
@@ -34,6 +35,8 @@ struct LightComponent {
     glm::vec3 ambient{1.,1.,1.};
     glm::vec3 diffuse{1.,1.,1.};
     glm::vec3 specular{1.,1.,1.};
+
+    Transform localTransform{};
 
     std::variant<PointLightData, DirLightData, SpotLightData> data;
 

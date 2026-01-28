@@ -124,6 +124,11 @@ namespace assimpLoader {
 			std::vector<Texture> specularMaps = loadMaterialTextures(
 				material, aiTextureType_SPECULAR, Texture::Type::SPECULAR, directory);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+
+			aiTextureType_BASE_COLOR;
+			std::vector<Texture> baseColor = loadMaterialTextures(
+				material, aiTextureType_BASE_COLOR, Texture::Type::SPECULAR, directory);
+			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 		}
 
 		return { meshdata, textures };

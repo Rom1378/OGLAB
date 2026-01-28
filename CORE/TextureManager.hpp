@@ -7,7 +7,7 @@
 
 struct Texture
 {
-	enum class Type { UNDEFINED, DIFFUSE, SPECULAR, NORMAL};
+	enum class Type { UNDEFINED, DIFFUSE, SPECULAR, NORMAL, BASECOLOR};
 	unsigned int id = 0; // OpenGL texture ID
 	int width = 0, height = 0; // dimensions of the texture
 

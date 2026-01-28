@@ -495,9 +495,11 @@ static physx::PxRigidActor* createActor(PhysicsBodyComponent* body, const Transf
 			break;
 		}
 
+
 		PxTransform localT(
-			PxVec3(col.localPosition.x, col.localPosition.y, col.localPosition.z),
-			PxQuat(col.localRotation.x, col.localRotation.y, col.localRotation.z, col.localRotation.w)
+			col.localTransform.toPx()
+			//PxVec3(col.localTransform.pos.x localPosition.x, col.localPosition.y, col.localPosition.z),
+			//PxQuat(col.localRotation.x, col.localRotation.y, col.localRotation.z, col.localRotation.w)
 		);
 
 		shape->setLocalPose(localT);

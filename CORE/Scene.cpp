@@ -131,8 +131,19 @@ void Scene::init() {
 
     addComponent<RenderableComponent>(paleVisitor, "res/3DModels/paleVisitor/source/PaleVisitor.fbx");
     auto t = addComponent<TransformComponent>(paleVisitor);
-    t->pos = glm::vec3(-5.0f, 20.0f, 0.0f);
+    t->pos = glm::vec3(-5.0f, 1.0f, 3.0f);
 
+
+    //load a 3D Model
+    Entity knife = createEntity("Knife");
+
+
+    addComponent<RenderableComponent>(knife, "res/3DModels/knife/source/Knife_low.fbx");
+    auto transfrom = addComponent<TransformComponent>(knife);
+    transfrom->pos = glm::vec3(-5.0f, 1.0f, 0.0f);
+
+
+    
 
 
 

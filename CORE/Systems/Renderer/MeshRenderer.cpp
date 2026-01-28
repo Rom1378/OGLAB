@@ -246,13 +246,15 @@ namespace MeshRenderer {
 
 		for (auto e : scene->getEntities()) {
 			RenderableComponent* renderableComponent = scene->getComponent<RenderableComponent>(e);
-			TransformComponent* transform = scene->getComponent<TransformComponent>(e);
+			TransformComponent* Etransform = scene->getComponent<TransformComponent>(e);
 			if (!renderableComponent)
 				continue;
-			if (!transform) {
+			if (!Etransform) {
 				LOG_WARN("Entity having renderable component must have a transform component");
 				continue;
 			}
+
+			Transform worldTransform = *Etransform * renderableComponent->localTransform;
 
 			RenderableData rdata = meshes[renderableComponent->rhandle];
 			ShaderProgram* shader = rdata.shader;
@@ -266,11 +268,12 @@ namespace MeshRenderer {
 			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
 
 			// Standard matrix uniforms
-			shader->setMat4("model", glm::value_ptr(transform->getModelMatrix()));
+			shader->setMat4("model", glm::value_ptr(worldTransform.getModelMatrix()));
 			shader->setMat4("view", glm::value_ptr(Renderer::getView()));
 			shader->setMat4("projection", glm::value_ptr(Renderer::getProjection()));
 
-			shader->setVec3("viewPos", transform->pos);
+
+			shader->setVec3("viewPos", Renderer::getViewPosition());
 
 			setLightUniforms(scene, *shader);
 

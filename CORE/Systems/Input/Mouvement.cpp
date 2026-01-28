@@ -43,19 +43,19 @@ namespace InputSystem {
 
 		// choosed to used the camera for direction as first choice
 		glm::vec3 forward{ transform->forward() };
-		glm::vec3 left{ transform->left() };
+		glm::vec3 right{ transform->right() };
 
 		forward.y = 0;
 		forward = glm::normalize(forward);
 
 		if (Input::isKeyPressed(GLFW_KEY_W))
-			dir -= forward;
-		if (Input::isKeyPressed(GLFW_KEY_S))
 			dir += forward;
+		if (Input::isKeyPressed(GLFW_KEY_S))
+			dir -= forward;
 		if (Input::isKeyPressed(GLFW_KEY_A))
-			dir -= left;
+			dir -= right;
 		if (Input::isKeyPressed(GLFW_KEY_D))
-			dir += left;
+			dir += right;
 
 		state->isSprinting = Input::isKeyPressed(GLFW_KEY_LEFT_SHIFT);
 

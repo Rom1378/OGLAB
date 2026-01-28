@@ -4,6 +4,7 @@
 
 #include "CORE/Systems/Renderer/MeshRenderer.hpp"
 
+#include "CORE/Transform.hpp"
 
 struct RenderableComponent {
 
@@ -13,5 +14,5 @@ struct RenderableComponent {
 
 
 	MeshRenderer::RenderableHandle rhandle{ MeshRenderer::INVALID_HANDLE };
-
+	Transform localTransform{ };
 };

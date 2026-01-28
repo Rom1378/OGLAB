@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "CORE/TextureManager.hpp"
+
 class ShaderProgram;
 class Scene;
 
@@ -78,9 +79,6 @@ namespace MeshRenderer {
 	void destroyRenderable(RenderableHandle handle);
 
 	void setCubeTextures(RenderableHandle handle, const std::vector<Texture>& textures);
-
-	void setTextures(const std::vector<Texture>& textures);
-
 
 	void renderPass(Scene* scene);
 

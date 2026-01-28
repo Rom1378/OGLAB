@@ -13,6 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "CORE/Camera.hpp"
+#include "CORE/Transform.hpp"
 
 struct CameraComponent {
 	Camera cam;
@@ -21,6 +22,7 @@ struct CameraComponent {
 	float nearPlane;
 	float farPlane;
 	float maxLightDistance{ 10000 };
+	Transform localTransform{};
 	CameraComponent(const CameraComponent&) = default;
 	CameraComponent(const glm::mat4& projection) : cam{ projection } {}
 	CameraComponent(float fov = 45.0f, float aspectRatio = 16.0f / 9.0f, float nearPlane = 0.1f, float farPlane = 1000.0f) :

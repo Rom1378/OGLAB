@@ -9,6 +9,7 @@
 #include <physx/PxActor.h>
 #include <physx/PxMaterial.h>
 #include "CORE/Systems/Physics/Physics.hpp"
+#include "CORE/Transform.hpp"
 
 struct CharacterControllerStateComponent {
 	glm::vec3 velocity{ 0 };
@@ -17,6 +18,7 @@ struct CharacterControllerStateComponent {
 	bool isSprinting{ 0 };
 	bool isOnTheGround{ 0 };
 
+	Transform localTransform{}; //TODO Not sure if should use it here
 
 };
 
@@ -36,18 +38,13 @@ struct ColliderComponent {
 	float radius{ 0.5f };          // For Sphere / Capsule
 	float height{ 1.8f };          // For Capsule
 
-	glm::vec3 localPosition{ 0.0f };
-	glm::quat localRotation{ 1, 0, 0, 0 };
+	//glm::vec3 localPosition{ 0.0f };
+	//glm::quat localRotation{ 1, 0, 0, 0 };
+	Transform localTransform;
 
 	physx::PxMaterial* material{ nullptr };
 
-	glm::vec3 getLocalEulerAngles() const {
-		return glm::degrees(glm::eulerAngles(localRotation));
-	}
-
-	void setLocalEulerAngles(const glm::vec3& euler) {
-		localRotation = glm::quat(glm::radians(euler));
-	}
+	
 };
 
 

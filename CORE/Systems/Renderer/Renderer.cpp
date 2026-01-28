@@ -33,6 +33,9 @@ namespace Renderer {
 		glm::mat4 view{};
 	} renderCam;
 
+	const glm::vec3& getViewPosition() {
+		return glm::vec3(glm::inverse(renderCam.view)[3]);
+	}
 
 	RendererSettings rdSettings{};
 
