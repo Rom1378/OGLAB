@@ -297,13 +297,15 @@ Entity Scene::createEntity() {
 }
 
 Entity Scene::createEntity(std::string name) {
-    LOG_WARN("NO name for now");
-    return createEntity();
+    Entity e = createEntity();
+	addComponent<NameComponent>(e, name);
+    return e;
 }
 
 Entity Scene::createEntity(const char* name) {
-	LOG_WARN("NO name for now");
-	return createEntity();
+    Entity e = createEntity();
+	addComponent<NameComponent>(e, name);
+    return e;
 }
 
 bool Scene::DestroyEntity(Entity e) {

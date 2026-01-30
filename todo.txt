@@ -25,4 +25,17 @@ add water at level -378
 Add cool fps camera
 
 
-think about adding local transform to component that should have there own
+[x] think about adding local transform to component that should have there own
+[x] add names to Entities (name component);
+[ ] light PBR instead of the old way and materials (baseColor texture vs diffuse)
+[ ] add the other kind of sphere.
+[ ] ajouter des deplacements smoothhh
+[ ] terrain generator 
+[ ] shadowmaps
+[ ] clean framebuffer
+[ ] instancing primitives
+[ ] object outline (stencil buffer)
+[ ] networking XD
+[ ] shader as filters (post processing)
+[ ] spotlights seem to not be working
+[ ] gamma correction

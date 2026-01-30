@@ -15,6 +15,8 @@
 
 using namespace physx;
 
+
+
 namespace TransformSyncSystem {
 
 	void update(Scene* scene) {
@@ -22,19 +24,12 @@ namespace TransformSyncSystem {
 
 		for (auto [entity, phys] : bodies) {
 
-			// Only sync active physics objects
 			if (phys->state != PhysicsBodyComponent::State::Alive)
 				continue;
-
 			TransformComponent* Etransform = scene->getComponent<TransformComponent>(entity);
 
-			if (!Etransform)
+			if (!Etransform || !phys->controlledByPhysics )
 				continue;
-
-
-			if (!phys->controlledByPhysics)
-				continue;
-			// --- Character Controller ---
 
 			switch (phys->role) {
 			case PhysicsBodyComponent::PhysicsRole::CharacterController: {

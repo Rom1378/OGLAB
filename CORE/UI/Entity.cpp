@@ -11,6 +11,7 @@
 #include "CORE/Components/Camera.hpp"
 #include "CORE/Components/Light.hpp"
 #include "CORE/Components/Physics.hpp"
+#include "CORE/Components/NameComponent.hpp"
 
 
 namespace UI {
@@ -26,7 +27,11 @@ namespace UI {
 
 		const auto& entities = scene->getEntities();
 		for (const Entity& entity : entities) {
-			std::string label = "Entity " + std::to_string(entity.getId());
+			std::string label = "EID: " + std::to_string(entity.getId());
+			const auto* entityNameComp = ComponentManager::getComponent<NameComponent>(entity.getId());
+			if (entityNameComp) {
+				label += " " + entityNameComp->name ;
+			}
 
 			if (ImGui::Selectable(label.c_str(),
 				selectedEntity.getId() == entity.getId())) {
@@ -142,6 +147,18 @@ namespace UI {
 	}
 
 	void initEntityTreeBrowser() {
+
+		// NameCOmponent registration
+
+		EntityBrowser::registerComponent<NameComponent>("Name",
+			[](NameComponent& nameComp, Entity e) {
+				char buffer[256];
+				std::strncpy(buffer, nameComp.name.c_str(), sizeof(buffer));
+				if (ImGui::InputText("Name", buffer, sizeof(buffer))) {
+					nameComp.name = std::string(buffer);
+				}
+			});
+
 		EntityBrowser::registerComponent<TransformComponent>("Transform", 
 			TransformEditMenu
 			//[](TransformComponent& t, Entity e) {}

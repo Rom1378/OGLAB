@@ -4,6 +4,7 @@
 #include "CORE/Debug.hpp"
 #include "CORE/ComponentManager.hpp"
 #include "CORE/Systems/Renderer/Skybox.hpp"
+#include "CORE/Components/NameComponent.hpp"
 
 
 class Entity;

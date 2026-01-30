@@ -111,14 +111,14 @@ struct Transform {
 
 
 	glm::vec3 forward() const {
-		return rot * glm::vec3(0, 0, -1); // Simpler!
+		return rot * glm::vec3(0, 0, -1);
 	}
 
 	glm::vec3 up() const {
 		return rot * glm::vec3(0, 1, 0);
 	}
 
-	glm::vec3 right() const { // "right" is more standard than "left"
+	glm::vec3 right() const {
 		return rot * glm::vec3(1, 0, 0);
 	}
 
