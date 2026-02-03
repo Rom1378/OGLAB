@@ -7,6 +7,7 @@
 #include "CORE/Shader.hpp"
 #include "CORE/Lights/LightManager.hpp"
 #include "CORE/Systems/Renderer/Renderer.hpp"
+#include "CORE/Systems/Renderer/ShadowMap.hpp"
 
 #include "AssimpLoader.hpp"
 #include <memory>
@@ -19,6 +20,7 @@
 #include "CORE/Systems/Renderer/Sphere.hpp"
 #include "CORE/Shader.hpp"
 #include "CORE/ShaderProgram.hpp"
+
 
 namespace MeshRenderer {
 
@@ -219,7 +221,7 @@ namespace MeshRenderer {
 				shader.setVec3(base + "ambient", light->ambient);
 				shader.setVec3(base + "diffuse", light->diffuse);
 				shader.setVec3(base + "specular", light->specular);
-				
+
 				shader.setFloat(base + "constant", spotData->constant);
 				shader.setFloat(base + "linear", spotData->linear);
 				shader.setFloat(base + "quadratic", spotData->quadratic);
@@ -243,6 +245,7 @@ namespace MeshRenderer {
 	void renderPass(Scene* scene) {
 
 		auto& rdSettings = Renderer::getRendererSettings();
+		auto shadowView = scene->getComponentView<ShadowCasterComponent>();
 
 		for (auto e : scene->getEntities()) {
 			RenderableComponent* renderableComponent = scene->getComponent<RenderableComponent>(e);
@@ -267,101 +270,95 @@ namespace MeshRenderer {
 			shader->use();
 			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
 
-			// Standard matrix uniforms
-			shader->setMat4("model", glm::value_ptr(worldTransform.getModelMatrix()));
-			shader->setMat4("view", glm::value_ptr(Renderer::getView()));
-			shader->setMat4("projection", glm::value_ptr(Renderer::getProjection()));
-
-
-			shader->setVec3("viewPos", Renderer::getViewPosition());
-
-			setLightUniforms(scene, *shader);
-
-			shader->setBool("useLighting", rdSettings.enableLighting);
-			shader->setBool("blinn", rdSettings.enableBlinn);
-			/*
-			shader->setMat4("lightSpaceMatrix", LightManager::getShadowMapper()->getLightSpaceMatrix());
-			std::vector<std::shared_ptr<Light>> relevantLights = LightManager::getRelevantLights(cam, 128);
-			shader->setBool("useLighting", !relevantLights.empty());
-			shader->setInt("numLights", relevantLights.size());
-
-			*/
-
-			/*
-			for (size_t i = 0; i < relevantLights.size(); i++) {
-				std::string base = "lights[" + std::to_string(i) + "].";
-
-				// Set light type
-				int lightType = 0; // Default to Point Light
-				switch (relevantLights[i]->getType()) {
-				case LightType::POINT: lightType = 0; break;
-				case LightType::DIRECTIONAL: lightType = 1; break;
-				case LightType::SPOT: lightType = 2; break;
-				}
-				//m_shader->setInt(base + "type", lightType);
-				m_shader->setVec3(base + "position", relevantLights[i]->getPosition());
-				//m_shader->setVec3(base + "direction", relevantLights[i]->getDirection());
-				//m_shader->setVec3(base + "color", relevantLights[i]->getColor());
-				//m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
-			}
-			*/
-
-			/*
-			for (size_t i = 0; i < relevantLights.size(); i++) {
-				std::string base = "lights[" + std::to_string(i) + "].";
-				shader->setVec3(base + "position", relevantLights[i]->getWorldPosition());
-				shader->setVec3(base + "color", relevantLights[i]->getColor());
-				m_shader->setFloat(base + "intensity", relevantLights[i]->getIntensity());
-			}
-			*/
-
-				///////////////////////				//MESH DRAW
 				const MeshData& mesh = rdata.meshdatas[i];
 				const Material& material = rdata.material[i];
+				// Standard matrix uniforms
+				shader->setMat4("model", glm::value_ptr(worldTransform.getModelMatrix()));
+				shader->setMat4("view", glm::value_ptr(Renderer::getView()));
+				shader->setMat4("projection", glm::value_ptr(Renderer::getProjection()));
+				shader->setVec3("viewPos", Renderer::getViewPosition());
 
-				// Material properties
-				shader->setVec3("objectColor", material.color.x, material.color.y, material.color.z);
-				/*
-								if ( useShadows) {
-									glActiveTexture(GL_TEXTURE10);
-									shader->setInt("shadowMap", 10);
-									glBindTexture(GL_TEXTURE_2D, LightManager::getShadowMapper()->getDepthMapTexture());
+				if (!rdSettings.geometryOnlyPass) {
+					
+					if (rdSettings.enableLighting)
+						setLightUniforms(scene, *shader);
+						
+					if (rdSettings.enableShadows && ShadowMapSystem::hasShadowMap()) {
+						ShadowMapSystem::bindShadowMaps(*shader);
+						
+						// Initialize all shadow indices to -1 (no shadow)
+						for (int i = 0; i < MAX_DIR_LIGHTS; i++) {
+							shader->setInt("dirLightShadowIndices[" + std::to_string(i) + "]", -1);
+						}
+						for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
+							shader->setInt("pointLightShadowIndices[" + std::to_string(i) + "]", -1);
+						}
+						for (int i = 0; i < MAX_SPOT_LIGHTS; i++) {
+							shader->setInt("spotLightShadowIndices[" + std::to_string(i) + "]", -1);
+						}
+
+						// Map lights to their shadow maps
+						uint32_t shadowInfoIndex = 0;
+						uint32_t dir2DIndex = 0, point2DIndex = 0, pointCubeIndex = 0, spot2DIndex = 0;
+
+						for (auto [entity, shadowCaster] : shadowView) {
+							auto lightComponent = scene->getComponent<LightComponent>(entity);
+							auto transform = scene->getComponent<TransformComponent>(entity);
+
+							if (lightComponent && transform) {
+								shader->setVec3("shadowLightPositions[" + std::to_string(shadowInfoIndex) + "]", transform->pos);
+
+								// Map light index to shadow map index based on type
+								if (lightComponent->type == LightComponent::Type::DIR) {
+									shader->setInt("dirLightShadowIndices[" + std::to_string(dir2DIndex) + "]", dir2DIndex);
+									dir2DIndex++;
 								}
-				*/
-				// Material properties
-				shader->setBool("useTexture", !material.textures.empty());
+								else if (lightComponent->type == LightComponent::Type::POINT) {
+									shader->setFloat("shadowFarPlanes[" + std::to_string(pointCubeIndex) + "]", shadowCaster->far_plane);
+									shader->setInt("pointLightShadowIndices[" + std::to_string(pointCubeIndex) + "]", pointCubeIndex);
+									pointCubeIndex++;
+								}
+								else if (lightComponent->type == LightComponent::Type::SPOT) {
+									shader->setInt("spotLightShadowIndices[" + std::to_string(spot2DIndex) + "]", dir2DIndex + spot2DIndex);
+									spot2DIndex++;
+								}
 
-				
+								shadowInfoIndex++;
+							}
+						}
+					}
+					
+					shader->setBool("useLighting", rdSettings.enableLighting);
+					shader->setBool("blinn", rdSettings.enableBlinn);
+					shader->setBool("useShadow", rdSettings.enableShadows && ShadowMapSystem::hasShadowMap());
 
+					// Material properties
+					shader->setVec3("objectColor", material.color.x, material.color.y, material.color.z);
+					shader->setBool("useTexture", !material.textures.empty());
+					shader->setFloat("material.shininess", material.shininess);
 
-				//shader->setMat4("lightSpaceMatrix", lightSpaceMatrix);
-				//shader->setMat4("lightSpaceMatrix", glm::mat4(1.0f));
-
-
-
-				shader->setFloat("material.shininess", material.shininess);
-
-				// Bind first diffuse texture if it exists
-				for (const Texture& texture : material.textures) {
-					switch (texture.type)
-					{
-					case Texture::Type::DIFFUSE:
-						glActiveTexture(GL_TEXTURE0);
-						shader->setInt("material.diffuse", 0);
-						glBindTexture(GL_TEXTURE_2D, texture.id);
-						break;
-					case Texture::Type::NORMAL:
-						glActiveTexture(GL_TEXTURE2);
-						shader->setInt("material.normal", 2);
-						glBindTexture(GL_TEXTURE_2D, texture.id);
-						break;
-					case Texture::Type::SPECULAR:
-						glActiveTexture(GL_TEXTURE1);
-						shader->setInt("material.specular", 1);
-						glBindTexture(GL_TEXTURE_2D, texture.id);
-						break;
-					default:
-						break;
+					// Bind material textures - IMPORTANT: Use units 0, 1, 2 (NOT 3+)
+					for (const Texture& texture : material.textures) {
+						switch (texture.type)
+						{
+						case Texture::Type::DIFFUSE:
+							glActiveTexture(GL_TEXTURE0);
+							glBindTexture(GL_TEXTURE_2D, texture.id);
+							shader->setInt("material.diffuse", 0);
+							break;
+						case Texture::Type::SPECULAR:
+							glActiveTexture(GL_TEXTURE1);
+							glBindTexture(GL_TEXTURE_2D, texture.id);
+							shader->setInt("material.specular", 1);
+							break;
+						case Texture::Type::NORMAL:
+							glActiveTexture(GL_TEXTURE2);
+							glBindTexture(GL_TEXTURE_2D, texture.id);
+							shader->setInt("material.normal", 2);
+							break;
+						default:
+							break;
+						}
 					}
 				}
 
@@ -369,22 +366,13 @@ namespace MeshRenderer {
 				glBindVertexArray(mesh.vao);
 				glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
 				glBindVertexArray(0);
-
-				// Reset to default texture unit
-				glActiveTexture(GL_TEXTURE0);
-
-
-
-
 			}
-
-			/////////////////// END MESH DRAW ///////////////
-
-
-
 		}
+		
+		// Reset to default texture unit
+		glActiveTexture(GL_TEXTURE0);
 	}
-
+	
 	void cleanup() {
 		meshes.clear();
 		cubeHandle = INVALID_HANDLE;
@@ -396,8 +384,12 @@ namespace MeshRenderer {
 
 	void setCubeTextures(RenderableHandle handle, const std::vector<Texture>& textures) {
 		if (isValidHandle(handle))
-			meshes[handle].material[0].textures =  textures ;
+			meshes[handle].material[0].textures = textures;
 
+	}
+
+	const RenderableData& getRenderableData(RenderableHandle handle) {
+		return meshes[handle];
 	}
 
 

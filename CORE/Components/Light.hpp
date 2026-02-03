@@ -5,6 +5,7 @@
 
 #include "CORE/Lights/LightManager.hpp"
 #include "CORE/Transform.hpp"
+#include "CORE/Systems/Renderer/ShadowMap.hpp"
 
 struct SpotLightData {
     float cutOff;
@@ -25,12 +26,17 @@ struct DirLightData {
 
 };
 
+struct ShadowCasterComponent {
+	ShadowMapSystem::ShadowMapHandle shadowMapHandle{ ShadowMapSystem::INVALID_SHADOWMAP_HANDLE };
+    float near_plane{ 1.0f };
+    float far_plane{ 1017.5f };
+    uint32_t shadowMapResolution{ 2048 };
+};
+
 struct LightComponent {
     enum class Type { POINT, DIR, SPOT };
 
-    LightComponent() {
-    }
-
+  
     Type type{};
     glm::vec3 ambient{1.,1.,1.};
     glm::vec3 diffuse{1.,1.,1.};

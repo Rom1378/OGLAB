@@ -41,6 +41,10 @@ public:
 
     // Loading and configuration
     void loadFromFiles(const std::string& vertexPath, const std::string& fragmentPath);
+
+    void loadFromFiles(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath);
+
+
     void addDefine(const std::string& name, const std::string& value);
     void use() const;
     GLuint getProgram() const { return m_program; }

@@ -436,6 +436,9 @@ namespace Window
 		ImGui::Image((ImTextureID)(intptr_t)7, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::SameLine();
 		ImGui::Image((ImTextureID)(intptr_t)8, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image((ImTextureID)(intptr_t)9, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::SameLine();
+		ImGui::Image((ImTextureID)(intptr_t)10, ImVec2(100, 100), ImVec2(0, 1), ImVec2(1, 0));
 		//contrast control
 		ImGui::End();
 

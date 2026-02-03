@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include "CORE/Debug.hpp"
 
+
 namespace ShaderManager
 {
     namespace
@@ -17,6 +18,7 @@ namespace ShaderManager
         {
             std::string vertexPath;
             std::string fragmentPath;
+            std::string geometryPath; // Optional
             std::unordered_map<std::string, std::string> defines;
         };
 
@@ -27,7 +29,6 @@ namespace ShaderManager
     {
         try
         {
-            // Read the entire file into a string
             std::ifstream file(configPath);
             if (!file.is_open())
             {
@@ -39,19 +40,14 @@ namespace ShaderManager
             buffer << file.rdbuf();
             std::string jsonContent = buffer.str();
 
-
-            // Parse JSON with error checking
             auto jsonConfig = nlohmann::json::parse(jsonContent, nullptr, true, true);
 
-            // Clear existing configs
             shaderConfigs.clear();
 
-            // Load new configs
             for (const auto& [shaderName, shaderData] : jsonConfig.items())
             {
                 ShaderConfig config;
 
-                // Validate required fields
                 if (!shaderData.contains("vertex") || !shaderData.contains("fragment"))
                 {
                     LOG_ERROR("Shader '" + shaderName + "' missing vertex or fragment path");
@@ -61,6 +57,12 @@ namespace ShaderManager
                 config.vertexPath = shaderData["vertex"].get<std::string>();
                 config.fragmentPath = shaderData["fragment"].get<std::string>();
 
+                // Optional geometry shader
+                if (shaderData.contains("geometry"))
+                {
+                    config.geometryPath = shaderData["geometry"].get<std::string>();
+                }
+
                 // Optional defines
                 if (shaderData.contains("defines") && shaderData["defines"].is_object())
                 {
@@ -69,7 +71,6 @@ namespace ShaderManager
                         config.defines[defineName] = defineValue.get<std::string>();
                     }
                 }
-
 
                 // Verify shader files exist
                 std::ifstream vertFile(config.vertexPath);
@@ -85,6 +86,16 @@ namespace ShaderManager
                     throw std::runtime_error("Fragment shader not found: " + config.fragmentPath);
                 }
 
+                if (!config.geometryPath.empty())
+                {
+                    std::ifstream geomFile(config.geometryPath);
+                    if (!geomFile.good())
+                    {
+                        LOG_ERROR("Geometry shader not found: " + config.geometryPath);
+                        throw std::runtime_error("Geometry shader not found: " + config.geometryPath);
+                    }
+                }
+
                 shaderConfigs[shaderName] = config;
                 LOG("Loaded config for shader: ", shaderName);
             }
@@ -96,14 +107,12 @@ namespace ShaderManager
         }
         catch (const std::exception& e)
         {
-            system("cd");
             LOG_ERROR("Error loading shader configs: " + std::string(e.what()));
             throw std::runtime_error("Error loading shader configs: " + std::string(e.what()));
         }
     }
 
-    // Get or load a shader
-    std::shared_ptr<ShaderProgram> getShader(const std::string &name)
+    std::shared_ptr<ShaderProgram> getShader(const std::string& name)
     {
         if (m_shaders.find(name) == m_shaders.end())
         {
@@ -112,40 +121,45 @@ namespace ShaderManager
         return m_shaders[name];
     }
 
-    // Load a specific shader
-    void loadShader(const std::string &name)
+    void loadShader(const std::string& name)
     {
         if (shaderConfigs.find(name) == shaderConfigs.end())
         {
             throw std::runtime_error("No config found for shader: " + name);
         }
 
-        const auto &config = shaderConfigs[name];
+        const auto& config = shaderConfigs[name];
         auto shader = std::make_shared<ShaderProgram>();
 
-        // Add any preprocessor defines
-        for (const auto &[define, value] : config.defines)
+        for (const auto& [define, value] : config.defines)
         {
             shader->addDefine(define, value);
         }
 
-        shader->loadFromFiles(config.vertexPath, config.fragmentPath);
+        // Load with or without geometry shader
+        if (!config.geometryPath.empty())
+        {
+            shader->loadFromFiles(config.vertexPath, config.fragmentPath, config.geometryPath);
+        }
+        else
+        {
+            shader->loadFromFiles(config.vertexPath, config.fragmentPath);
+        }
+
         m_shaders[name] = shader;
     }
 
-    // Reload all shaders (useful for hot-reloading)
     void reloadAll()
     {
-        for (const auto &[name, _] : m_shaders)
+        for (const auto& [name, _] : m_shaders)
         {
             loadShader(name);
         }
     }
 
-    // Clear all loaded shaders
     void cleanup()
     {
         m_shaders.clear();
         shaderConfigs.clear();
     }
-} // namespace MyNamespace
+}

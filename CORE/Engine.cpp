@@ -127,7 +127,7 @@ namespace Engine {
 	}
 	void render(Scene* scene) {
 		//std::cout << "nothing rendering right now"<< std::endl;
-
+		Renderer::prerender(scene);
 		Renderer::render(scene);
 
 		}

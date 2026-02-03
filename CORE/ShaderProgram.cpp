@@ -144,6 +144,7 @@ GLuint ShaderProgram::compileShaderInternal(const std::string& source, GLenum ty
         LOG_ERROR("ERROR::SHADER::" , typeName , "::COMPILATION_FAILED\n" ,infoLog);
         LOG_ERROR("Shader source:\n", source);
         glDeleteShader(shader);
+		exit(EXIT_FAILURE);
         throw std::runtime_error("Shader compilation failed");
     }
     return shader;
@@ -210,7 +211,7 @@ void ShaderProgram::loadFromFiles(const std::string& vertexPath, const std::stri
         if (!success) {
             GLchar infoLog[1024];
             glGetProgramInfoLog(m_program, sizeof(infoLog), nullptr, infoLog);
-            std::cerr << "ERROR::PROGRAM::LINKING_FAILED\n" << infoLog << "\n";
+            LOG_ERROR("ERROR::PROGRAM::LINKING_FAILED\n", infoLog);
             throw std::runtime_error("Program linking failed");
         }
 
@@ -231,7 +232,62 @@ void ShaderProgram::loadFromFiles(const std::string& vertexPath, const std::stri
         GL_CHECK_ERROR();
     }
     catch (const std::runtime_error& e) {
-        LOG_ERROR("Shader loading error: " , e.what());
+        LOG_ERROR("Shader loading error: ", e.what());
+    }
+}
+
+void ShaderProgram::loadFromFiles(const std::string& vertexPath, const std::string& fragmentPath, const std::string& geometryPath) {
+    try {
+        std::string vertexSource = processShaderSource(loadShaderSource(vertexPath));
+        std::string fragmentSource = processShaderSource(loadShaderSource(fragmentPath));
+        std::string geometrySource = processShaderSource(loadShaderSource(geometryPath));
+
+        GLuint vertexShader = compileShader(vertexSource, GL_VERTEX_SHADER);
+        GLuint fragmentShader = compileShader(fragmentSource, GL_FRAGMENT_SHADER);
+        GLuint geometryShader = compileShader(geometrySource, GL_GEOMETRY_SHADER);
+
+        if (m_program) {
+            GL_CLEAR_ERROR();
+            glDeleteProgram(m_program);
+            GL_CHECK_ERROR();
+        }
+
+        GL_CLEAR_ERROR();
+        m_program = glCreateProgram();
+        glAttachShader(m_program, vertexShader);
+        glAttachShader(m_program, fragmentShader);
+        glAttachShader(m_program, geometryShader);
+        glLinkProgram(m_program);
+        GL_CHECK_ERROR();
+
+        GLint success;
+        glGetProgramiv(m_program, GL_LINK_STATUS, &success);
+        if (!success) {
+            GLchar infoLog[1024];
+            glGetProgramInfoLog(m_program, sizeof(infoLog), nullptr, infoLog);
+            LOG_ERROR("ERROR::PROGRAM::LINKING_FAILED\n", infoLog);
+            throw std::runtime_error("Program linking failed");
+        }
+
+        GL_CLEAR_ERROR();
+        glValidateProgram(m_program);
+        GL_CHECK_ERROR();
+
+        glGetProgramiv(m_program, GL_VALIDATE_STATUS, &success);
+        if (!success) {
+            GLchar infoLog[1024];
+            glGetProgramInfoLog(m_program, sizeof(infoLog), nullptr, infoLog);
+            throw std::runtime_error("ERROR::PROGRAM::VALIDATION_FAILED\n" + std::string(infoLog));
+        }
+
+        GL_CLEAR_ERROR();
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+        glDeleteShader(geometryShader);
+        GL_CHECK_ERROR();
+    }
+    catch (const std::runtime_error& e) {
+        LOG_ERROR("Shader loading error: ", e.what());
     }
 }
 

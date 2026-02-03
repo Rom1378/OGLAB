@@ -10,32 +10,39 @@
 
 #include <glm/matrix.hpp>
 
+#include <cstdint>
 
 
 
 class Scene;
+class ShaderProgram;
 
 namespace Renderer {
 	struct RendererSettings {
 		bool enableBlinn = true;
 		bool enableLighting = true;
+		bool enableShadows = true;
+		bool geometryOnlyPass = false;
 	};
 
 
 	void init();
-	void update(float dt);
+	void update(Scene& scene, float dt);
+
 	void draw();//submit ()receive draw call from components
 
 	void cleanup();
 
+	void prerender(Scene* scene);
 	void render(Scene* scene);
 
 
 	void rescale_framebuffer(float width, float height);
 	void clearFBO();
 
-	GLuint getFBO();
-	GLuint getRBO();
+
+	GLuint getMainFBO();
+	GLuint getMainRBO();
 	GLuint getColorTextureBuffer();
 
 	void setViewProjection(const glm::mat4& view, const glm::mat4& proj);

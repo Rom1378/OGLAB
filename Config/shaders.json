@@ -21,7 +21,12 @@
   },
   "simpleDepthShader": {
     "vertex": "res\\shaders\\simpleDepthShader.vert",
-    "fragment": "res\\shaders\\simpleDepthShader.frag"
+    "fragment": "res\\shaders\\simpleDepthShader.frag",
+    "geometry": "res\\shaders\\simpleDepthShader.geom"
+  },
+  "simpleDepthShader2D": {
+    "vertex": "res\\shaders\\simpleDepthShader2D.vert",
+    "fragment": "res\\shaders\\simpleDepthShader2D.frag"
   },
   "debugDepthQuad": {
     "vertex": "res\\shaders\\debug_quad.vs",

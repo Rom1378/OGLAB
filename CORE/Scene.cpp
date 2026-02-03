@@ -22,24 +22,37 @@
 #include "CORE/Components/Light.hpp"
 
 void Scene::init() {
-	cameraEntity= createEntity("Dev camera");
+    cameraEntity = createEntity("Dev camera");
 
-	addComponent<CameraComponent>(cameraEntity);
-	addComponent<TransformComponent>(cameraEntity);
-	
-	// stores dx dt dz yaw pitch
-	addComponent<CharacterControllerStateComponent>(cameraEntity);
-	
-	// simulate dx dt dz yaw pitch
-	addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
+    addComponent<CameraComponent>(cameraEntity);
+    addComponent<TransformComponent>(cameraEntity);
 
+    // stores dx dt dz yaw pitch
+    addComponent<CharacterControllerStateComponent>(cameraEntity);
 
+    // simulate dx dt dz yaw pitch
+    addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
 
 
-    LightComponent spotLight;
-    spotLight.type = LightComponent::Type::SPOT;
-    spotLight.data = SpotLightData();
 
+
+    LightComponent spotLight =
+    {
+        .type = LightComponent::Type::SPOT,
+        .ambient = { 0.1f,0.1f,0.1f },
+		.diffuse = { 1.0f,1.0f,1.0f },
+        .specular = { 1.0f,1.0f,1.0f },
+        .localTransform = Transform{ {0.0f,0.0f,1.0f}, {1.0f,0.0f,0.0f,0.0f}, {1.0f,1.0f,1.0f} },
+        .data = SpotLightData{
+            .cutOff = glm::cos(glm::radians(12.5f)),
+            .outerCutOff = glm::cos(glm::radians(15.0f)),
+            .constant = 1.0f,
+            .linear = 0.09f,
+            .quadratic = 0.032f
+		}
+
+    };
+   
     addComponent<LightComponent>(cameraEntity, spotLight);
 
 	
@@ -96,7 +109,7 @@ void Scene::init() {
     }
 
     // Floor
-    Entity floor = createEntity("Floor");
+    Entity floor = createEntity("Floor1");
     auto floorRd = addComponent<RenderableComponent>(floor, MeshRenderer::Primitive::CUBE);
     PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Static };
     ColliderComponent collider{ColliderComponent::Type::Box};
@@ -108,6 +121,19 @@ void Scene::init() {
     floorTransform.pos = glm::vec3(0.0f, -3.0f, 0.0f);
     floorTransform.scale = glm::vec3(200.0f, 0.5f, 200.0f);
     addComponent<TransformComponent>(floor, floorTransform);
+
+    Entity floor2 = createEntity("Floor2");
+    auto floorRd2 = addComponent<RenderableComponent>(floor2, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent body2{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent collider2{ ColliderComponent::Type::Box };
+    collider2.halfExtents = glm::vec3{ 100.,0.5,100 };
+    addComponent<ColliderComponent>(floor2, collider2);
+    auto physxCube2 = addComponent<PhysicsBodyComponent>(floor2, body2);
+    MeshRenderer::setCubeTextures(floorRd->rhandle, { container, specular });
+    TransformComponent floorTransform2;
+    floorTransform2.pos = glm::vec3(0.0f, 6.0f, 0.0f);
+    floorTransform2.scale = glm::vec3(200.0f, 0.5f, 200.0f);
+    addComponent<TransformComponent>(floor2, floorTransform2);
 
 	Entity Sphere = createEntity("Sphere");
 	auto sphereRd = addComponent<RenderableComponent>(Sphere, MeshRenderer::createSphere(1.0f, 32, 32));
@@ -144,11 +170,24 @@ void Scene::init() {
     transfrom->pos = glm::vec3(-5.0f, 1.0f, 0.0f);
 
 
-    
+    // Point Light 4 - Green (moving)
+    Entity pointLight4 = createEntity("Point Light 4 (Green)");
+    LightComponent light4;
+    light4.type = LightComponent::Type::POINT;
+    light4.ambient = glm::vec3(0.0f, 0.1f, 0.0f);
+    light4.diffuse = glm::vec3(0.0f, 3.0f, 0.0f);
+    light4.specular = glm::vec3(0.0f, 1.5f, 0.0f);
+    light4.data = PointLightData{ 1.0f, 0.07f, 0.017f };
+    addComponent<LightComponent>(pointLight4, light4);
+	auto shadowComp = addComponent<ShadowCasterComponent>(pointLight4);
+    TransformComponent light4Transform;
+    light4Transform.pos = glm::vec3(0.0f, 3.0f, 8.0f);
+    addComponent<TransformComponent>(pointLight4, light4Transform);
+	auto lightSphere = addComponent<RenderableComponent>(pointLight4, MeshRenderer::createSphere(0.2f, 8, 8));
+	lightSphere->localTransform.pos = glm::vec3(0.0f, 2.0f,0.0f);
 
 
 
-    // ================= LIGHTS (BRIGHTER) =================
 
     // Point Light 1 - White (center, moving in circle)
     Entity pointLight1 = createEntity("Point Light 1 (White)");
@@ -189,18 +228,7 @@ void Scene::init() {
     light3Transform.pos = glm::vec3(8.0f, 3.0f, 0.0f);
     addComponent<TransformComponent>(pointLight3, light3Transform);
 
-    // Point Light 4 - Green (moving)
-    Entity pointLight4 = createEntity("Point Light 4 (Green)");
-    LightComponent light4;
-    light4.type = LightComponent::Type::POINT;
-    light4.ambient = glm::vec3(0.0f, 0.1f, 0.0f);
-    light4.diffuse = glm::vec3(0.0f, 3.0f, 0.0f);
-    light4.specular = glm::vec3(0.0f, 1.5f, 0.0f);
-    light4.data = PointLightData{ 1.0f, 0.07f, 0.017f };
-    addComponent<LightComponent>(pointLight4, light4);
-    TransformComponent light4Transform;
-    light4Transform.pos = glm::vec3(0.0f, 3.0f, 8.0f);
-    addComponent<TransformComponent>(pointLight4, light4Transform);
+   
 
     // Directional Light - Subtle ambient
     Entity dirLight = createEntity("Directional Light");
@@ -211,7 +239,6 @@ void Scene::init() {
     dirLightComp.specular = glm::vec3(0.5f);
     //dirLightComp.data = DirLightData{ glm::vec3(-0.2f, -1.0f, -0.3f) };
     addComponent<LightComponent>(dirLight, dirLightComp);
-
 
 }
 
@@ -268,7 +295,7 @@ void Scene::update(float dt) {
 	//PlayerMovementSystem(world, dt);
 	//RenderSystem(world);
 
-	Renderer::update(dt);
+	Renderer::update(*this, dt);
 
     CameraComponent* camComp = getComponent<CameraComponent>(activeCamera);
 	TransformComponent* transform = getComponent<TransformComponent>(activeCamera);

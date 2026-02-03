@@ -47,15 +47,15 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
     ${CMAKE_CURRENT_SOURCE_DIR}/res
     $<TARGET_FILE_DIR:${PROJECT_NAME}>/res
-    COMMENT "Copying resources to build directory"
+    COMMENT "Copying resources to build directory including shader"
 )
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/CORE/shaders
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
-    COMMENT "Copying shaders to build directory"
-)
+##add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+ #   COMMAND ${CMAKE_COMMAND} -E copy_directory
+ #   ${CMAKE_CURRENT_SOURCE_DIR}/CORE/shaders
+ #   $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+ #   COMMENT "Copying shaders to build directory"
+#)
 
 
 #file(COPY Config DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

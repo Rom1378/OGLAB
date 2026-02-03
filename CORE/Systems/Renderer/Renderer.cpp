@@ -13,6 +13,8 @@
 #include "MeshRenderer.hpp"
 #include "LineRenderer.hpp"
 
+#include "ShadowMap.hpp"
+
 
 class frameBuffer {
 
@@ -90,15 +92,27 @@ namespace Renderer {
 		Skybox::init();
 		MeshRenderer::init();
 		LineRenderer::init();
+
+		ShadowMapSystem::init();
+
 		
 		LOG_OK("Skybox initialized");
 	}
 
-	void update(float dt) {
+	void update(Scene& scene, float dt) {
+		ShadowMapSystem::update(scene);
 
 	}
 
+	void prerender(Scene* scene) {
+		ShadowMapSystem::computeShadowMapsPass(*scene);
+	}
+
+
 	void render(Scene* scene) {
+		//shadow 
+		//prerender(scene);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, gFrameBuffer);
 		clearFBO();
 
@@ -176,8 +190,8 @@ namespace Renderer {
 	}
 
 
-	GLuint getFBO() { return gFrameBuffer; }
-	GLuint getRBO() { return gRboDepthStencil; }
+	GLuint getMainFBO() { return gFrameBuffer; }
+	GLuint getMainRBO() { return gRboDepthStencil; }
 	GLuint getColorTextureBuffer() { return gTexColorBuffer; }
 
 

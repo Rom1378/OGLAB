@@ -82,6 +82,9 @@ namespace MeshRenderer {
 
 	void renderPass(Scene* scene);
 
+	const RenderableData& getRenderableData(RenderableHandle handle);
+
+
 	//void DrawCube(Tran, );
 
 	void cleanup();
