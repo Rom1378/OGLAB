@@ -24,7 +24,7 @@ namespace TextureManager
 
 	}
 
-	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name)
+	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name, bool useSRGB)
 	{
 		LOG("Loading texture: ", path);
 
@@ -52,19 +52,34 @@ namespace TextureManager
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			// Load and generate the texture
-			if (nrChannels == 3)
+			
+			// Choose internal format based on sRGB requirement and channel count
+			GLenum internalFormat;
+			GLenum dataFormat;
+			
+			if (nrChannels == 1)
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+				internalFormat = GL_RED;
+				dataFormat = GL_RED;
+			}
+			else if (nrChannels == 3)
+			{
+				internalFormat = useSRGB ? GL_SRGB : GL_RGB;
+				dataFormat = GL_RGB;
 			}
 			else if (nrChannels == 4)
 			{
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				internalFormat = useSRGB ? GL_SRGB_ALPHA : GL_RGBA;
+				dataFormat = GL_RGBA;
 			}
 			else
 			{
 				LOG_ERROR("TextureManager: Unsupported number of channels: " ,nrChannels);
+				stbi_image_free(data);
+				return texture;
 			}
+			
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 			texture->width = width;
 			texture->height = height;
@@ -89,7 +104,7 @@ namespace TextureManager
 	// +Z (front) 
 	// -Z (back)
 	// -------------------------------------------------------
-	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces)
+	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, bool useSRGB)
 	{
 
 		auto texture = std::make_shared<Texture>();
@@ -106,8 +121,9 @@ namespace TextureManager
 			unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
 			if (data)
 			{
+				GLenum internalFormat = (useSRGB && nrChannels == 3) ? GL_SRGB : GL_RGB;
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-					0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+					0, internalFormat, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
 				);
 				stbi_image_free(data);
 			}
@@ -125,7 +141,7 @@ namespace TextureManager
 
 		return texture;
 	}
-	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, const std::string& name)
+	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, const std::string& name, bool useSRGB)
 	{
 		auto it = Internal::textures.find(name);
 		if (it != Internal::textures.end())
@@ -133,7 +149,7 @@ namespace TextureManager
 			return it->second;
 		}
 
-		auto texture = loadCubemap(faces);
+		auto texture = loadCubemap(faces, useSRGB);
 		Internal::textures[name] = texture;
 		return texture;
 	}
@@ -243,6 +259,7 @@ namespace TextureManager
 		glGenTextures(1, &cubemap->id);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->id);
 
+		// HDR cubemaps are linear (not sRGB) - use GL_RGB16F
 		for (unsigned int i = 0; i < 6; ++i) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
 				cubemapSize, cubemapSize, 0, GL_RGB, GL_FLOAT, nullptr);
@@ -252,7 +269,7 @@ namespace TextureManager
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); // Changed!
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		// Create framebuffer for rendering
@@ -262,7 +279,7 @@ namespace TextureManager
 
 		glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
 		glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cubemapSize, cubemapSize); // Fixed!
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, cubemapSize, cubemapSize);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
 
 		// Check framebuffer completeness
@@ -282,7 +299,7 @@ namespace TextureManager
 			glm::lookAt(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, -1.0f, 0.0f))
 		};
 
-		// Get shader - FIXED TYPO IN SHADER NAME
+		// Get shader
 		auto shader = ShaderManager::getShader("equirectanular2cubemap");
 		if (!shader) {
 			std::cerr << "Failed to get equirectanular2cubemap" << std::endl;
@@ -311,7 +328,7 @@ namespace TextureManager
 			glBindVertexArray(0);
 		}
 
-		// Render to each cubemap face - USING CORRECT VIEWPORT SIZE
+		// Render to each cubemap face
 		glViewport(0, 0, cubemapSize, cubemapSize);
 		glBindVertexArray(cubeVAO);
 		for (unsigned int i = 0; i < 6; ++i) {
@@ -323,7 +340,7 @@ namespace TextureManager
 		}
 		glBindVertexArray(0);
 
-		// Generate mipmaps - CRUCIAL FOR GOOD QUALITY
+		// Generate mipmaps
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap->id);
 		glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 

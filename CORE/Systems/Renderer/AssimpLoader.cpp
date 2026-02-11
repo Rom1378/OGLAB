@@ -115,20 +115,20 @@ namespace assimpLoader {
 		if (mesh->mMaterialIndex >= 0) {
 			aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
-			// Diffuse maps
+			// Diffuse maps (sRGB)
 			std::vector<Texture> diffuseMaps = loadMaterialTextures(
 				material, aiTextureType_DIFFUSE, Texture::Type::DIFFUSE, directory);
 			textures.insert(textures.end(), diffuseMaps.begin(), diffuseMaps.end());
 
-			// Specular maps
+			// Specular maps (Linear - NOT sRGB)
 			std::vector<Texture> specularMaps = loadMaterialTextures(
 				material, aiTextureType_SPECULAR, Texture::Type::SPECULAR, directory);
 			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
 
-			aiTextureType_BASE_COLOR;
+			// Base color (sRGB)
 			std::vector<Texture> baseColor = loadMaterialTextures(
-				material, aiTextureType_BASE_COLOR, Texture::Type::SPECULAR, directory);
-			textures.insert(textures.end(), specularMaps.begin(), specularMaps.end());
+				material, aiTextureType_BASE_COLOR, Texture::Type::DIFFUSE, directory);
+			textures.insert(textures.end(), baseColor.begin(), baseColor.end());
 		}
 
 		return { meshdata, textures };
@@ -142,8 +142,11 @@ namespace assimpLoader {
 			aiString str;
 			auto t = mat->GetTexture(type, i, &str);
 
+			// Determine if texture should be in sRGB space
+			bool useSRGB = (typeName == Texture::Type::DIFFUSE);
+
 			textures.push_back({
-				.id = TextureFromFile(str.C_Str(), directory),
+				.id = TextureFromFile(str.C_Str(), directory, useSRGB),
 				.type = typeName,
 				.path = str.C_Str(),
 				});
@@ -151,7 +154,7 @@ namespace assimpLoader {
 		return textures;
 	}
 
-	unsigned int TextureFromFile(const char* path, const std::string& directory) {
+	unsigned int TextureFromFile(const char* path, const std::string& directory, bool useSRGB) {
 		std::string filename = std::string(path);
 		filename = directory + '/' + filename;
 
@@ -161,16 +164,24 @@ namespace assimpLoader {
 		int width, height, nrComponents;
 		unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
 		if (data) {
-			GLenum format;
-			if (nrComponents == 1)
-				format = GL_RED;
-			else if (nrComponents == 3)
-				format = GL_RGB;
-			else if (nrComponents == 4)
-				format = GL_RGBA;
-
 			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+
+			// Choose internal format based on sRGB requirement and channel count
+			GLenum internalFormat;
+			GLenum dataFormat;
+			if (nrComponents == 1) {
+				internalFormat = GL_RED;
+				dataFormat = GL_RED;
+			}
+			else if (nrComponents == 3) {
+				internalFormat = useSRGB ? GL_SRGB : GL_RGB;
+				dataFormat = GL_RGB;
+			}
+			else if (nrComponents == 4) {
+				internalFormat = useSRGB ? GL_SRGB_ALPHA : GL_RGBA;
+				dataFormat = GL_RGBA;
+			}
+			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -182,7 +193,6 @@ namespace assimpLoader {
 		}
 		else {
 			LOG_WARN("Texture failed to load at path : ", path);
-			//std::cerr << "Texture failed to load at path: " << path << std::endl;
 			stbi_image_free(data);
 		}
 

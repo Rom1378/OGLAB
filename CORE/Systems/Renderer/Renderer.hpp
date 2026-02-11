@@ -35,6 +35,7 @@ namespace Renderer {
 
 	void prerender(Scene* scene);
 	void render(Scene* scene);
+	void postRender(Scene& scene);
 
 
 	void rescale_framebuffer(float width, float height);

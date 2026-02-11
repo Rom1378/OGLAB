@@ -12,6 +12,7 @@
 #include "Skybox.hpp"
 #include "MeshRenderer.hpp"
 #include "LineRenderer.hpp"
+#include "PostProcessing.hpp"
 
 #include "ShadowMap.hpp"
 
@@ -30,6 +31,7 @@ namespace Renderer {
 	GLuint gFrameBuffer = {};
 	GLuint gTexColorBuffer = {};
 	GLuint gRboDepthStencil = {};
+
 
 	struct RenderCamera {	
 		glm::mat4 projection{};
@@ -66,6 +68,7 @@ namespace Renderer {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gTexColorBuffer, 0);
 
 
@@ -92,8 +95,9 @@ namespace Renderer {
 		Skybox::init();
 		MeshRenderer::init();
 		LineRenderer::init();
-
 		ShadowMapSystem::init();
+
+		PostProcessing::init();
 
 		
 		LOG_OK("Skybox initialized");
@@ -125,12 +129,19 @@ namespace Renderer {
 		LineRenderer::render();
 
 
+
+
 		//draw each pass.
 		// cubepass
 		//modelPass
 		//linePass
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
+
+	void postRender(Scene& scene) {
+		PostProcessing::renderPass();
+	}
+
 
 
 	void clearFBO() {
@@ -172,7 +183,7 @@ namespace Renderer {
 
 		// Resize the texture
 		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		// Resize the renderbuffer

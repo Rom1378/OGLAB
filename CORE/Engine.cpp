@@ -129,6 +129,7 @@ namespace Engine {
 		//std::cout << "nothing rendering right now"<< std::endl;
 		Renderer::prerender(scene);
 		Renderer::render(scene);
+		Renderer::postRender(*scene);
 
 		}
 	bool isRunning() { return m_isRunning; }

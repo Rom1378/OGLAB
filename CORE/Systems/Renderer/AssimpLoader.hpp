@@ -23,8 +23,7 @@ namespace assimpLoader {
 	std::vector<Texture> loadMaterialTextures(aiMaterial* mat,
 		aiTextureType type,
 		Texture::Type typeName, const std::string& directory);
-	unsigned int TextureFromFile(const char* path, const std::string& directory);
-
+	unsigned int TextureFromFile(const char* path, const std::string& directory, bool useSRGB);
 	void printModelInfo(const MeshRenderer::RenderableData& data);
 
 }

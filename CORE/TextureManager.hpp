@@ -24,9 +24,9 @@ struct HDRTextureInfo {
 
 namespace TextureManager
 {
-	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name);
-	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, const std::string& name);
-	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces);
+	std::shared_ptr<Texture> loadTexture(const std::string& path, const std::string& name, bool useSRGB = false);
+	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, const std::string& name, bool useSRGB = false);
+	std::shared_ptr<Texture> loadCubemap(const std::vector<std::string>& faces, bool useSRGB = false);
 
 	HDRTextureInfo loadHDRTextureWithInfo(const std::string& path);
 

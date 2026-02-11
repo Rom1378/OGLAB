@@ -72,7 +72,9 @@ void Scene::init() {
 	auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
 
 	Texture& cat = *TextureManager::loadTexture("res/textures/CAT.png", "cat");
-	Texture& container = *TextureManager::loadTexture("res/textures/container/container2.png", "container");
+	Texture& wood = *TextureManager::loadTexture("res/textures/NICEWOOD.png", "wood", true);
+	Texture& container = *TextureManager::loadTexture("res/textures/container/container2.png", "container", false);
+	wood.type = Texture::Type::DIFFUSE;
 	container.type = Texture::Type::DIFFUSE;
 	cat.type = Texture::Type::DIFFUSE;
 	Texture& specular = *TextureManager::loadTexture("res/textures/container/container2_specular.png", "container_specular");

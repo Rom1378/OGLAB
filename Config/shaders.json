@@ -39,5 +39,9 @@
   "line": {
     "vertex": "res\\shaders\\line.vs",
     "fragment": "res\\shaders\\line.fs"
+  },
+  "gammaCorrection": {
+    "vertex": "res\\shaders\\gammaCorrection.vert",
+    "fragment": "res\\shaders\\gammaCorrection.frag"
   }
 }

@@ -4,6 +4,7 @@ out vec4 FragColor;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D normal;
     float shininess;
 }; 
 
@@ -131,10 +132,21 @@ float ShadowCalculation2D(int mapIndex, int lightPosIndex, vec3 fragPos)
 void main() {
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
+
+
     
     vec3 result = vec3(0.0);
     
     if (useLighting && useTexture) {
+        
+        //obtain normal map in range [0,1]
+        vec3 normal = texture(material.normal, TexCoords).rgb;
+
+        //transform normal vector to range [-1,1]
+        normal = normalize(normal * 2.0 - 1.0);
+
+        norm = normal;
+    
         for (int i = 0; i < numDirLights; i++) {
             result += CalcDirLight(dirLights[i], norm, viewDir, i);
         }
