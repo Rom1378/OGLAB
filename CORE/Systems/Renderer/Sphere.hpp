@@ -39,6 +39,21 @@ namespace MeshRenderer {
 				vert.Position = { x, y, z };
 				vert.Normal = { x * lengthInv, y * lengthInv, z * lengthInv };
 				vert.TexCoord = { uCoord, 1.0f - vCoord }; // flip V for OpenGL
+
+
+				// Calculate tangent (along the longitude direction)
+				// Tangent is perpendicular to the normal in the horizontal plane
+				float tangentX = -sinf(sectorAngle);
+				float tangentY = cosf(sectorAngle);
+				float tangentZ = 0.0f;
+				vert.Tangent = { tangentX, tangentY, tangentZ };
+
+				// Calculate bitangent (along the latitude direction)
+				// Bitangent = Normal × Tangent
+				float bitangentX = -cosf(sectorAngle) * sinf(stackAngle);
+				float bitangentY = -sinf(sectorAngle) * sinf(stackAngle);
+				float bitangentZ = cosf(stackAngle);
+				vert.Bitangent = { bitangentX, bitangentY, bitangentZ };
 			}
 		}
 

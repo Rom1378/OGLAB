@@ -46,6 +46,7 @@ struct SpotLight {
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
+in mat3 TBN;
 
 uniform vec3 viewPos;
 uniform Material material;
@@ -143,7 +144,10 @@ void main() {
         vec3 normal = texture(material.normal, TexCoords).rgb;
 
         //transform normal vector to range [-1,1]
-        normal = normalize(normal * 2.0 - 1.0);
+        normal = normal * 2.0 - 1.0;
+
+        //transform normal vector to world space
+        normal = normalize(TBN * normal);
 
         norm = normal;
     

@@ -76,6 +76,15 @@ namespace MeshRenderer {
 			// Texture coordinates
 			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoord));
 			glEnableVertexAttribArray(2);
+
+			// Tangent attribute
+			glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+			glEnableVertexAttribArray(3);
+
+			// Bitangent attribute
+			glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+			glEnableVertexAttribArray(4);
+
 		}
 
 	}
