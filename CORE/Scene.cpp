@@ -74,6 +74,12 @@ void Scene::init() {
 	Texture& cat = *TextureManager::loadTexture("res/textures/CAT.png", "cat");
 	Texture& wood = *TextureManager::loadTexture("res/textures/NICEWOOD.png", "wood", true);
 	Texture& container = *TextureManager::loadTexture("res/textures/container/container2.png", "container", false);
+
+	Texture& brickNormalMap = *TextureManager::loadTexture("res/textures/normal_map_brick_wall.jpg", "brick_normal", false);
+	Texture& brickDiffuse = *TextureManager::loadTexture("res/textures/brick_wall.jpg", "brick_diffuse", false);
+	brickDiffuse.type = Texture::Type::DIFFUSE;
+	brickNormalMap.type = Texture::Type::NORMAL;
+
 	wood.type = Texture::Type::DIFFUSE;
 	container.type = Texture::Type::DIFFUSE;
 	cat.type = Texture::Type::DIFFUSE;
@@ -118,7 +124,7 @@ void Scene::init() {
     collider.halfExtents = glm::vec3{ 100.,0.5,100 };
     addComponent<ColliderComponent>(floor, collider);
     auto physxCube = addComponent<PhysicsBodyComponent>(floor, body);
-    MeshRenderer::setCubeTextures(floorRd->rhandle, { container, specular });
+    MeshRenderer::setCubeTextures(floorRd->rhandle, { brickDiffuse, brickNormalMap });
     TransformComponent floorTransform;
     floorTransform.pos = glm::vec3(0.0f, -3.0f, 0.0f);
     floorTransform.scale = glm::vec3(200.0f, 0.5f, 200.0f);
@@ -131,7 +137,7 @@ void Scene::init() {
     collider2.halfExtents = glm::vec3{ 100.,0.5,100 };
     addComponent<ColliderComponent>(floor2, collider2);
     auto physxCube2 = addComponent<PhysicsBodyComponent>(floor2, body2);
-    MeshRenderer::setCubeTextures(floorRd->rhandle, { container, specular });
+    MeshRenderer::setCubeTextures(floorRd->rhandle, { brickDiffuse, brickNormalMap });
     TransformComponent floorTransform2;
     floorTransform2.pos = glm::vec3(0.0f, 6.0f, 0.0f);
     floorTransform2.scale = glm::vec3(200.0f, 0.5f, 200.0f);
