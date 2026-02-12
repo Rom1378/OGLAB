@@ -446,6 +446,10 @@ namespace Window
 		ImGui::Begin("Menu");
 		//show opengl scene fps
 		ImGui::Text("FPS: %.1f", Internal::avgFPS);
+
+		//Number of draw calls
+		ImGui::Text("Draw Calls: %d", Renderer::getDrawCallCount());
+
 		//turn on/off polygonem ode
 		if (ImGui::Button("Polygon Mode")) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

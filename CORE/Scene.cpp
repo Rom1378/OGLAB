@@ -33,9 +33,6 @@ void Scene::init() {
     // simulate dx dt dz yaw pitch
     addComponent<PhysicsBodyComponent>(cameraEntity, PhysicsBodyComponent::PhysicsRole::CharacterController);
 
-
-
-
     LightComponent spotLight =
     {
         .type = LightComponent::Type::SPOT,
@@ -50,14 +47,12 @@ void Scene::init() {
             .linear = 0.09f,
             .quadratic = 0.032f
 		}
-
     };
    
     addComponent<LightComponent>(cameraEntity, spotLight);
 
-	
 	activeCamera = cameraEntity;
-	activeEntity = cameraEntity; //will 
+	activeEntity = cameraEntity;
 
 	skybox = Skybox::createSkybox({
 		"res/textures/CubeMaps/skybox/right.jpg",
@@ -66,242 +61,365 @@ void Scene::init() {
 		"res/textures/CubeMaps/skybox/bottom.jpg",
 		"res/textures/CubeMaps/skybox/front.jpg",
 		"res/textures/CubeMaps/skybox/back.jpg"
-		});
+	});
 
-	Entity cube = createEntity("Cube");
-	auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
-
-	Texture& cat = *TextureManager::loadTexture("res/textures/CAT.png", "cat");
+	// Load textures
+	// ========== TEXTURES DIFFUSE/ALBEDO - sRGB = TRUE ==========
+	Texture& cat = *TextureManager::loadTexture("res/textures/CAT.png", "cat", true);
 	Texture& wood = *TextureManager::loadTexture("res/textures/NICEWOOD.png", "wood", true);
-	Texture& container = *TextureManager::loadTexture("res/textures/container/container2.png", "container", false);
+	Texture& container = *TextureManager::loadTexture("res/textures/container/container2.png", "container", true);
+	Texture& brickDiffuse = *TextureManager::loadTexture("res/textures/brick_wall.jpg", "brick_diffuse", true);
 
-	Texture& brickNormalMap = *TextureManager::loadTexture("res/textures/normal_map_brick_wall.jpg", "brick_normal", false);
-	Texture& brickDiffuse = *TextureManager::loadTexture("res/textures/brick_wall.jpg", "brick_diffuse", false);
 	brickDiffuse.type = Texture::Type::DIFFUSE;
-	brickNormalMap.type = Texture::Type::NORMAL;
-
 	wood.type = Texture::Type::DIFFUSE;
 	container.type = Texture::Type::DIFFUSE;
 	cat.type = Texture::Type::DIFFUSE;
-	Texture& specular = *TextureManager::loadTexture("res/textures/container/container2_specular.png", "container_specular");
+
+	// ========== TEXTURES NON-COLOR - sRGB = FALSE ==========
+	Texture& brickNormalMap = *TextureManager::loadTexture("res/textures/normal_map_brick_wall.jpg", "brick_normal", false);
+	Texture& specular = *TextureManager::loadTexture("res/textures/container/container2_specular.png", "container_specular", false);
+
+	brickNormalMap.type = Texture::Type::NORMAL;
 	specular.type = Texture::Type::SPECULAR;
 
-	MeshRenderer::setCubeTextures(rdcomp->rhandle, { container, specular});
+    // ========== MAIN FLOOR ==========
+    Entity mainFloor = createEntity("Main Floor");
+    auto mainFloorRd = addComponent<RenderableComponent>(mainFloor, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent floorBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent floorCollider{ ColliderComponent::Type::Box };
+    floorCollider.halfExtents = glm::vec3{ 50.0f, 0.5f, 50.0f };
+    addComponent<ColliderComponent>(mainFloor, floorCollider);
+    addComponent<PhysicsBodyComponent>(mainFloor, floorBody);
+    MeshRenderer::setCubeTextures(mainFloorRd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent mainFloorTransform;
+    mainFloorTransform.pos = glm::vec3(0.0f, 0.0f, 0.0f);
+    mainFloorTransform.scale = glm::vec3(100.0f, 1.0f, 100.0f);
+    addComponent<TransformComponent>(mainFloor, mainFloorTransform);
 
+    // ========== CENTRAL ROOM (15x15) ==========
+    // North Wall
+    Entity centralNorthWall = createEntity("Central Room - North Wall");
+    auto cnwRd = addComponent<RenderableComponent>(centralNorthWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent cnwBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent cnwCollider{ ColliderComponent::Type::Box };
+    cnwCollider.halfExtents = glm::vec3{ 7.5f, 3.0f, 0.5f };
+    addComponent<ColliderComponent>(centralNorthWall, cnwCollider);
+    addComponent<PhysicsBodyComponent>(centralNorthWall, cnwBody);
+    MeshRenderer::setCubeTextures(cnwRd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent cnwTransform;
+    cnwTransform.pos = glm::vec3(0.0f, 3.0f, -7.5f);
+    cnwTransform.scale = glm::vec3(15.0f, 6.0f, 1.0f);
+    addComponent<TransformComponent>(centralNorthWall, cnwTransform);
 
-	TransformComponent comp{  };
-	comp.scale = { 1.0,3.0f,1.0f };
-	comp.pos = { 0,-4,0 };
-	addComponent<TransformComponent>(cube, comp);
+    // South Wall
+    Entity centralSouthWall = createEntity("Central Room - South Wall");
+    auto cswRd = addComponent<RenderableComponent>(centralSouthWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent cswBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent cswCollider{ ColliderComponent::Type::Box };
+    cswCollider.halfExtents = glm::vec3{ 7.5f, 3.0f, 0.5f };
+    addComponent<ColliderComponent>(centralSouthWall, cswCollider);
+    addComponent<PhysicsBodyComponent>(centralSouthWall, cswBody);
+    MeshRenderer::setCubeTextures(cswRd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent cswTransform;
+    cswTransform.pos = glm::vec3(0.0f, 3.0f, 7.5f);
+    cswTransform.scale = glm::vec3(15.0f, 6.0f, 1.0f);
+    addComponent<TransformComponent>(centralSouthWall, cswTransform);
 
+    // East Wall (with doorway)
+    Entity centralEastWall1 = createEntity("Central Room - East Wall 1");
+    auto cew1Rd = addComponent<RenderableComponent>(centralEastWall1, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent cew1Body{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent cew1Collider{ ColliderComponent::Type::Box };
+    cew1Collider.halfExtents = glm::vec3{ 0.5f, 3.0f, 3.0f };
+    addComponent<ColliderComponent>(centralEastWall1, cew1Collider);
+    addComponent<PhysicsBodyComponent>(centralEastWall1, cew1Body);
+    MeshRenderer::setCubeTextures(cew1Rd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent cew1Transform;
+    cew1Transform.pos = glm::vec3(7.5f, 3.0f, -4.5f);
+    cew1Transform.scale = glm::vec3(1.0f, 6.0f, 6.0f);
+    addComponent<TransformComponent>(centralEastWall1, cew1Transform);
 
-    // Create cubes in a grid
-    for (int x = -2; x <= 3; x++) {
-        for (int z = -2; z <= 3; z++) {
-            Entity cube = createEntity("Cube_" + std::to_string(x) + "_" + std::to_string(z));
-            auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
-            PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Dynamic };
-            ColliderComponent collider{ ColliderComponent::Type::Box };
-            collider.localTransform.pos = { -0.2f,0,0};
-            addComponent<PhysicsBodyComponent>(cube, body);
-            addComponent<ColliderComponent>(cube, collider);
+    Entity centralEastWall2 = createEntity("Central Room - East Wall 2");
+    auto cew2Rd = addComponent<RenderableComponent>(centralEastWall2, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent cew2Body{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent cew2Collider{ ColliderComponent::Type::Box };
+    cew2Collider.halfExtents = glm::vec3{ 0.5f, 3.0f, 3.0f };
+    addComponent<ColliderComponent>(centralEastWall2, cew2Collider);
+    addComponent<PhysicsBodyComponent>(centralEastWall2, cew2Body);
+    MeshRenderer::setCubeTextures(cew2Rd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent cew2Transform;
+    cew2Transform.pos = glm::vec3(7.5f, 3.0f, 4.5f);
+    cew2Transform.scale = glm::vec3(1.0f, 6.0f, 6.0f);
+    addComponent<TransformComponent>(centralEastWall2, cew2Transform);
 
-            collider.halfExtents = { 0.5,0.5,0.5 };
-            MeshRenderer::setCubeTextures(rdcomp->rhandle, { container, specular });
+    // West Wall (with doorway)
+    Entity centralWestWall1 = createEntity("Central Room - West Wall 1");
+    auto cww1Rd = addComponent<RenderableComponent>(centralWestWall1, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent cww1Body{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent cww1Collider{ ColliderComponent::Type::Box };
+    cww1Collider.halfExtents = glm::vec3{ 0.5f, 3.0f, 3.0f };
+    addComponent<ColliderComponent>(centralWestWall1, cww1Collider);
+    addComponent<PhysicsBodyComponent>(centralWestWall1, cww1Body);
+    MeshRenderer::setCubeTextures(cww1Rd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent cww1Transform;
+    cww1Transform.pos = glm::vec3(-7.5f, 3.0f, -4.5f);
+    cww1Transform.scale = glm::vec3(1.0f, 6.0f, 6.0f);
+    addComponent<TransformComponent>(centralWestWall1, cww1Transform);
 
-            TransformComponent transform;
-            transform.pos = glm::vec3(x * 3.0f, 100.0f, z * 3.0f);
-            transform.scale = glm::vec3(1.0f);
-            addComponent<TransformComponent>(cube, transform);
-        }
+    Entity centralWestWall2 = createEntity("Central Room - West Wall 2");
+    auto cww2Rd = addComponent<RenderableComponent>(centralWestWall2, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent cww2Body{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent cww2Collider{ ColliderComponent::Type::Box };
+    cww2Collider.halfExtents = glm::vec3{ 0.5f, 3.0f, 3.0f };
+    addComponent<ColliderComponent>(centralWestWall2, cww2Collider);
+    addComponent<PhysicsBodyComponent>(centralWestWall2, cww2Body);
+    MeshRenderer::setCubeTextures(cww2Rd->rhandle, { brickDiffuse, brickNormalMap });
+    TransformComponent cww2Transform;
+    cww2Transform.pos = glm::vec3(-7.5f, 3.0f, 4.5f);
+    cww2Transform.scale = glm::vec3(1.0f, 6.0f, 6.0f);
+    addComponent<TransformComponent>(centralWestWall2, cww2Transform);
+
+    // ========== EAST ROOM (12x10) ==========
+    Entity eastNorthWall = createEntity("East Room - North Wall");
+    auto enwRd = addComponent<RenderableComponent>(eastNorthWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent enwBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent enwCollider{ ColliderComponent::Type::Box };
+    enwCollider.halfExtents = glm::vec3{ 6.0f, 3.0f, 0.5f };
+    addComponent<ColliderComponent>(eastNorthWall, enwCollider);
+    addComponent<PhysicsBodyComponent>(eastNorthWall, enwBody);
+    MeshRenderer::setCubeTextures(enwRd->rhandle, { wood });
+    TransformComponent enwTransform;
+    enwTransform.pos = glm::vec3(14.0f, 3.0f, -5.0f);
+    enwTransform.scale = glm::vec3(12.0f, 6.0f, 1.0f);
+    addComponent<TransformComponent>(eastNorthWall, enwTransform);
+
+    Entity eastSouthWall = createEntity("East Room - South Wall");
+    auto eswRd = addComponent<RenderableComponent>(eastSouthWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent eswBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent eswCollider{ ColliderComponent::Type::Box };
+    eswCollider.halfExtents = glm::vec3{ 6.0f, 3.0f, 0.5f };
+    addComponent<ColliderComponent>(eastSouthWall, eswCollider);
+    addComponent<PhysicsBodyComponent>(eastSouthWall, eswBody);
+    MeshRenderer::setCubeTextures(eswRd->rhandle, { wood });
+    TransformComponent eswTransform;
+    eswTransform.pos = glm::vec3(14.0f, 3.0f, 5.0f);
+    eswTransform.scale = glm::vec3(12.0f, 6.0f, 1.0f);
+    addComponent<TransformComponent>(eastSouthWall, eswTransform);
+
+    Entity eastEastWall = createEntity("East Room - East Wall");
+    auto eewRd = addComponent<RenderableComponent>(eastEastWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent eewBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent eewCollider{ ColliderComponent::Type::Box };
+    eewCollider.halfExtents = glm::vec3{ 0.5f, 3.0f, 5.0f };
+    addComponent<ColliderComponent>(eastEastWall, eewCollider);
+    addComponent<PhysicsBodyComponent>(eastEastWall, eewBody);
+    MeshRenderer::setCubeTextures(eewRd->rhandle, { wood });
+    TransformComponent eewTransform;
+    eewTransform.pos = glm::vec3(20.0f, 3.0f, 0.0f);
+    eewTransform.scale = glm::vec3(1.0f, 6.0f, 10.0f);
+    addComponent<TransformComponent>(eastEastWall, eewTransform);
+
+    // ========== WEST ROOM (10x10) ==========
+    Entity westNorthWall = createEntity("West Room - North Wall");
+    auto wnwRd = addComponent<RenderableComponent>(westNorthWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent wnwBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent wnwCollider{ ColliderComponent::Type::Box };
+    wnwCollider.halfExtents = glm::vec3{ 5.0f, 3.0f, 0.5f };
+    addComponent<ColliderComponent>(westNorthWall, wnwCollider);
+    addComponent<PhysicsBodyComponent>(westNorthWall, wnwBody);
+    MeshRenderer::setCubeTextures(wnwRd->rhandle, { container, specular });
+    TransformComponent wnwTransform;
+    wnwTransform.pos = glm::vec3(-12.5f, 3.0f, -5.0f);
+    wnwTransform.scale = glm::vec3(10.0f, 6.0f, 1.0f);
+    addComponent<TransformComponent>(westNorthWall, wnwTransform);
+
+    Entity westSouthWall = createEntity("West Room - South Wall");
+    auto wswRd = addComponent<RenderableComponent>(westSouthWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent wswBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent wswCollider{ ColliderComponent::Type::Box };
+    wswCollider.halfExtents = glm::vec3{ 5.0f, 3.0f, 0.5f };
+    addComponent<ColliderComponent>(westSouthWall, wswCollider);
+    addComponent<PhysicsBodyComponent>(westSouthWall, wswBody);
+    MeshRenderer::setCubeTextures(wswRd->rhandle, { container, specular });
+    TransformComponent wswTransform;
+    wswTransform.pos = glm::vec3(-12.5f, 3.0f, 5.0f);
+    wswTransform.scale = glm::vec3(10.0f, 6.0f, 1.0f);
+    addComponent<TransformComponent>(westSouthWall, wswTransform);
+
+    Entity westWestWall = createEntity("West Room - West Wall");
+    auto wwwRd = addComponent<RenderableComponent>(westWestWall, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent wwwBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent wwwCollider{ ColliderComponent::Type::Box };
+    wwwCollider.halfExtents = glm::vec3{ 0.5f, 3.0f, 5.0f };
+    addComponent<ColliderComponent>(westWestWall, wwwCollider);
+    addComponent<PhysicsBodyComponent>(westWestWall, wwwBody);
+    MeshRenderer::setCubeTextures(wwwRd->rhandle, { container, specular });
+    TransformComponent wwwTransform;
+    wwwTransform.pos = glm::vec3(-17.5f, 3.0f, 0.0f);
+    wwwTransform.scale = glm::vec3(1.0f, 6.0f, 10.0f);
+    addComponent<TransformComponent>(westWestWall, wwwTransform);
+
+    // ========== DECORATIVE OBJECTS ==========
+    // Central pedestal
+    Entity pedestal = createEntity("Pedestal");
+    auto pedestalRd = addComponent<RenderableComponent>(pedestal, MeshRenderer::Primitive::CUBE);
+    PhysicsBodyComponent pedestalBody{ PhysicsBodyComponent::PhysicsRole::Static };
+    ColliderComponent pedestalCollider{ ColliderComponent::Type::Box };
+    pedestalCollider.halfExtents = glm::vec3{ 0.75f, 1.5f, 0.75f };
+    addComponent<ColliderComponent>(pedestal, pedestalCollider);
+    addComponent<PhysicsBodyComponent>(pedestal, pedestalBody);
+    MeshRenderer::setCubeTextures(pedestalRd->rhandle, { wood });
+    TransformComponent pedestalTransform;
+    pedestalTransform.pos = glm::vec3(0.0f, 1.5f, 0.0f);
+    pedestalTransform.scale = glm::vec3(1.5f, 3.0f, 1.5f);
+    addComponent<TransformComponent>(pedestal, pedestalTransform);
+
+    // Display sphere on pedestal
+    Entity displaySphere = createEntity("Display Sphere");
+    auto displaySphereRd = addComponent<RenderableComponent>(displaySphere, MeshRenderer::createSphere(0.8f, 32, 32));
+    MeshRenderer::setCubeTextures(displaySphereRd->rhandle, { cat });
+    TransformComponent displaySphereTransform;
+    displaySphereTransform.pos = glm::vec3(0.0f, 4.0f, 0.0f);
+    addComponent<TransformComponent>(displaySphere, displaySphereTransform);
+
+    // Physics objects in East Room
+    for (int i = 0; i < 5; i++) {
+        Entity cube = createEntity("Physics Cube " + std::to_string(i));
+        auto rdcomp = addComponent<RenderableComponent>(cube, MeshRenderer::createCube());
+        PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Dynamic };
+        ColliderComponent collider{ ColliderComponent::Type::Box };
+        collider.halfExtents = { 0.5f, 0.5f, 0.5f };
+        addComponent<PhysicsBodyComponent>(cube, body);
+        addComponent<ColliderComponent>(cube, collider);
+        MeshRenderer::setCubeTextures(rdcomp->rhandle, { container, specular });
+        
+        TransformComponent transform;
+        transform.pos = glm::vec3(14.0f, 10.0f + i * 2.0f, -2.0f + i * 0.5f);
+        transform.scale = glm::vec3(1.0f);
+        addComponent<TransformComponent>(cube, transform);
     }
 
-    // Floor
-    Entity floor = createEntity("Floor1");
-    auto floorRd = addComponent<RenderableComponent>(floor, MeshRenderer::Primitive::CUBE);
-    PhysicsBodyComponent body{ PhysicsBodyComponent::PhysicsRole::Static };
-    ColliderComponent collider{ColliderComponent::Type::Box};
-    collider.halfExtents = glm::vec3{ 100.,0.5,100 };
-    addComponent<ColliderComponent>(floor, collider);
-    auto physxCube = addComponent<PhysicsBodyComponent>(floor, body);
-    MeshRenderer::setCubeTextures(floorRd->rhandle, { brickDiffuse, brickNormalMap });
-    TransformComponent floorTransform;
-    floorTransform.pos = glm::vec3(0.0f, -3.0f, 0.0f);
-    floorTransform.scale = glm::vec3(200.0f, 0.5f, 200.0f);
-    addComponent<TransformComponent>(floor, floorTransform);
+    // Physics spheres in West Room
+    for (int i = 0; i < 3; i++) {
+        Entity sphere = createEntity("Physics Sphere " + std::to_string(i));
+        auto sphereRd = addComponent<RenderableComponent>(sphere, MeshRenderer::createSphere(0.6f, 32, 32));
+        PhysicsBodyComponent sphereBody{ PhysicsBodyComponent::PhysicsRole::Dynamic };
+        ColliderComponent sphereCollider{ ColliderComponent::Type::Sphere };
+        sphereCollider.radius = 0.6f;
+        addComponent<ColliderComponent>(sphere, sphereCollider);
+        addComponent<PhysicsBodyComponent>(sphere, sphereBody);
+        MeshRenderer::setCubeTextures(sphereRd->rhandle, { wood });
+        
+        TransformComponent sphereTransform;
+        sphereTransform.pos = glm::vec3(-12.5f, 8.0f + i * 3.0f, i * 1.5f);
+        addComponent<TransformComponent>(sphere, sphereTransform);
+    }
 
-    Entity floor2 = createEntity("Floor2");
-    auto floorRd2 = addComponent<RenderableComponent>(floor2, MeshRenderer::Primitive::CUBE);
-    PhysicsBodyComponent body2{ PhysicsBodyComponent::PhysicsRole::Static };
-    ColliderComponent collider2{ ColliderComponent::Type::Box };
-    collider2.halfExtents = glm::vec3{ 100.,0.5,100 };
-    addComponent<ColliderComponent>(floor2, collider2);
-    auto physxCube2 = addComponent<PhysicsBodyComponent>(floor2, body2);
-    MeshRenderer::setCubeTextures(floorRd->rhandle, { brickDiffuse, brickNormalMap });
-    TransformComponent floorTransform2;
-    floorTransform2.pos = glm::vec3(0.0f, 6.0f, 0.0f);
-    floorTransform2.scale = glm::vec3(200.0f, 0.5f, 200.0f);
-    addComponent<TransformComponent>(floor2, floorTransform2);
-
-	Entity Sphere = createEntity("Sphere");
-	auto sphereRd = addComponent<RenderableComponent>(Sphere, MeshRenderer::createSphere(1.0f, 32, 32));
-	PhysicsBodyComponent sphereBody{ PhysicsBodyComponent::PhysicsRole::Dynamic };
-	ColliderComponent sphereCollider{ ColliderComponent::Type::Sphere };
-	sphereCollider.radius = 1.0f;
-
-	addComponent<ColliderComponent>(Sphere, sphereCollider);
-	auto physxSphere = addComponent<PhysicsBodyComponent>(Sphere, sphereBody);
-	MeshRenderer::setCubeTextures(sphereRd->rhandle, { container, specular });
-	TransformComponent sphereTransform;
-	sphereTransform.pos = glm::vec3(5.0f, 250.0f, 0.0f);
-	addComponent<TransformComponent>(Sphere, sphereTransform);
-
-
-
-
-
-    //load a 3D Model
+    // ========== 3D MODELS ==========
     Entity paleVisitor = createEntity("PaleVisitor");
-
-
     addComponent<RenderableComponent>(paleVisitor, "res/3DModels/paleVisitor/source/PaleVisitor.fbx");
-    auto t = addComponent<TransformComponent>(paleVisitor);
-    t->pos = glm::vec3(-5.0f, 1.0f, 3.0f);
+    auto pvTransform = addComponent<TransformComponent>(paleVisitor);
+    pvTransform->pos = glm::vec3(14.0f, 1.0f, 0.0f);
 
-
-    //load a 3D Model
     Entity knife = createEntity("Knife");
-
-
     addComponent<RenderableComponent>(knife, "res/3DModels/knife/source/Knife_low.fbx");
-    auto transfrom = addComponent<TransformComponent>(knife);
-    transfrom->pos = glm::vec3(-5.0f, 1.0f, 0.0f);
+    auto knifeTransform = addComponent<TransformComponent>(knife);
+    knifeTransform->pos = glm::vec3(-12.5f, 1.5f, 0.0f);
 
+    // ========== LIGHTING ==========
+    // Central room - warm white overhead
+    Entity centralLight = createEntity("Central Room Light");
+    LightComponent centralLightComp;
+    centralLightComp.type = LightComponent::Type::POINT;
+    centralLightComp.ambient = glm::vec3(0.2f, 0.2f, 0.15f);
+    centralLightComp.diffuse = glm::vec3(1.5f, 1.4f, 1.2f);
+    centralLightComp.specular = glm::vec3(1.0f);
+    centralLightComp.data = PointLightData{ 1.0f, 0.045f, 0.0075f };
+    addComponent<LightComponent>(centralLight, centralLightComp);
+    auto centralLightShadow = addComponent<ShadowCasterComponent>(centralLight);
+    TransformComponent centralLightTransform;
+    centralLightTransform.pos = glm::vec3(0.0f, 5.5f, 0.0f);
+    addComponent<TransformComponent>(centralLight, centralLightTransform);
+    auto centralLightSphere = addComponent<RenderableComponent>(centralLight, MeshRenderer::createSphere(0.15f, 8, 8));
 
-    // Point Light 4 - Green (moving)
-    Entity pointLight4 = createEntity("Point Light 4 (Green)");
-    LightComponent light4;
-    light4.type = LightComponent::Type::POINT;
-    light4.ambient = glm::vec3(0.0f, 0.1f, 0.0f);
-    light4.diffuse = glm::vec3(0.0f, 3.0f, 0.0f);
-    light4.specular = glm::vec3(0.0f, 1.5f, 0.0f);
-    light4.data = PointLightData{ 1.0f, 0.07f, 0.017f };
-    addComponent<LightComponent>(pointLight4, light4);
-	auto shadowComp = addComponent<ShadowCasterComponent>(pointLight4);
-    TransformComponent light4Transform;
-    light4Transform.pos = glm::vec3(0.0f, 3.0f, 8.0f);
-    addComponent<TransformComponent>(pointLight4, light4Transform);
-	auto lightSphere = addComponent<RenderableComponent>(pointLight4, MeshRenderer::createSphere(0.2f, 8, 8));
-	lightSphere->localTransform.pos = glm::vec3(0.0f, 2.0f,0.0f);
+    // East room - cool blue light
+    Entity eastLight = createEntity("East Room Light");
+    LightComponent eastLightComp;
+    eastLightComp.type = LightComponent::Type::POINT;
+    eastLightComp.ambient = glm::vec3(0.05f, 0.05f, 0.1f);
+    eastLightComp.diffuse = glm::vec3(0.3f, 0.5f, 1.5f);
+    eastLightComp.specular = glm::vec3(0.5f, 0.7f, 1.0f);
+    eastLightComp.data = PointLightData{ 1.0f, 0.07f, 0.017f };
+    addComponent<LightComponent>(eastLight, eastLightComp);
+    TransformComponent eastLightTransform;
+    eastLightTransform.pos = glm::vec3(14.0f, 5.0f, 0.0f);
+    addComponent<TransformComponent>(eastLight, eastLightTransform);
+    auto eastLightSphere = addComponent<RenderableComponent>(eastLight, MeshRenderer::createSphere(0.15f, 8, 8));
 
+    // West room - warm orange light
+    Entity westLight = createEntity("West Room Light");
+    LightComponent westLightComp;
+    westLightComp.type = LightComponent::Type::POINT;
+    westLightComp.ambient = glm::vec3(0.1f, 0.05f, 0.0f);
+    westLightComp.diffuse = glm::vec3(1.5f, 0.5f, 0.1f);
+    westLightComp.specular = glm::vec3(1.0f, 0.5f, 0.0f);
+    westLightComp.data = PointLightData{ 1.0f, 0.07f, 0.017f };
+    addComponent<LightComponent>(westLight, westLightComp);
+    TransformComponent westLightTransform;
+    westLightTransform.pos = glm::vec3(-12.5f, 5.0f, 0.0f);
+    addComponent<TransformComponent>(westLight, westLightTransform);
+    auto westLightSphere = addComponent<RenderableComponent>(westLight, MeshRenderer::createSphere(0.15f, 8, 8));
 
+    // Accent light - green (moving)
+    Entity accentLight = createEntity("Accent Light (Green)");
+    LightComponent accentLightComp;
+    accentLightComp.type = LightComponent::Type::POINT;
+    accentLightComp.ambient = glm::vec3(0.0f, 0.05f, 0.0f);
+    accentLightComp.diffuse = glm::vec3(0.0f, 2.0f, 0.0f);
+    accentLightComp.specular = glm::vec3(0.0f, 1.0f, 0.0f);
+    accentLightComp.data = PointLightData{ 1.0f, 0.09f, 0.032f };
+    addComponent<LightComponent>(accentLight, accentLightComp);
+    TransformComponent accentLightTransform;
+    accentLightTransform.pos = glm::vec3(0.0f, 3.0f, 0.0f);
+    addComponent<TransformComponent>(accentLight, accentLightTransform);
+    auto accentLightSphere = addComponent<RenderableComponent>(accentLight, MeshRenderer::createSphere(0.12f, 8, 8));
 
-
-    // Point Light 1 - White (center, moving in circle)
-    Entity pointLight1 = createEntity("Point Light 1 (White)");
-    LightComponent light1;
-    light1.type = LightComponent::Type::POINT;
-    light1.ambient = glm::vec3(0.3f);
-    light1.diffuse = glm::vec3(2.0f);  // Brighter!
-    light1.specular = glm::vec3(2.0f);
-    light1.data = PointLightData{ 1.0f, 0.07f, 0.017f };  // Less attenuation
-    addComponent<LightComponent>(pointLight1, light1);
-    TransformComponent light1Transform;
-    light1Transform.pos = glm::vec3(0.0f, 5.0f, 0.0f);
-    addComponent<TransformComponent>(pointLight1, light1Transform);
-
-    // Point Light 2 - Red (moving)
-    Entity pointLight2 = createEntity("Point Light 2 (Red)");
-    LightComponent light2;
-    light2.type = LightComponent::Type::POINT;
-    light2.ambient = glm::vec3(0.1f, 0.0f, 0.0f);
-    light2.diffuse = glm::vec3(3.0f, 0.0f, 0.0f);
-    light2.specular = glm::vec3(1.5f, 0.0f, 0.0f);
-    light2.data = PointLightData{ 1.0f, 0.07f, 0.017f };
-    addComponent<LightComponent>(pointLight2, light2);
-    TransformComponent light2Transform;
-    light2Transform.pos = glm::vec3(-8.0f, 3.0f, 0.0f);
-    addComponent<TransformComponent>(pointLight2, light2Transform);
-
-    // Point Light 3 - Blue (moving)
-    Entity pointLight3 = createEntity("Point Light 3 (Blue)");
-    LightComponent light3;
-    light3.type = LightComponent::Type::POINT;
-    light3.ambient = glm::vec3(0.0f, 0.0f, 0.1f);
-    light3.diffuse = glm::vec3(0.0f, 0.0f, 3.0f);
-    light3.specular = glm::vec3(0.0f, 0.0f, 1.5f);
-    light3.data = PointLightData{ 1.0f, 0.07f, 0.017f };
-    addComponent<LightComponent>(pointLight3, light3);
-    TransformComponent light3Transform;
-    light3Transform.pos = glm::vec3(8.0f, 3.0f, 0.0f);
-    addComponent<TransformComponent>(pointLight3, light3Transform);
-
-   
-
-    // Directional Light - Subtle ambient
+    // Directional light - ambient scene lighting
     Entity dirLight = createEntity("Directional Light");
     LightComponent dirLightComp;
     dirLightComp.type = LightComponent::Type::DIR;
-    dirLightComp.ambient = glm::vec3(0.1f);
-    dirLightComp.diffuse = glm::vec3(0.4f);
-    dirLightComp.specular = glm::vec3(0.5f);
-    //dirLightComp.data = DirLightData{ glm::vec3(-0.2f, -1.0f, -0.3f) };
+    dirLightComp.ambient = glm::vec3(0.15f, 0.15f, 0.2f);
+    dirLightComp.diffuse = glm::vec3(0.1f, 0.1f, 0.1f);
+    dirLightComp.specular = glm::vec3(0.2f);
     addComponent<LightComponent>(dirLight, dirLightComp);
-
 }
 
 void Scene::update(float dt) {
+    // Animate accent light in a circle around central pedestal
+    float time = glfwGetTime();
+    auto lightView = getComponentView<LightComponent>();
 
-    //lights move
-    {
-        float time = glfwGetTime();
+    for (auto [entity, light] : lightView) {
+        if (light->type != LightComponent::Type::POINT) continue;
 
-        // Get light entities
-        auto lightView = getComponentView<LightComponent>();
+        NameComponent* name = getComponent<NameComponent>(entity);
+        if (!name || name->name.find("Accent") == std::string::npos) continue;
 
-        int lightIndex = 0;
-        for (auto [entity, light] : lightView) {
-            if (light->type != LightComponent::Type::POINT) continue;
+        TransformComponent* transform = getComponent<TransformComponent>(entity);
+        if (!transform) continue;
 
-            TransformComponent* transform = getComponent<TransformComponent>(entity);
-            if (!transform) continue;
+        float radius = 5.0f;
+        float speed = 1.2f;
 
-            // Each light moves in a different pattern
-            float radius = 8.0f;
-            float speed = 0.5f;
-            float offset = lightIndex * glm::pi<float>() / 2.0f;  // 90 degree offset each
-
-            transform->pos.x = radius * glm::cos(time * speed + offset);
-            transform->pos.z = radius * glm::sin(time * speed + offset);
-            transform->pos.y = 3.0f + 2.0f * glm::sin(time * speed * 2.0f + offset);
-
-            lightIndex++;
-        }
-
+        transform->pos.x = radius * glm::cos(time * speed);
+        transform->pos.z = radius * glm::sin(time * speed);
+        transform->pos.y = 3.0f + 1.5f * glm::sin(time * speed * 2.0f);
     }
-
-
-
-
-
-
-
-
-
-
-
-// 1 input system
-// 2 simulate physx
-// 3 sync
-// 4 update 3d
 
 	if (Input::isMouseLocked())
 		InputSystem::update(this, dt);
 	PhysicsSystem::update(this, dt);
 	TransformSyncSystem::update(this);
-//	PhysicsStep(world, dt);
-	//PlayerMovementSystem(world, dt);
-	//RenderSystem(world);
 
 	Renderer::update(*this, dt);
 
@@ -315,13 +433,11 @@ void Scene::update(float dt) {
         {
             Transform world = *transform * camComp->localTransform;
             Renderer::setViewProjection(world.getViewMatrix(), cam->getProjection());
-
         }
     }
     else {
         LOG_WARN("No Active CameraComponent or Transform component!!!");
     }
-
 
 	onUpdate();
 }

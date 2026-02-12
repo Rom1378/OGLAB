@@ -88,6 +88,7 @@ namespace LineRenderer {
 
 		glBindVertexArray(VAO);
 		glDrawArrays(GL_LINES, 0, count * 2);
+		Renderer::increaseDrawCallCount();
 		DrawData.clear();
 		count = 0;
 

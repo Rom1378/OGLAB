@@ -180,9 +180,17 @@ void main() {
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
 {
     vec3 lightDir = normalize(-light.direction);
-    float diff = max(dot(normal, lightDir), 0.0);
-    
+
+    //check if normal and lightDir are facing each other
+    float NdotL = dot(normal, lightDir);
+
+    if (NdotL <= 0.0) {
+        return light.ambient * vec3(texture(material.diffuse, TexCoords));
+    }
+
+    float diff = NdotL;
     float spec = 0.0;
+
     if (blinn) {
         vec3 halfwayDir = normalize(lightDir + viewDir);
         spec = pow(max(dot(normal, halfwayDir), 0.0), material.shininess);
@@ -206,7 +214,20 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, int lightIndex)
 {
     vec3 lightDir = normalize(light.position - fragPos);
-    float diff = max(dot(normal, lightDir), 0.0);
+
+    float NdotL = dot(normal, lightDir);
+
+    // Si la face est orientée à l'opposé de la lumière, seulement ambient très faible
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+
+    if (NdotL <= 0.0) {
+        // Pour les faces arrière, seulement un ambient très atténué
+        float distance = length(light.position - fragPos);
+        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+        return ambient * attenuation * 0.1;  // Ambient très faible pour faces arrière
+    }
+    
+    float diff = NdotL;
     
     float spec = 0.0;
     if (blinn) {
@@ -220,7 +241,6 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, i
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
     
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
     
@@ -240,7 +260,18 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, i
 vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, int lightIndex)
 {
     vec3 lightDir = normalize(light.position - fragPos);
-    float diff = max(dot(normal, lightDir), 0.0);
+
+    float NdotL = dot(normal, lightDir);
+
+    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+
+    if (NdotL <= 0.0) {
+        float distance = length(light.position - fragPos);
+        float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+        return ambient * attenuation * 0.1;
+    }
+
+    float diff = NdotL;
     
     float spec = 0.0;
     if (blinn) {
@@ -258,7 +289,7 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, int
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     
-    vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+    ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
     vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
     

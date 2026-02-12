@@ -48,46 +48,44 @@ namespace Renderer {
 		return rdSettings;
 	}
 
+	uint32_t drawCallCount = 0;
+
 
 
 	void init() {
-
 		// Framebuffer init
 		glGenFramebuffers(1, &gFrameBuffer);
-
 		glBindFramebuffer(GL_FRAMEBUFFER, gFrameBuffer);
 
-
-		//color buffer
+		// Color buffer - USE GL_RGBA16F for linear HDR rendering
 		glGenTextures(1, &gTexColorBuffer);
 		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
 
+		// CHANGEMENT CRITIQUE : GL_RGBA16F au lieu de GL_RGBA
 		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGBA, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL
+			GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_FLOAT, NULL
 		);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gTexColorBuffer, 0);
 
 
-		//rbo depth + stencil
+		// RBO depth + stencil
 		glGenRenderbuffers(1, &gRboDepthStencil);
 		glBindRenderbuffer(GL_RENDERBUFFER, gRboDepthStencil);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Window::getFrameBufferWidth(), Window::getFrameBufferHeight());
-
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, gRboDepthStencil);
 
-		// In init() function, add this check:
+		// Check framebuffer completeness
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			// Check specific error
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			// Log status for debugging
 			LOG_ERROR("Framebuffer is not complete! status: ", status);
 		}
 		else {
-			LOG_OK("Created FBO + texture and RBO");
+			LOG_OK("Created FBO + texture (GL_RGBA16F linear) and RBO");
 		}
 
 
@@ -96,11 +94,9 @@ namespace Renderer {
 		MeshRenderer::init();
 		LineRenderer::init();
 		ShadowMapSystem::init();
-
 		PostProcessing::init();
-
 		
-		LOG_OK("Skybox initialized");
+		LOG_OK("Renderer initialized with linear HDR framebuffer");
 	}
 
 	void update(Scene& scene, float dt) {
@@ -117,6 +113,7 @@ namespace Renderer {
 		//shadow 
 		//prerender(scene);
 
+		drawCallCount = 0;
 		glBindFramebuffer(GL_FRAMEBUFFER, gFrameBuffer);
 		clearFBO();
 
@@ -129,13 +126,12 @@ namespace Renderer {
 		LineRenderer::render();
 
 
-
-
 		//draw each pass.
 		// cubepass
 		//modelPass
 		//linePass
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	}
 
 	void postRender(Scene& scene) {
@@ -159,6 +155,10 @@ namespace Renderer {
 
 		// Enable depth testing
 		glEnable(GL_DEPTH_TEST);
+
+		//glEnable(GL_CULL_FACE);
+		//glCullFace(GL_BACK);        // Ne pas rendre les faces arrière
+		//glFrontFace(GL_CCW);
 	}
 
 
@@ -181,9 +181,9 @@ namespace Renderer {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, gFrameBuffer);
 
-		// Resize the texture
+		// Resize the texture - KEEP GL_RGBA16F format
 		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		// Resize the renderbuffer
@@ -215,6 +215,8 @@ namespace Renderer {
 	const glm::mat4& getProjection() { return renderCam.projection; }
 
 
+	uint32_t getDrawCallCount() { return drawCallCount; }
+	void increaseDrawCallCount() { drawCallCount++; }
 
 
 }

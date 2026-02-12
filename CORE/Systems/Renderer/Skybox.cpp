@@ -68,6 +68,7 @@ namespace Skybox {
 
 		glDepthFunc(GL_LESS);
 
+		Renderer::increaseDrawCallCount();
 		}
 
 	void cleanup() {

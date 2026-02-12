@@ -238,12 +238,16 @@ namespace ShadowMapSystem {
 		ShaderProgram* depthShaderCube = &*ShaderManager::getShader("simpleDepthShader");
 		ShaderProgram* depthShader2D = &*ShaderManager::getShader("simpleDepthShader2D");
 
-
-
 		if (!depthShaderCube || !depthShader2D) {
 			LOG_WARN("Shadow shaders not found");
 			return;
 		}
+
+		GLint cullFaceMode;
+		glGetIntegerv(GL_CULL_FACE_MODE, &cullFaceMode);
+
+		glCullFace(GL_FRONT);
+
 
 		for (auto [e, shadowCaster] : shadowCasterView) {
 			ShadowMap* sm = getShadowMap(shadowCaster->shadowMapHandle);
@@ -262,7 +266,6 @@ namespace ShadowMapSystem {
 				continue;
 			}
 			
-
 			glViewport(0, 0, shadowCaster->shadowMapResolution, shadowCaster->shadowMapResolution);
 			glBindFramebuffer(GL_FRAMEBUFFER, sm->depthMapFBO);
 			glClear(GL_DEPTH_BUFFER_BIT);
@@ -294,13 +297,8 @@ namespace ShadowMapSystem {
 				activeShader->setMat4("lightSpaceMatrix", glm::value_ptr(sm->lightSpaces[0]));
 			}
 
-
-
 			//now render scene from light's point of view
-
 			auto renderableComponentsView = scene.getComponentView<RenderableComponent>();
-			glCullFace(GL_FRONT);
-
 
 			for (auto [e, renderableComponent] : renderableComponentsView) {
 				TransformComponent* Etransform = scene.getComponent<TransformComponent>(e);
@@ -320,13 +318,11 @@ namespace ShadowMapSystem {
 				}
 			}
 
-
-			glCullFace(GL_BACK);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 		}
 
-	
+		// RESTAURER l'état du culling original
+		glCullFace(cullFaceMode);
 	}
 
 	//renderers call this to bind shadow maps before rendering

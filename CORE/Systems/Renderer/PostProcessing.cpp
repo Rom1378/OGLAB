@@ -129,6 +129,8 @@ namespace PostProcessing
 
 		glDrawElements(GL_TRIANGLES, MeshRawData::Quad::indices.size(), GL_UNSIGNED_INT, 0);
 
+		Renderer::increaseDrawCallCount();
+
 		//glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 

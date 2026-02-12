@@ -90,8 +90,8 @@ namespace MeshRenderer {
 	}
 
 	RenderableHandle createCube() {
-		if (cubeHandle)
-			return cubeHandle;
+		//if (cubeHandle)
+		//	return cubeHandle; stupid
 
 		RenderableData rd{
 			.meshdatas = { {
@@ -108,8 +108,8 @@ namespace MeshRenderer {
 	}
 
 	RenderableHandle createSphere(float radius, unsigned int sectorCount, unsigned int stackCount) {
-		if (sphereHandle)
-			return sphereHandle;
+		//if (sphereHandle)
+		//	return sphereHandle;
 		RenderableData rd{
 			.meshdatas = {{}	},
 			.material = { Material() },
@@ -374,6 +374,7 @@ namespace MeshRenderer {
 				// Draw mesh
 				glBindVertexArray(mesh.vao);
 				glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
+				Renderer::increaseDrawCallCount();
 				glBindVertexArray(0);
 			}
 		}

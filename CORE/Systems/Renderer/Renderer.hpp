@@ -51,5 +51,8 @@ namespace Renderer {
 	const glm::mat4& getProjection();
 	glm::vec3 getViewPosition();
 	RendererSettings& getRendererSettings();
+
+	uint32_t getDrawCallCount();
+	void increaseDrawCallCount();
 	
 }
