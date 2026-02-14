@@ -61,7 +61,6 @@ namespace Renderer {
 		glGenTextures(1, &gTexColorBuffer);
 		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
 
-		// CHANGEMENT CRITIQUE : GL_RGBA16F au lieu de GL_RGBA
 		glTexImage2D(
 			GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_FLOAT, NULL
 		);

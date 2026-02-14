@@ -43,5 +43,9 @@
   "gammaCorrection": {
     "vertex": "res\\shaders\\gammaCorrection.vert",
     "fragment": "res\\shaders\\gammaCorrection.frag"
+  },
+  "tonemap": {
+    "vertex": "res\\shaders\\tonemap.vert",
+    "fragment": "res\\shaders\\tonemap.frag"
   }
 }

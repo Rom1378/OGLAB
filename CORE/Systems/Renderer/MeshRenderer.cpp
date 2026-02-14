@@ -86,13 +86,12 @@ namespace MeshRenderer {
 			glEnableVertexAttribArray(4);
 
 		}
-
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
 
 	RenderableHandle createCube() {
-		//if (cubeHandle)
-		//	return cubeHandle; stupid
-
 		RenderableData rd{
 			.meshdatas = { {
 					.vertices = MeshRawData::Cube::vertices,
@@ -108,8 +107,6 @@ namespace MeshRenderer {
 	}
 
 	RenderableHandle createSphere(float radius, unsigned int sectorCount, unsigned int stackCount) {
-		//if (sphereHandle)
-		//	return sphereHandle;
 		RenderableData rd{
 			.meshdatas = {{}	},
 			.material = { Material() },
@@ -277,76 +274,89 @@ namespace MeshRenderer {
 			}
 
 			shader->use();
+			
+			// Standard matrix uniforms (commun à tous les meshes)
+			shader->setMat4("model", glm::value_ptr(worldTransform.getModelMatrix()));
+			shader->setMat4("view", glm::value_ptr(Renderer::getView()));
+			shader->setMat4("projection", glm::value_ptr(Renderer::getProjection()));
+			shader->setVec3("viewPos", Renderer::getViewPosition());
+
+			if (!rdSettings.geometryOnlyPass) {
+				
+				if (rdSettings.enableLighting)
+					setLightUniforms(scene, *shader);
+					
+				if (rdSettings.enableShadows && ShadowMapSystem::hasShadowMap()) {
+					ShadowMapSystem::bindShadowMaps(*shader);
+					
+					// Initialize all shadow indices to -1 (no shadow)
+					for (int i = 0; i < MAX_DIR_LIGHTS; i++) {
+						shader->setInt("dirLightShadowIndices[" + std::to_string(i) + "]", -1);
+					}
+					for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
+						shader->setInt("pointLightShadowIndices[" + std::to_string(i) + "]", -1);
+					}
+					for (int i = 0; i < MAX_SPOT_LIGHTS; i++) {
+						shader->setInt("spotLightShadowIndices[" + std::to_string(i) + "]", -1);
+					}
+
+					// Map lights to their shadow maps
+					uint32_t shadowInfoIndex = 0;
+					uint32_t dir2DIndex = 0, point2DIndex = 0, pointCubeIndex = 0, spot2DIndex = 0;
+
+					for (auto [entity, shadowCaster] : shadowView) {
+						auto lightComponent = scene->getComponent<LightComponent>(entity);
+						auto transform = scene->getComponent<TransformComponent>(entity);
+
+						if (lightComponent && transform) {
+							shader->setVec3("shadowLightPositions[" + std::to_string(shadowInfoIndex) + "]", transform->pos);
+
+							// Map light index to shadow map index based on type
+							if (lightComponent->type == LightComponent::Type::DIR) {
+								shader->setInt("dirLightShadowIndices[" + std::to_string(dir2DIndex) + "]", dir2DIndex);
+								dir2DIndex++;
+							}
+							else if (lightComponent->type == LightComponent::Type::POINT) {
+								shader->setFloat("shadowFarPlanes[" + std::to_string(pointCubeIndex) + "]", shadowCaster->far_plane);
+								shader->setInt("pointLightShadowIndices[" + std::to_string(pointCubeIndex) + "]", pointCubeIndex);
+								pointCubeIndex++;
+							}
+							else if (lightComponent->type == LightComponent::Type::SPOT) {
+								shader->setInt("spotLightShadowIndices[" + std::to_string(spot2DIndex) + "]", dir2DIndex + spot2DIndex);
+								spot2DIndex++;
+							}
+
+							shadowInfoIndex++;
+						}
+					}
+				}
+				
+				shader->setBool("useLighting", rdSettings.enableLighting);
+				shader->setBool("blinn", rdSettings.enableBlinn);
+				shader->setBool("useShadow", rdSettings.enableShadows && ShadowMapSystem::hasShadowMap());
+			}
+
+			// Render chaque submesh avec son propre matériau
 			for (uint32_t i = 0; i < rdata.meshdatas.size(); i++) {
 
 				const MeshData& mesh = rdata.meshdatas[i];
 				const Material& material = rdata.material[i];
-				// Standard matrix uniforms
-				shader->setMat4("model", glm::value_ptr(worldTransform.getModelMatrix()));
-				shader->setMat4("view", glm::value_ptr(Renderer::getView()));
-				shader->setMat4("projection", glm::value_ptr(Renderer::getProjection()));
-				shader->setVec3("viewPos", Renderer::getViewPosition());
 
 				if (!rdSettings.geometryOnlyPass) {
-					
-					if (rdSettings.enableLighting)
-						setLightUniforms(scene, *shader);
-						
-					if (rdSettings.enableShadows && ShadowMapSystem::hasShadowMap()) {
-						ShadowMapSystem::bindShadowMaps(*shader);
-						
-						// Initialize all shadow indices to -1 (no shadow)
-						for (int i = 0; i < MAX_DIR_LIGHTS; i++) {
-							shader->setInt("dirLightShadowIndices[" + std::to_string(i) + "]", -1);
-						}
-						for (int i = 0; i < MAX_POINT_LIGHTS; i++) {
-							shader->setInt("pointLightShadowIndices[" + std::to_string(i) + "]", -1);
-						}
-						for (int i = 0; i < MAX_SPOT_LIGHTS; i++) {
-							shader->setInt("spotLightShadowIndices[" + std::to_string(i) + "]", -1);
-						}
-
-						// Map lights to their shadow maps
-						uint32_t shadowInfoIndex = 0;
-						uint32_t dir2DIndex = 0, point2DIndex = 0, pointCubeIndex = 0, spot2DIndex = 0;
-
-						for (auto [entity, shadowCaster] : shadowView) {
-							auto lightComponent = scene->getComponent<LightComponent>(entity);
-							auto transform = scene->getComponent<TransformComponent>(entity);
-
-							if (lightComponent && transform) {
-								shader->setVec3("shadowLightPositions[" + std::to_string(shadowInfoIndex) + "]", transform->pos);
-
-								// Map light index to shadow map index based on type
-								if (lightComponent->type == LightComponent::Type::DIR) {
-									shader->setInt("dirLightShadowIndices[" + std::to_string(dir2DIndex) + "]", dir2DIndex);
-									dir2DIndex++;
-								}
-								else if (lightComponent->type == LightComponent::Type::POINT) {
-									shader->setFloat("shadowFarPlanes[" + std::to_string(pointCubeIndex) + "]", shadowCaster->far_plane);
-									shader->setInt("pointLightShadowIndices[" + std::to_string(pointCubeIndex) + "]", pointCubeIndex);
-									pointCubeIndex++;
-								}
-								else if (lightComponent->type == LightComponent::Type::SPOT) {
-									shader->setInt("spotLightShadowIndices[" + std::to_string(spot2DIndex) + "]", dir2DIndex + spot2DIndex);
-									spot2DIndex++;
-								}
-
-								shadowInfoIndex++;
-							}
-						}
-					}
-					
-					shader->setBool("useLighting", rdSettings.enableLighting);
-					shader->setBool("blinn", rdSettings.enableBlinn);
-					shader->setBool("useShadow", rdSettings.enableShadows && ShadowMapSystem::hasShadowMap());
-
 					// Material properties
 					shader->setVec3("objectColor", material.color.x, material.color.y, material.color.z);
 					shader->setBool("useTexture", !material.textures.empty());
 					shader->setFloat("material.shininess", material.shininess);
 
-					// Bind material textures - IMPORTANT: Use units 0, 1, 2 (NOT 3+)
+					for (int unit = 0; unit < 3; unit++) {
+						glActiveTexture(GL_TEXTURE0 + unit);
+						glBindTexture(GL_TEXTURE_2D, 0);
+					}
+
+					bool hasDiffuse = false;
+					bool hasSpecular = false;
+					bool hasNormal = false;
+
 					for (const Texture& texture : material.textures) {
 						switch (texture.type)
 						{
@@ -354,32 +364,45 @@ namespace MeshRenderer {
 							glActiveTexture(GL_TEXTURE0);
 							glBindTexture(GL_TEXTURE_2D, texture.id);
 							shader->setInt("material.diffuse", 0);
+							hasDiffuse = true;
 							break;
 						case Texture::Type::SPECULAR:
 							glActiveTexture(GL_TEXTURE1);
 							glBindTexture(GL_TEXTURE_2D, texture.id);
 							shader->setInt("material.specular", 1);
+							hasSpecular = true;
 							break;
 						case Texture::Type::NORMAL:
 							glActiveTexture(GL_TEXTURE2);
 							glBindTexture(GL_TEXTURE_2D, texture.id);
 							shader->setInt("material.normal", 2);
+							hasNormal = true;
 							break;
 						default:
 							break;
 						}
 					}
+
+					shader->setBool("hasDiffuseMap", hasDiffuse);
+					shader->setBool("hasSpecularMap", hasSpecular);
+					shader->setBool("hasNormalMap", hasNormal);
 				}
 
 				// Draw mesh
 				glBindVertexArray(mesh.vao);
 				glDrawElements(GL_TRIANGLES, mesh.indices.size(), GL_UNSIGNED_INT, 0);
 				Renderer::increaseDrawCallCount();
-				glBindVertexArray(0);
 			}
+			
+			for (int unit = 0; unit < 3; unit++) {
+				glActiveTexture(GL_TEXTURE0 + unit);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+			
+			glBindVertexArray(0);
 		}
 		
-		// Reset to default texture unit
+
 		glActiveTexture(GL_TEXTURE0);
 	}
 	
