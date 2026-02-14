@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
@@ -102,21 +104,24 @@ if(TARGET unofficial::omniverse-physx-sdk::gpu-library)
     endif()
 
 
+
 if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
 
-    # option 1: put the following command before the creation of the first
-    #           compiled target you want to apply the option to;
-    #           this applies to targets created in this dir and subdirectories
-    #add_link_option($<$<CONFIG:Debug>:/INCREMENTAL>)
-    #add_compile_option($<$<CONFIG:Debug>:/ZI>)
-
-    # option 2: apply the option on a per-target basis
+    target_compile_options(${PROJECT_NAME} PRIVATE /MP)
     target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
-    target_compile_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/ZI>)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 
+    # Suppress specific warnings if needed
+    # target_compile_options(${PROJECT_NAME} PRIVATE /wd4201 /wd4100)
 
-    # Disable warnings from PhysX headers (MSVC 2019+)
+endif()
 
-
+# Enable warnings for GCC/Clang
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(${PROJECT_NAME} PRIVATE 
+        -Wall -Wextra -Wpedantic
+        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Release>:-O3>
+    )
 endif()
 
