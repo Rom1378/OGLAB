@@ -8,7 +8,7 @@ class Scene;
 
 namespace Skybox {
 	
-	constexpr GLuint INVALID_HANDLE = -1;
+	constexpr GLuint INVALID_HANDLE = UINT_MAX;
 	struct skyboxHandle {
 		skyboxHandle(GLuint handle) : id{ handle } {}
 		bool isValid() const { return id != INVALID_HANDLE; }

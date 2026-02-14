@@ -107,7 +107,7 @@ if(TARGET unofficial::omniverse-physx-sdk::gpu-library)
 
 if (MSVC AND WIN32 AND NOT MSVC_VERSION VERSION_LESS 142)
 
-    target_compile_options(${PROJECT_NAME} PRIVATE /MP)
+    target_compile_options(${PROJECT_NAME} PRIVATE /MP /EHsc)
     target_link_options(${PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:/INCREMENTAL>)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 

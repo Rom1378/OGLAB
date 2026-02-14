@@ -12,7 +12,9 @@
 
 #include <cstdint>
 
-
+//color attachement defines
+constexpr uint32_t MAIN_COLOR_ATTACHMENT = GL_COLOR_ATTACHMENT0;
+constexpr uint32_t BRIGHTNESS_THRESHOLD_ATTACHMENT = GL_COLOR_ATTACHMENT1;
 
 class Scene;
 class ShaderProgram;
@@ -35,7 +37,7 @@ namespace Renderer {
 
 	void prerender(Scene* scene);
 	void render(Scene* scene);
-	void postRender(Scene& scene);
+	void postRender();
 
 
 	void rescale_framebuffer(float width, float height);
@@ -45,6 +47,9 @@ namespace Renderer {
 	GLuint getMainFBO();
 	GLuint getMainRBO();
 	GLuint getColorTextureBuffer();
+	GLuint getBrightnessTextureBuffer();
+	GLuint getPostProcessedFBO();
+	GLuint getPostProcessedTexture();
 
 	void setViewProjection(const glm::mat4& view, const glm::mat4& proj);
 	const glm::mat4& getView();

@@ -36,8 +36,8 @@ namespace Window
 	void rescale_framebuffer(float width, float height);
 	GLuint getFramebufferTexture();
 	WindowProps const* getWindowProps();
-	float getFrameBufferWidth();
-	float getFrameBufferHeight();
+	uint32_t getFrameBufferWidth();
+	uint32_t getFrameBufferHeight();
 	bool getViewPortChanged();
 
 	void drawImGuiInterface();

@@ -21,6 +21,8 @@
 #include "CORE/Shader.hpp"
 #include "CORE/ShaderProgram.hpp"
 
+#include "PostProcessing.hpp"
+
 
 namespace MeshRenderer {
 
@@ -286,6 +288,10 @@ namespace MeshRenderer {
 				if (rdSettings.enableLighting)
 					setLightUniforms(scene, *shader);
 					
+
+				shader->setFloat("threshold", PostProcessing::getBloomThreshold());
+
+
 				if (rdSettings.enableShadows && ShadowMapSystem::hasShadowMap()) {
 					ShadowMapSystem::bindShadowMaps(*shader);
 					

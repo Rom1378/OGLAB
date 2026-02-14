@@ -41,6 +41,37 @@ namespace UI {
 		}
 		
 		ImGui::Spacing();
+		ImGui::SeparatorText("Bloom");
+
+		float bloomThreshold = PostProcessing::getBloomThreshold();
+		if (ImGui::SliderFloat("Threshold", &bloomThreshold, 0.0f, 2.0f, "%.2f")) {
+			PostProcessing::setBloomThreshold(bloomThreshold);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reset##threshold")) {
+			PostProcessing::setBloomThreshold(0.5f);
+		}
+
+		float bloomIntensity = PostProcessing::getBloomIntensity();
+		if (ImGui::SliderFloat("Intensity", &bloomIntensity, 0.0f, 3.0f, "%.2f")) {
+			PostProcessing::setBloomIntensity(bloomIntensity);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reset##intensity")) {
+			PostProcessing::setBloomIntensity(1.0f);
+		}
+
+		int bloomBlurPasses = PostProcessing::getBloomBlurPasses();
+		if (ImGui::SliderInt("Blur Passes", &bloomBlurPasses, 1, 20)) {
+			PostProcessing::setBloomBlurPasses(bloomBlurPasses);
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Reset##passes")) {
+			PostProcessing::setBloomBlurPasses(10);
+		}
+
+		ImGui::Spacing();
+
 		ImGui::TextDisabled("HDR renders in linear space (GL_RGBA16F)");
 		ImGui::TextDisabled("Tone mapping converts HDR to LDR (0-1)");
 		ImGui::TextDisabled("Gamma corrects for monitor display");

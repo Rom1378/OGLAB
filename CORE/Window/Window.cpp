@@ -20,8 +20,8 @@ namespace Window
 
 		float frameBufferX;
 		float frameBufferY;
-		float frameBufferWidth;
-		float frameBufferHeight;
+		float frameBufferWidth = 300;
+		float frameBufferHeight= 300;
 
 		const uint32_t sizeArrayFps = 20;
 		float lastFPS[sizeArrayFps];
@@ -255,7 +255,7 @@ namespace Window
 	}
 	void rescale_framebuffer(float width, float height)
 	{
-		Renderer::rescale_framebuffer(width, height);
+		Renderer::rescale_framebuffer(static_cast<GLsizei>(width), static_cast<GLsizei>(height));
 		Internal::frameBufferWidth = width;
 		Internal::frameBufferHeight = height;
 		/*
@@ -298,12 +298,12 @@ namespace Window
 		return &Internal::m_props;
 	}
 
-	float getFrameBufferWidth()
+	uint32_t getFrameBufferWidth()
 	{
 		return Internal::frameBufferWidth;
 	}
 
-	float getFrameBufferHeight()
+	uint32_t getFrameBufferHeight()
 	{
 		return Internal::frameBufferHeight;
 	}
@@ -414,9 +414,9 @@ namespace Window
 
 		// Display the OpenGL scene
 		ImVec2 availSize = ImGui::GetContentRegionAvail();
-		ImGui::Image((ImTextureID)(intptr_t)Renderer::getColorTextureBuffer(), availSize, ImVec2(0, 1), ImVec2(1, 0));
-
+		ImGui::Image((ImTextureID)(intptr_t)Renderer::getPostProcessedTexture(), availSize, ImVec2(0, 1), ImVec2(1, 0));
 		ImGui::End();
+
 
 		//show 10 openl gl textues in a grid with a contrast slider for eact images
 

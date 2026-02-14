@@ -17,23 +17,17 @@
 #include "ShadowMap.hpp"
 
 
-class frameBuffer {
-
-	static void init() {
-
-	}
-
-	static void rescale(float width, float height) {
-	}
-};
-
 namespace Renderer {
-	GLuint gFrameBuffer = {};
+
+	GLuint gFrameBuffer = {}, gPostProcessedFBO = {};
+	GLuint gColorBrightnessThresholdBuffer = 0;
+	GLuint gPostProcessedTexture = {};
+
 	GLuint gTexColorBuffer = {};
 	GLuint gRboDepthStencil = {};
 
 
-	struct RenderCamera {	
+	struct RenderCamera {
 		glm::mat4 projection{};
 		glm::mat4 view{};
 	} renderCam;
@@ -59,17 +53,24 @@ namespace Renderer {
 
 		// Color buffer - USE GL_RGBA16F for linear HDR rendering
 		glGenTextures(1, &gTexColorBuffer);
-		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
+		glGenTextures(1, &gColorBrightnessThresholdBuffer);
 
-		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_FLOAT, NULL
-		);
+		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, MAIN_COLOR_ATTACHMENT, GL_TEXTURE_2D, gTexColorBuffer, 0);
 
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gTexColorBuffer, 0);
+
+		glBindTexture(GL_TEXTURE_2D, gColorBrightnessThresholdBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, BRIGHTNESS_THRESHOLD_ATTACHMENT, GL_TEXTURE_2D, gColorBrightnessThresholdBuffer, 0);
 
 
 		// RBO depth + stencil
@@ -77,6 +78,15 @@ namespace Renderer {
 		glBindRenderbuffer(GL_RENDERBUFFER, gRboDepthStencil);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Window::getFrameBufferWidth(), Window::getFrameBufferHeight());
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, gRboDepthStencil);
+
+
+
+		unsigned int attachments[2] = { MAIN_COLOR_ATTACHMENT, BRIGHTNESS_THRESHOLD_ATTACHMENT };
+		glDrawBuffers(2, attachments);
+
+
+	
+
 
 		// Check framebuffer completeness
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -88,13 +98,30 @@ namespace Renderer {
 		}
 
 
+		glGenFramebuffers(1, &gPostProcessedFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, gPostProcessedFBO);
+
+		glGenTextures(1, &gPostProcessedTexture);
+		glBindTexture(GL_TEXTURE_2D, gPostProcessedTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, Window::getFrameBufferWidth(), Window::getFrameBufferHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gPostProcessedTexture, 0);
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			LOG_ERROR("Post-processed framebuffer is not complete!");
+		}
+
+
 
 		Skybox::init();
 		MeshRenderer::init();
 		LineRenderer::init();
 		ShadowMapSystem::init();
 		PostProcessing::init();
-		
+
 		LOG_OK("Renderer initialized with linear HDR framebuffer");
 	}
 
@@ -133,7 +160,7 @@ namespace Renderer {
 
 	}
 
-	void postRender(Scene& scene) {
+	void postRender() {
 		PostProcessing::renderPass();
 	}
 
@@ -180,15 +207,25 @@ namespace Renderer {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, gFrameBuffer);
 
-		// Resize the texture - KEEP GL_RGBA16F format
+		// Resize the main color texture - KEEP GL_RGBA16F format
 		glBindTexture(GL_TEXTURE_2D, gTexColorBuffer);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
+		// Resize the brightness threshold texture
+		glBindTexture(GL_TEXTURE_2D, gColorBrightnessThresholdBuffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		// Resize the renderbuffer
 		glBindRenderbuffer(GL_RENDERBUFFER, gRboDepthStencil);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
 		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+		// Resize post-processed texture
+		glBindTexture(GL_TEXTURE_2D, gPostProcessedTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glBindTexture(GL_TEXTURE_2D, 0);
+
 
 		// Check framebuffer completeness
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -197,12 +234,18 @@ namespace Renderer {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+		PostProcessing::rescale(width, height);
 	}
 
 
 	GLuint getMainFBO() { return gFrameBuffer; }
 	GLuint getMainRBO() { return gRboDepthStencil; }
 	GLuint getColorTextureBuffer() { return gTexColorBuffer; }
+
+	GLuint getPostProcessedFBO() { return gPostProcessedFBO; }
+	GLuint getPostProcessedTexture() { return gPostProcessedTexture; }
+
+	GLuint getBrightnessTextureBuffer() { return gColorBrightnessThresholdBuffer; }
 
 
 	void setViewProjection(const glm::mat4& view, const glm::mat4& proj) {

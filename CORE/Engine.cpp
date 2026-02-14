@@ -42,7 +42,6 @@ namespace Engine {
 
 	void init() {
 	//	registerPrefabs();
-
 		Window::WindowProps props;
 		props.title = "CLC";
 		props.width = 1280;
@@ -59,9 +58,6 @@ namespace Engine {
 		Renderer::init();
 
 		UI::init();
-		//LightManager::init();
-
-		//LineRenderer::init();
 
 		Window::setVSync(1);
 
@@ -91,33 +87,7 @@ namespace Engine {
 
 	}
 
-	void renderFrame(Scene* scene, LightManager::ShadowMapper* shadowMapper) {
-		// 1. Shadow Pass
-		//shadowMapper->renderShadowPass(scene, LightManager::getLights()[0]);
-
-		// 2. Main Pass
-		//Window::bind_framebuffer();
-		Window::update_viewport();
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//3. physx debug pass
-
-
-		// Bind shadow map to shader
-		//auto mainShader = ShaderManager::getShader("standard");
-		//mainShader->use();
-		//mainShader->setInt("shadowMap", 1);
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, shadowMapper->getDepthMapTexture());
-		//mainShader->setMat4("lightSpaceMatrix", shadowMapper->getLightSpaceMatrix());
-
-	}
-
 	void renderUI(Scene* scene) {
-
-		// Render UI
-		//scene->onImGuiRender();
-			
 		UI::render(scene);
 
 		// Render ImGui
@@ -129,7 +99,7 @@ namespace Engine {
 		//std::cout << "nothing rendering right now"<< std::endl;
 		Renderer::prerender(scene);
 		Renderer::render(scene);
-		Renderer::postRender(*scene);
+		Renderer::postRender();
 
 		}
 	bool isRunning() { return m_isRunning; }

@@ -47,5 +47,9 @@
   "tonemap": {
     "vertex": "res\\shaders\\tonemap.vert",
     "fragment": "res\\shaders\\tonemap.frag"
+  },
+  "blur": {
+    "vertex": "res\\shaders\\tonemap.vert",
+    "fragment": "res\\shaders\\blur.frag"
   }
 }

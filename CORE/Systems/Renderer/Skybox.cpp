@@ -39,8 +39,11 @@ namespace Skybox {
 		
 		GLuint skyTexture = static_cast<GLuint>(TextureManager::loadCubemap(faces, "skybox")->id);
 		
-		if (!cubeMapShader)
+		if (!cubeMapShader) {
 			LOG_ERROR("cubeMapShader is null");
+			return skyboxHandle{ INVALID_HANDLE };
+
+		}
 		cubeMapShader->use();
 		cubeMapShader->setInt("skybox", 0);
 		return skyboxHandle{ skyTexture};
@@ -51,8 +54,10 @@ namespace Skybox {
 		glDepthFunc(GL_LEQUAL);
 		//glDepthMask(GL_FALSE);   // Disable depth writinkg
 
-		if (!cubeMapShader)
+		if (!cubeMapShader) {
 			LOG_ERROR("cubeMapShader is null");
+			return;
+		}
 		
 		cubeMapShader->use();
 		cubeMapShader->setMat4("view", glm::value_ptr(glm::mat4(glm::mat3(Renderer::getView()))));

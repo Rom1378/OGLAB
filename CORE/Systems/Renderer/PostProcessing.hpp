@@ -11,5 +11,14 @@ namespace PostProcessing {
 	
 	float getGamma();
 	void setGamma(float gamma);
-	
+
+	float getBloomThreshold();
+	void setBloomThreshold(float threshold);
+
+	float getBloomIntensity();
+	void setBloomIntensity(float intensity);
+	int getBloomBlurPasses();
+	void setBloomBlurPasses(int passes);
+
+	void rescale(float width, float height);
 }

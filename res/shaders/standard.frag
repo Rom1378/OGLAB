@@ -1,5 +1,7 @@
 #version 460 core
-out vec4 FragColor;
+//out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
 
 struct Material {
     sampler2D diffuse;
@@ -69,6 +71,8 @@ uniform bool useTexture;
 uniform bool useLighting;
 uniform bool useShadow;
 uniform bool blinn;
+
+uniform float threshold;
 
 // Shadow maps
 uniform sampler2D shadowMaps2D[MAX_SHADOW_MAPS];
@@ -150,6 +154,16 @@ void main() {
     }
 
     FragColor = vec4(result, 1.0);
+
+
+    // bloom
+    float brightness = dot(FragColor.rgb, vec3(0.2126, 0.7152, 0.0722));
+    
+    // Threshold of 0.5
+    if(brightness > threshold)
+        BrightColor = vec4(FragColor.rgb, 1.0);
+    else
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir, int lightIndex)
